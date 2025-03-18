@@ -12,7 +12,7 @@ const activeTab = ref(1);
     <h1 class="text-slate-100 mb-10 text-md">
       Welcome to
       <span class="text-yellow-400"> Qi Card</span>
-      live tasks demo!
+      tasks demo!
     </h1>
 
     <!-- Tab Navigation -->
