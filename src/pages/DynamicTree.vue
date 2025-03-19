@@ -21,7 +21,7 @@ const fetchData = async (page: number, label: string = "") => {
   try {
     isLoading.value = true;
     const data = await APIService.request({
-      endpoint: API_ENDPOINTS.testAllTreeNode,
+      endpoint: API_ENDPOINTS.getAllNodeWithoutChildren,
       method: "GET",
       pathParams: `?page=${page}&limit=${
         pageSize.value

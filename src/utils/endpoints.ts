@@ -5,7 +5,7 @@
 
 enum API_ENDPOINTS {
   getAllTreeNode = "/mock-api/dynamic-tree",
-  testAllTreeNode="/mock-api/departments"
+  getAllNodeWithoutChildren="/mock-api/departments"
 }
 
 
