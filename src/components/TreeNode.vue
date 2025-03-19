@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { defineProps } from "vue";
-import { ref } from "vue";
+import { defineProps, defineEmits, ref } from "vue";
+import { preprocessNodeID } from "../utils/helpers.ts";
 import { APIService } from "../services/ApiService.ts";
 import API_ENDPOINTS from "../utils/endpoints.ts";
-import { preprocessNodeID } from "../utils/helpers.ts";
 
 const props = defineProps({
   node: {
     type: Object,
     required: true,
+  },
+  visible: {
+    type: Boolean,
+    default: true, // Default value for visible
   },
 });
 
@@ -17,40 +20,28 @@ const isLoading = ref(false);
 // Function to handle toggling a node
 const toggleNode = async (node: any) => {
   if (!node.isOpen) {
-    // If the node is not already open, we fetch the node details and children
     try {
-      isLoading.value = true; // Set loading to true before the request
+      isLoading.value = true;
 
-      // Fetch node details (can include children data if available)
       const data = await APIService.request({
         endpoint: `${API_ENDPOINTS.getAllTreeNode}/${preprocessNodeID(node.id)}`,
         method: "GET",
         setLoading: (loading: boolean) => (isLoading.value = loading),
         setterFunction: (data: any) => {
-          // Instead of reassigning the node, we directly mutate its properties
           node.children = data.children || [];
-          node.isOpen = true; // Open the node after fetching details
+          node.isOpen = true;
         },
       });
 
-      console.log("Fetched node data:", data);
-
-      // If there are no children, set the children as empty
-      if (!node.children) {
-        node.children = [];
-      }
-
-      // If node has children, fetch the children dynamically
       if (node.children && node.children.length === 0) {
         await fetchChildren(node);
       }
     } catch (error) {
       console.error("Error fetching node details:", error);
     } finally {
-      isLoading.value = false; // Set loading to false after the request completes
+      isLoading.value = false;
     }
   } else {
-    // If the node is already open, just toggle the state
     node.isOpen = !node.isOpen;
   }
 };
@@ -58,28 +49,25 @@ const toggleNode = async (node: any) => {
 // Function to fetch children dynamically
 const fetchChildren = async (node: any) => {
   try {
-    isLoading.value = true; // Set loading to true before fetching children
+    isLoading.value = true;
     const childrenData = await APIService.request({
-      endpoint: `${API_ENDPOINTS.getAllTreeNode}/${preprocessNodeID(node.id)}`, // Assuming an endpoint for fetching children
+      endpoint: `${API_ENDPOINTS.getAllTreeNode}/${preprocessNodeID(node.id)}`,
       method: "GET",
       setLoading: (loading: boolean) => (isLoading.value = loading),
       setterFunction: (data: any) => {
-        node.children = data; // Assign fetched children to the node
+        node.children = data;
       },
     });
-
-    console.log("Fetched children data:", childrenData);
   } catch (error) {
     console.error("Error fetching children data:", error);
   } finally {
-    isLoading.value = false; // Set loading to false after the request completes
+    isLoading.value = false;
   }
 };
 </script>
 
-
 <template>
-  <div>
+  <div v-if="visible"> <!-- Only render if visible is true -->
     <!-- Show toggle and fetch node details on click -->
     <div class="flex items-center cursor-pointer mb-3">
       <span @click="toggleNode(node)" class="mr-2">
@@ -133,6 +121,7 @@ const fetchChildren = async (node: any) => {
         v-for="(child, idx) in node.children"
         :key="child.id"
         :node="child"
+        :visible="child.visible" 
       />
     </div>
   </div>
