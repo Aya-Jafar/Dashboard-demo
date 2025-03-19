@@ -2,38 +2,38 @@
 import { ref, onMounted, watch } from "vue";
 import Button from "../components/Button.vue";
 import TreeNode from "../components/TreeNode.vue";
-import CreateRootModal from "../components/CreateRootModal.vue";
-import NodeDetailsModal from "../components/NodeDetailsModal.vue"; // For showing node details
+import CreateNodeModal from "../components/CreateNodeModal.vue"; // Modal for creating new nodes
 import { useDynamicTreeStore } from "../stores/dyanmicTree.ts";
+import NodeDetailsModal from "../components/NodeDetailsModal.vue";
 
 // Use the store
 const nodeStore = useDynamicTreeStore();
 
 // Modal visibility states
-const isCreateModalVisible = ref(false); // For "Create New" modal
-const isDetailsModalVisible = ref(false); // For "Node Details" modal
+const isCreateNodeModalVisible = ref(false); // For "Create New Node" modal
+const selectedParentId = ref<string | null>(null); // Store the parent ID for the new node
 
-// Selected node data for the details modal
-const selectedNode = ref(null);
-
-// Function to show node details in the modal
-const showNodeDetails = (node:any) => {
-  selectedNode.value = node; // Set the selected node data
-  isDetailsModalVisible.value = true; // Show the details modal
+// Function to handle creating a new node
+const handleCreateNode = (parentId: string | null) => {
+  selectedParentId.value = parentId; // Set the parent ID
+  isCreateNodeModalVisible.value = true; // Show the modal
 };
 
-// Function to show the "Create New" modal
-const showCreateModal = () => {
-  isCreateModalVisible.value = true;
-};
+// const handleCreateRootNode = (parentId: string | null) => {
+//   selectedParentId.value = parentId; // Set the parent ID
+//   isCreateNodeModalVisible.value = true; // Show the modal
+// };
 
 // Watch for changes in the search label and trigger search
-watch(() => nodeStore.searchLabel, (newLabel) => {
-  nodeStore.currentPage = 1; // Reset to first page on new search
-  nodeStore.fetchData(nodeStore.currentPage, newLabel).then(() => {
-    nodeStore.toggleNodesBySearch(newLabel); // Open or close nodes based on the search label
-  });
-});
+watch(
+  () => nodeStore.searchLabel,
+  (newLabel) => {
+    nodeStore.currentPage = 1; // Reset to first page on new search
+    nodeStore.fetchData(nodeStore.currentPage, newLabel).then(() => {
+      nodeStore.toggleNodesBySearch(newLabel); // Open or close nodes based on the search label
+    });
+  }
+);
 
 // Fetch data when component is mounted
 onMounted(() => {
@@ -55,10 +55,20 @@ const goToPreviousPage = () => {
     nodeStore.fetchData(nodeStore.currentPage, nodeStore.searchLabel);
   }
 };
+// Modal visibility state
+const isDetailsModalVisible = ref(false);
+
+// Selected node data for the modal
+const selectedNode = ref(null);
+
+const showNodeDetails = (node: any) => {
+  selectedNode.value = node; // Set the selected node data
+  isDetailsModalVisible.value = true; // Show the modal
+};
 </script>
 
 <template>
-  <div :class="{ 'blur-sm': isCreateModalVisible || isDetailsModalVisible }">
+  <div :class="{ 'blur-sm': isCreateNodeModalVisible || isDetailsModalVisible}">
     <!-- Search and New Button -->
     <div class="flex justify-between items-end mb-10 py-4">
       <input
@@ -69,7 +79,7 @@ const goToPreviousPage = () => {
       />
       <Button
         :loading="nodeStore.isLoading"
-        :action="showCreateModal"
+        :action="() => handleCreateNode(null)"
         class="w-25 border hover:bg-yellow-500"
       >
         New
@@ -98,7 +108,8 @@ const goToPreviousPage = () => {
           :node="node"
           :visible="node.visible"
           @toggle="nodeStore.toggleNodeVisibility(node.id)"
-          @show-details="showNodeDetails" 
+          @show-details="showNodeDetails"
+          @create-node="handleCreateNode"
         />
       </div>
 
@@ -125,15 +136,15 @@ const goToPreviousPage = () => {
     </div>
   </div>
 
-  <!-- Create New Modal -->
-  <CreateRootModal
-    v-if="isCreateModalVisible"
-    @close="isCreateModalVisible = false"
+  <!-- Create Node Modal -->
+  <CreateNodeModal
+    v-if="isCreateNodeModalVisible && selectedParentId !== undefined"
+    :parentId="selectedParentId"
+    @close="isCreateNodeModalVisible = false"
+    @submit="nodeStore.addNode"
   />
-
-  <!-- Node Details Modal -->
   <NodeDetailsModal
-    v-if="isDetailsModalVisible && selectedNode !== null"
+    v-if="isDetailsModalVisible && selectedNode != null"
     :nodeData="selectedNode"
     @close="isDetailsModalVisible = false"
   />

@@ -1,30 +1,26 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
-import { useDynamicTreeStore } from "../stores/dyanmicTree.ts";
-
 
 const props = defineProps({
   parentId: {
-    type: String,
-    required: true,
+    type: String || null,
     default: null,
   },
 });
 
-// Use the store
-const nodeStore = useDynamicTreeStore();
+const emit = defineEmits(["close", "submit"]);
 
-// New node label input
 const newNodeLabel = ref("");
-
-// Emit events to close the modal
-const emit = defineEmits(["close"]);
 
 // Handle form submission
 const handleSubmit = () => {
   if (newNodeLabel.value.trim()) {
-    // TODO: 
-    // nodeStore.addNode(newNodeLabel.value);
+    const newNode = {
+      label: newNodeLabel.value,
+      id: `node-${Date.now()}`, // Generate a unique ID
+      parentId: props.parentId, // Include the parent ID
+    };
+    emit("submit", newNode); // Emit the new node data
     newNodeLabel.value = ""; // Clear the input
     emit("close"); // Close the modal
   }
@@ -58,8 +54,12 @@ onUnmounted(() => {
   <div
     class="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50"
   >
-    <div ref="modalRef" class="bg-gray-800 rounded-lg p-6 w-96">
-      <h2 class="text-xl font-semibold mb-4 text-white">Add New Node</h2>
+    <div class="bg-gray-800 rounded-lg p-6 w-96" ref="modalRef" >
+      <h2 class="text-xl font-semibold mb-4 text-white">
+        Create New Department
+      </h2>
+
+      <!-- Form for Creating a New Node -->
       <form @submit.prevent="handleSubmit">
         <input
           v-model="newNodeLabel"
@@ -79,7 +79,7 @@ onUnmounted(() => {
             type="submit"
             class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
           >
-            Add
+            Create
           </button>
         </div>
       </form>
@@ -87,4 +87,6 @@ onUnmounted(() => {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+/* Add any additional styles here */
+</style>

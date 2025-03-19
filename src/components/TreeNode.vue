@@ -14,7 +14,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["show-details"]); // Emit event to show node details
+const emit = defineEmits(["show-details", "create-node"]); // Add create-node event
 
 const isLoading = ref(false);
 const hasChildren = ref<boolean>(true);
@@ -71,6 +71,11 @@ const fetchChildren = async (node: any) => {
 const showDetails = () => {
   emit("show-details", props.node); // Emit the node data to the parent
 };
+
+// Function to handle creating a new node
+const createNode = () => {
+  emit("create-node", props.node.id); // Emit the parent node's ID
+};
 </script>
 
 <template>
@@ -113,32 +118,56 @@ const showDetails = () => {
         <span class="font-medium text-gray-100">{{ node.label }}</span>
       </div>
 
-      <!-- Button to show node details -->
-      <button
-        @click.stop="showDetails"
-        class="px-2 py-1 text-white rounded hover:bg-[#F2CE00] focus:outline-none"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
+      <!-- Buttons for Details and Create New Node -->
+      <div class="flex items-center space-x-2">
+        <!-- Eye Icon Button for Details -->
+        <button
+          @click.stop="showDetails"
+          class="px-2 py-1 text-white rounded hover:bg-[#F2CE00] focus:outline-none"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-          />
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"
-          />
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"
+            />
+          </svg>
+        </button>
+
+        <!-- Plus Icon Button for Creating New Node -->
+        <button
+          @click.stop="createNode"
+          class="px-2 py-1 text-white rounded hover:bg-[#F2CE00] focus:outline-none"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+        </button>
+      </div>
     </div>
 
     <!-- Children -->
@@ -155,6 +184,7 @@ const showDetails = () => {
         :node="child"
         :visible="child.visible"
         @show-details="emit('show-details', $event)"
+        @create-node="emit('create-node', $event)" 
       />
     </div>
   </div>
