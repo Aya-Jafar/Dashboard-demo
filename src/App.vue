@@ -21,24 +21,14 @@ watch(
 
 <template>
   <div class="min-h-screen bg-gray-900 p-8 text-gray-100 font-sans">
-    <div class="flex justify-end items-center">
+    <div class="flex justify-between items-center mb-15">
+      <div class="flex gap-3 items-center">
+        <img src="/src/assets/Qi Card PNG.png" alt="logo" class="w-20 h-20" />
+        <p class="text-4xl font-bold">{{$t("title")}}</p>
+      </div>
       <LangougeToggle class="mb-5 flex justify-end items-center" />
     </div>
 
-    <div class="flex items-center mb-15">
-      <h1 class="text-3xl font-bold">
-        {{ $t("welcome_to") }}
-        <!-- <img src="./Qi Card PNG.png" alt="dd" class="w-20 h-20" /> -->
-        <span class="text-[#F2CE00]" v-if="locale === 'en'">{{
-          $t("qi_card")
-        }}</span>
-        {{ $t("tasks_demo") }}
-
-        <span class="text-[#F2CE00]" v-if="locale === 'ar'">{{
-          $t("qi_card")
-        }}</span>
-      </h1>
-    </div>
 
     <!-- Tab Navigation -->
     <div class="flex border-b border-gray-700">

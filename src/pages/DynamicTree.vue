@@ -1,114 +1,75 @@
 <script setup lang="ts">
-import { onMounted, ref, computed, watch } from "vue";
-import { APIService } from "../services/ApiService.ts";
+import { ref, onMounted, watch } from "vue";
 import Button from "../components/Button.vue";
-import API_ENDPOINTS from "../utils/endpoints.ts";
 import TreeNode from "../components/TreeNode.vue";
+import CreateRootModal from "../components/CreateRootModal.vue";
+import NodeDetailsModal from "../components/NodeDetailsModal.vue"; // For showing node details
+import { useDynamicTreeStore } from "../stores/dyanmicTree.ts";
 
-// State variables
-const isLoading = ref(false);
-const nodes = ref<any[]>([]);
-const currentPage = ref(1); // Track the current page
-const pageSize = ref(10); // Number of items per page (limit)
-const searchLabel = ref(""); // Search input for node label
-const totalItems = ref(20); // Total items
+// Use the store
+const nodeStore = useDynamicTreeStore();
 
-// Calculate total pages based on total items and page size
-const totalPages = computed(() => Math.ceil(totalItems.value / pageSize.value));
+// Modal visibility states
+const isCreateModalVisible = ref(false); // For "Create New" modal
+const isDetailsModalVisible = ref(false); // For "Node Details" modal
 
-// Function to handle API requests with dynamic search based on the label
-const fetchData = async (page: number, label: string = "") => {
-  try {
-    isLoading.value = true;
-    const data = await APIService.request({
-      endpoint: API_ENDPOINTS.getAllNodeWithoutChildren,
-      method: "GET",
-      pathParams: `?parentId=null&page=${page}&limit=${
-        pageSize.value
-      }&label=${encodeURIComponent(label)}`, // Include label in query params
-      setLoading: (loading: boolean) => (isLoading.value = loading),
-      setterFunction: (data: any) => {
-        nodes.value = data; // Assuming API returns an array of nodes
-      },
-    });
-    console.log(data);
-  } catch (error) {
-    console.error("Error fetching data:", error);
-  } finally {
-    isLoading.value = false;
-  }
+// Selected node data for the details modal
+const selectedNode = ref(null);
+
+// Function to show node details in the modal
+const showNodeDetails = (node:any) => {
+  selectedNode.value = node; // Set the selected node data
+  isDetailsModalVisible.value = true; // Show the details modal
 };
 
-// Recursive function to open or close nodes based on the search label
-const toggleNodesBySearch = (nodes: any[], label: string) => {
-  nodes.forEach((node) => {
-    if (label === "") {
-      // If the search label is empty, close all nodes
-      node.isOpen = false;
-    } else if (node.label.toLowerCase().includes(label.toLowerCase())) {
-      // If the node matches the search label, open it
-      node.isOpen = true;
-    }
-    // Recursively process children
-    // if (node.children && node.children.length > 0) {
-    toggleNodesBySearch(node.children, label);
-    // }
-  });
+// Function to show the "Create New" modal
+const showCreateModal = () => {
+  isCreateModalVisible.value = true;
 };
 
 // Watch for changes in the search label and trigger search
-watch(searchLabel, (newLabel) => {
-  currentPage.value = 1; // Reset to first page on new search
-  fetchData(currentPage.value, newLabel).then(() => {
-    toggleNodesBySearch(nodes.value, newLabel); // Open or close nodes based on the search label
+watch(() => nodeStore.searchLabel, (newLabel) => {
+  nodeStore.currentPage = 1; // Reset to first page on new search
+  nodeStore.fetchData(nodeStore.currentPage, newLabel).then(() => {
+    nodeStore.toggleNodesBySearch(newLabel); // Open or close nodes based on the search label
   });
 });
 
 // Fetch data when component is mounted
 onMounted(() => {
-  fetchData(currentPage.value, searchLabel.value);
+  nodeStore.fetchData(nodeStore.currentPage, nodeStore.searchLabel);
 });
 
 // Handle next page click
 const goToNextPage = () => {
-  if (currentPage.value < totalPages.value) {
-    currentPage.value++;
-    fetchData(currentPage.value, searchLabel.value);
+  if (nodeStore.currentPage < nodeStore.totalPages) {
+    nodeStore.currentPage++;
+    nodeStore.fetchData(nodeStore.currentPage, nodeStore.searchLabel);
   }
 };
 
 // Handle previous page click
 const goToPreviousPage = () => {
-  if (currentPage.value > 1) {
-    currentPage.value--;
-    fetchData(currentPage.value, searchLabel.value);
+  if (nodeStore.currentPage > 1) {
+    nodeStore.currentPage--;
+    nodeStore.fetchData(nodeStore.currentPage, nodeStore.searchLabel);
   }
 };
-
-// Toggle the visibility of nodes
-const toggleNodeVisibility = (nodeId: string) => {
-  const node = nodes.value.find((node: any) => node.id === nodeId);
-  if (node) {
-    node.visible = !node.visible; // Toggle visibility
-  }
-};
-
-const handleAction = () => {};
 </script>
 
 <template>
-  <div>
+  <div :class="{ 'blur-sm': isCreateModalVisible || isDetailsModalVisible }">
     <!-- Search and New Button -->
     <div class="flex justify-between items-end mb-10 py-4">
       <input
-        v-model="searchLabel"
+        v-model="nodeStore.searchLabel"
         type="text"
         placeholder="Search by label..."
-        class="p-2 rounded-md w-70 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+        class="p-2 rounded-md w-80 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
       />
       <Button
-        :loading="isLoading"
-        :action="handleAction"
+        :loading="nodeStore.isLoading"
+        :action="showCreateModal"
         class="w-25 border hover:bg-yellow-500"
       >
         New
@@ -116,7 +77,10 @@ const handleAction = () => {};
     </div>
 
     <!-- Loading State -->
-    <div v-if="isLoading" class="flex justify-center items-center py-8">
+    <div
+      v-if="nodeStore.isLoading"
+      class="flex justify-center items-center py-8"
+    >
       <div
         class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F2CE00]"
       ></div>
@@ -125,7 +89,7 @@ const handleAction = () => {};
     <!-- Tree Rendering -->
     <div v-else>
       <div
-        v-for="(node, index) in nodes"
+        v-for="(node, index) in nodeStore.nodes"
         :key="node.id"
         class="mb-4 p-4 bg-gray-800 rounded-lg shadow-md"
       >
@@ -133,24 +97,25 @@ const handleAction = () => {};
         <TreeNode
           :node="node"
           :visible="node.visible"
-          @toggle="toggleNodeVisibility(node.id)"
+          @toggle="nodeStore.toggleNodeVisibility(node.id)"
+          @show-details="showNodeDetails" 
         />
       </div>
 
       <!-- Pagination Controls -->
       <div class="flex justify-center mt-8">
         <button
-          :disabled="currentPage === 1"
+          :disabled="nodeStore.currentPage === 1"
           @click="goToPreviousPage"
           class="px-4 py-2 bg-gray-700 text-white rounded-l hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Previous
         </button>
         <span class="px-4 py-2 bg-gray-700 text-white">
-          Page {{ currentPage }} of {{ totalPages }}
+          Page {{ nodeStore.currentPage }} of {{ nodeStore.totalPages }}
         </span>
         <button
-          :disabled="currentPage === totalPages"
+          :disabled="nodeStore.currentPage === nodeStore.totalPages"
           @click="goToNextPage"
           class="px-4 py-2 bg-gray-700 text-white rounded-r hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -159,4 +124,21 @@ const handleAction = () => {};
       </div>
     </div>
   </div>
+
+  <!-- Create New Modal -->
+  <CreateRootModal
+    v-if="isCreateModalVisible"
+    @close="isCreateModalVisible = false"
+  />
+
+  <!-- Node Details Modal -->
+  <NodeDetailsModal
+    v-if="isDetailsModalVisible && selectedNode !== null"
+    :nodeData="selectedNode"
+    @close="isDetailsModalVisible = false"
+  />
 </template>
+
+<style scoped>
+/* Add any additional styles here */
+</style>

@@ -10,9 +10,11 @@ const props = defineProps({
   },
   visible: {
     type: Boolean,
-    default: true, // Default value for visible
+    default: true,
   },
 });
+
+const emit = defineEmits(["show-details"]); // Emit event to show node details
 
 const isLoading = ref(false);
 const hasChildren = ref<boolean>(true);
@@ -64,30 +66,59 @@ const fetchChildren = async (node: any) => {
     isLoading.value = false;
   }
 };
+
+// Function to show node details
+const showDetails = () => {
+  emit("show-details", props.node); // Emit the node data to the parent
+};
 </script>
 
 <template>
   <div v-if="visible" class="space-y-2">
     <!-- Node Header -->
-    <div class="flex items-center cursor-pointer" @click="toggleNode(node)">
-      <span class="mr-2">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center cursor-pointer" @click="toggleNode(node)">
+        <span class="mr-2">
+          <svg
+            v-if="node.isOpen"
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 transform rotate-90"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 9l-7 7-7-7"
+            />
+          </svg>
+          <svg
+            v-else
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 15l7-7 7 7"
+            />
+          </svg>
+        </span>
+        <span class="font-medium text-gray-100">{{ node.label }}</span>
+      </div>
+
+      <!-- Button to show node details -->
+      <button
+        @click.stop="showDetails"
+        class="px-2 py-1 text-white rounded hover:bg-[#F2CE00] focus:outline-none"
+      >
         <svg
-          v-if="node.isOpen && hasChildren"
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5 transform rotate-90"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 9l-7 7-7-7"
-          />
-        </svg>
-        <svg
-          v-else
           xmlns="http://www.w3.org/2000/svg"
           class="h-5 w-5"
           fill="none"
@@ -98,11 +129,16 @@ const fetchChildren = async (node: any) => {
             stroke-linecap="round"
             stroke-linejoin="round"
             stroke-width="2"
-            d="M5 15l7-7 7 7"
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"
           />
         </svg>
-      </span>
-      <span class="font-medium text-gray-100">{{ node.label }}</span>
+      </button>
     </div>
 
     <!-- Children -->
@@ -118,6 +154,7 @@ const fetchChildren = async (node: any) => {
         :key="child.id"
         :node="child"
         :visible="child.visible"
+        @show-details="emit('show-details', $event)"
       />
     </div>
   </div>
