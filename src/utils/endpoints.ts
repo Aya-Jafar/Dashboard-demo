@@ -3,8 +3,9 @@
  * This file will contain enum of API endpoints to easily access it
  */
 
-const enum API_ENDPOINTS {
+enum API_ENDPOINTS {
   getAllTreeNode = "/mock-api/dynamic-tree",
+  testAllTreeNode="/mock-api/departments"
 }
 
 
