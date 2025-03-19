@@ -67,10 +67,10 @@ const fetchChildren = async (node: any) => {
 </script>
 
 <template>
-  <div v-if="visible"> <!-- Only render if visible is true -->
-    <!-- Show toggle and fetch node details on click -->
-    <div class="flex items-center cursor-pointer mb-3">
-      <span @click="toggleNode(node)" class="mr-2">
+  <div v-if="visible" class="space-y-2">
+    <!-- Node Header -->
+    <div class="flex items-center cursor-pointer" @click="toggleNode(node)">
+      <span class="mr-2">
         <svg
           v-if="node.isOpen"
           xmlns="http://www.w3.org/2000/svg"
@@ -102,26 +102,20 @@ const fetchChildren = async (node: any) => {
           />
         </svg>
       </span>
-      <span class="font-medium">{{ node.label }}</span>
+      <span class="font-medium text-gray-100">{{ node.label }}</span>
     </div>
 
-    <!-- Recursively render children if the node is open -->
+    <!-- Children -->
     <div v-if="node.isOpen" class="ml-6">
-      <!-- Show loading spinner when isLoading is true -->
-      <div v-if="isLoading" class="flex justify-center items-center">
-        <div
-          class="spinner-border animate-spin inline-block w-8 h-8 border-4 border-blue-500 rounded-full"
-          role="status"
-        ></div>
+      <div v-if="isLoading" class="flex justify-center items-center py-4">
+        <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-yellow-400"></div>
       </div>
-
-      <!-- Render the children nodes if not loading -->
       <TreeNode
         v-else
         v-for="(child, idx) in node.children"
         :key="child.id"
         :node="child"
-        :visible="child.visible" 
+        :visible="child.visible"
       />
     </div>
   </div>

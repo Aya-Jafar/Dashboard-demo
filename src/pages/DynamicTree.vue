@@ -97,26 +97,23 @@ const handleAction = () => {};
 </script>
 
 <template>
-  <div class="flex justify-between items-end mb-10 p-4">
-    <!-- Search input -->
-    <input
-      v-model="searchLabel"
-      type="text"
-      placeholder="Search by label..."
-      class="p-2 rounded-md bg-gray-800 text-white"
-    />
-    <Button :loading="isLoading" :action="handleAction" class="w-30">
-      New
-    </Button>
-  </div>
+  <div>
+    <!-- Search and New Button -->
+    <div class="flex justify-between items-end mb-10 p-4">
+      <input
+        v-model="searchLabel"
+        type="text"
+        placeholder="Search by label..."
+        class="p-2 rounded-md bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+      />
+      <Button :loading="isLoading" :action="handleAction" class="w-30 bg-yellow-500 text-gray-900 hover:bg-yellow-500">
+        New
+      </Button>
+    </div>
 
-  <div class="p-4">
-    <!-- Loading state -->
-    <div v-if="isLoading" class="flex justify-center items-center">
-      <div
-        class="spinner-border animate-spin inline-block w-8 h-8 border-4 border-blue-500 rounded-full"
-        role="status"
-      ></div>
+    <!-- Loading State -->
+    <div v-if="isLoading" class="flex justify-center items-center py-8">
+      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400"></div>
     </div>
 
     <!-- Tree Rendering -->
@@ -124,34 +121,28 @@ const handleAction = () => {};
       <div
         v-for="(node, index) in nodes"
         :key="node.id"
-        class="mb-4 text-white"
+        class="mb-4 p-4 bg-gray-800 rounded-lg shadow-md"
       >
         <!-- Root Level Node -->
-        <TreeNode
-          :node="node"
-          :visible="node.visible"
-          @toggle="toggleNodeVisibility(node.id)"
-        />
+        <TreeNode :node="node" :visible="node.visible" @toggle="toggleNodeVisibility(node.id)" />
       </div>
 
       <!-- Pagination Controls -->
-      <div class="flex justify-center mt-4">
+      <div class="flex justify-center mt-8">
         <button
           :disabled="currentPage === 1"
           @click="goToPreviousPage"
-          class="px-4 py-2 bg-gray-800 text-white rounded-l hover:bg-gray-700"
+          class="px-4 py-2 bg-gray-700 text-white rounded-l hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Previous
         </button>
-
-        <span class="px-4 py-2 text-white"
-          >Page {{ currentPage }} of {{ totalPages }}</span
-        >
-
+        <span class="px-4 py-2 bg-gray-700 text-white">
+          Page {{ currentPage }} of {{ totalPages }}
+        </span>
         <button
           :disabled="currentPage === totalPages"
           @click="goToNextPage"
-          class="px-4 py-2 bg-gray-800 text-white rounded-r hover:bg-gray-700"
+          class="px-4 py-2 bg-gray-700 text-white rounded-r hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Next
         </button>
