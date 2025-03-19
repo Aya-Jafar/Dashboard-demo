@@ -97,23 +97,30 @@ const handleAction = () => {};
 </script>
 
 <template>
+
   <div>
     <!-- Search and New Button -->
-    <div class="flex justify-between items-end mb-10 p-4">
+    <div class="flex justify-between items-end mb-10 py-4">
       <input
         v-model="searchLabel"
         type="text"
         placeholder="Search by label..."
-        class="p-2 rounded-md bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+        class="p-2 rounded-md w-70 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
       />
-      <Button :loading="isLoading" :action="handleAction" class="w-30 bg-yellow-500 text-gray-900 hover:bg-yellow-500">
+      <Button
+        :loading="isLoading"
+        :action="handleAction"
+        class="w-25  border  hover:bg-yellow-500"
+      >
         New
       </Button>
     </div>
 
     <!-- Loading State -->
     <div v-if="isLoading" class="flex justify-center items-center py-8">
-      <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-400"></div>
+      <div
+        class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F2CE00]"
+      ></div>
     </div>
 
     <!-- Tree Rendering -->
@@ -124,7 +131,11 @@ const handleAction = () => {};
         class="mb-4 p-4 bg-gray-800 rounded-lg shadow-md"
       >
         <!-- Root Level Node -->
-        <TreeNode :node="node" :visible="node.visible" @toggle="toggleNodeVisibility(node.id)" />
+        <TreeNode
+          :node="node"
+          :visible="node.visible"
+          @toggle="toggleNodeVisibility(node.id)"
+        />
       </div>
 
       <!-- Pagination Controls -->

@@ -1,42 +1,67 @@
 <script setup lang="ts">
 import DynamicTree from "./pages/DynamicTree.vue";
 import Graph from "./pages/Graph.vue";
-import { ref } from "vue";
+import { ref, watch } from "vue";
+import LangougeToggle from "./components/LangougeToggle.vue";
 
+import { useI18n } from "vue-i18n";
 // Track the active tab
 const activeTab = ref(1);
+
+const { locale } = useI18n();
+
+watch(
+  locale,
+  (newLocale) => {
+    document.documentElement.dir = newLocale === "ar" ? "rtl" : "ltr";
+  },
+  { immediate: true }
+);
 </script>
 
 <template>
   <div class="min-h-screen bg-gray-900 p-8 text-gray-100 font-sans">
-    <h1 class="text-3xl font-bold mb-10">
-      Welcome to
-      <span class="text-yellow-400">Qi Card</span>
-      tasks demo!
-    </h1>
+    <div class="flex justify-end items-center">
+      <LangougeToggle class="mb-5 flex justify-end items-center" />
+    </div>
+
+    <div class="flex items-center mb-15">
+      <h1 class="text-3xl font-bold">
+        {{ $t("welcome_to") }}
+        <!-- <img src="./Qi Card PNG.png" alt="dd" class="w-20 h-20" /> -->
+        <span class="text-[#F2CE00]" v-if="locale === 'en'">{{
+          $t("qi_card")
+        }}</span>
+        {{ $t("tasks_demo") }}
+
+        <span class="text-[#F2CE00]" v-if="locale === 'ar'">{{
+          $t("qi_card")
+        }}</span>
+      </h1>
+    </div>
 
     <!-- Tab Navigation -->
     <div class="flex border-b border-gray-700">
       <button
         class="py-2 px-4 text-lg font-medium relative"
-        :class="{ 'text-yellow-400': activeTab === 1 }"
+        :class="{ 'font-bold border-b border-[#F2CE00]': activeTab === 1 }"
         @click="activeTab = 1"
       >
         Dynamic Tree
         <span
           v-if="activeTab === 1"
-          class="absolute bottom-0 left-0 w-full h-0.5 bg-yellow-400 transition-all"
+          class="absolute bottom-0 left-0 w-full h-0.5 text-[#F2CE00] transition-all"
         ></span>
       </button>
       <button
         class="py-2 px-4 text-lg font-medium relative"
-        :class="{ 'text-yellow-400': activeTab === 2 }"
+        :class="{ 'font-bold border-b border-[#F2CE00]': activeTab === 2 }"
         @click="activeTab = 2"
       >
         Graph
         <span
           v-if="activeTab === 2"
-          class="absolute bottom-0 left-0 w-full h-0.5 bg-yellow-400 transition-all"
+          class="absolute bottom-0 left-0 w-full h-0.5 text-[#F2CE00] transition-all"
         ></span>
       </button>
     </div>
@@ -61,6 +86,6 @@ button {
 }
 
 button:hover {
-  color: #fbbf24; /* Yellow-400 */
+  @apply text-[#F2CE00];
 }
 </style>
