@@ -11,7 +11,7 @@ const nodes = ref<any[]>([]);
 const currentPage = ref(1); // Track the current page
 const pageSize = ref(10); // Number of items per page (limit)
 const searchLabel = ref(""); // Search input for node label
-const totalItems = ref(1000); // Total items
+const totalItems = ref(20); // Total items
 
 // Calculate total pages based on total items and page size
 const totalPages = computed(() => Math.ceil(totalItems.value / pageSize.value));
@@ -23,7 +23,7 @@ const fetchData = async (page: number, label: string = "") => {
     const data = await APIService.request({
       endpoint: API_ENDPOINTS.getAllNodeWithoutChildren,
       method: "GET",
-      pathParams: `?page=${page}&limit=${
+      pathParams: `?parentId=null&page=${page}&limit=${
         pageSize.value
       }&label=${encodeURIComponent(label)}`, // Include label in query params
       setLoading: (loading: boolean) => (isLoading.value = loading),
@@ -50,9 +50,9 @@ const toggleNodesBySearch = (nodes: any[], label: string) => {
       node.isOpen = true;
     }
     // Recursively process children
-    if (node.children && node.children.length > 0) {
-      toggleNodesBySearch(node.children, label);
-    }
+    // if (node.children && node.children.length > 0) {
+    toggleNodesBySearch(node.children, label);
+    // }
   });
 };
 
@@ -97,7 +97,6 @@ const handleAction = () => {};
 </script>
 
 <template>
-
   <div>
     <!-- Search and New Button -->
     <div class="flex justify-between items-end mb-10 py-4">
@@ -110,7 +109,7 @@ const handleAction = () => {};
       <Button
         :loading="isLoading"
         :action="handleAction"
-        class="w-25  border  hover:bg-yellow-500"
+        class="w-25 border hover:bg-yellow-500"
       >
         New
       </Button>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { defineProps, defineEmits, ref } from "vue";
-import { preprocessNodeID } from "../utils/helpers.ts";
 import { APIService } from "../services/ApiService.ts";
 import API_ENDPOINTS from "../utils/endpoints.ts";
 
@@ -16,6 +15,7 @@ const props = defineProps({
 });
 
 const isLoading = ref(false);
+const hasChildren = ref<boolean>(true);
 
 // Function to handle toggling a node
 const toggleNode = async (node: any) => {
@@ -24,7 +24,7 @@ const toggleNode = async (node: any) => {
       isLoading.value = true;
 
       const data = await APIService.request({
-        endpoint: `${API_ENDPOINTS.getAllTreeNode}/${preprocessNodeID(node.id)}`,
+        endpoint: `${API_ENDPOINTS.getAllNodeWithoutChildren}?parentId=${node.id}`,
         method: "GET",
         setLoading: (loading: boolean) => (isLoading.value = loading),
         setterFunction: (data: any) => {
@@ -32,12 +32,12 @@ const toggleNode = async (node: any) => {
           node.isOpen = true;
         },
       });
+      hasChildren.value = node.children.length > 0;
 
-      if (node.children && node.children.length === 0) {
-        await fetchChildren(node);
-      }
+      await fetchChildren(node);
     } catch (error) {
       console.error("Error fetching node details:", error);
+      hasChildren.value = false;
     } finally {
       isLoading.value = false;
     }
@@ -51,7 +51,7 @@ const fetchChildren = async (node: any) => {
   try {
     isLoading.value = true;
     const childrenData = await APIService.request({
-      endpoint: `${API_ENDPOINTS.getAllTreeNode}/${preprocessNodeID(node.id)}`,
+      endpoint: `${API_ENDPOINTS.getAllNodeWithoutChildren}?parentId=${node.id}`,
       method: "GET",
       setLoading: (loading: boolean) => (isLoading.value = loading),
       setterFunction: (data: any) => {
@@ -72,7 +72,7 @@ const fetchChildren = async (node: any) => {
     <div class="flex items-center cursor-pointer" @click="toggleNode(node)">
       <span class="mr-2">
         <svg
-          v-if="node.isOpen"
+          v-if="node.isOpen && hasChildren"
           xmlns="http://www.w3.org/2000/svg"
           class="h-5 w-5 transform rotate-90"
           fill="none"
@@ -108,7 +108,9 @@ const fetchChildren = async (node: any) => {
     <!-- Children -->
     <div v-if="node.isOpen" class="ml-6">
       <div v-if="isLoading" class="flex justify-center items-center py-4">
-        <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-yellow-400"></div>
+        <div
+          class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-yellow-400"
+        ></div>
       </div>
       <TreeNode
         v-else
