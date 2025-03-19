@@ -52,22 +52,27 @@ onUnmounted(() => {
     class="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50"
   >
     <div ref="modalRef" class="bg-gray-800 rounded-lg p-6 w-96">
-      <h2 class="text-xl font-semibold mb-4 text-white">Department Details</h2>
+      <h2 class="text-xl font-bold mb-4 text-white">{{ nodeData.label }}</h2>
 
       <!-- Display Node Data -->
       <div class="mb-4">
-        <p class="text-white"><strong>Label:</strong> {{ nodeData.label }}</p>
         <p class="text-white">
           <strong>Description:</strong>
-          {{ nodeData.departmentDescription }}
+          {{
+            nodeData.departmentDescription ||
+            "This department is responsible for overseeing various projects, ensuring smooth operations, and coordinating between different teams. It plays a crucial role in strategic planning and execution, driving efficiency and innovation within the organization."
+          }}
         </p>
+        <br />
         <p class="text-white">
-          <strong>Number of Employees:</strong> {{ nodeData.numberOfEmployees }}
+          <strong>Number of Employees: </strong>
+          <span class="text-[#F2CE00] font-bold">
+            {{ nodeData.numberOfEmployees || 10 }}
+          </span>
         </p>
       </div>
     </div>
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>
