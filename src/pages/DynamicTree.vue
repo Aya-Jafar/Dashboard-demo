@@ -15,16 +15,12 @@ const selectedParentId = ref<string | null>(null); // Store the parent ID for th
 
 // Function to handle creating a new node
 const handleCreateNode = (parentId: string | null) => {
-  selectedParentId.value = parentId; // Set the parent ID
+  selectedParentId.value = parentId ?? null; // Set the parent ID
   isCreateNodeModalVisible.value = true; // Show the modal
 };
 
-// const handleCreateRootNode = (parentId: string | null) => {
-//   selectedParentId.value = parentId; // Set the parent ID
-//   isCreateNodeModalVisible.value = true; // Show the modal
-// };
-
 // Watch for changes in the search label and trigger search
+// TODO: FIX THIS auto toggle
 watch(
   () => nodeStore.searchLabel,
   (newLabel) => {
@@ -65,24 +61,40 @@ const showNodeDetails = (node: any) => {
   selectedNode.value = node; // Set the selected node data
   isDetailsModalVisible.value = true; // Show the modal
 };
+
+const handleNodeCreate = (newNode: {
+  label: string;
+  id: string;
+  parentId: string | null;
+}) => {
+  // Add the new node to the tree (assuming you have a store method for this)
+  nodeStore.add({
+    label: newNode.label,
+    parentId: newNode.parentId,
+    createdAt: new Date().getTime(),
+  });
+  // Close the modal
+  isCreateNodeModalVisible.value = false;
+};
 </script>
 
 <template>
-  <div :class="{ 'blur-sm': isCreateNodeModalVisible || isDetailsModalVisible}">
+  <div
+    :class="{ 'blur-sm': isCreateNodeModalVisible || isDetailsModalVisible }"
+  >
     <!-- Search and New Button -->
     <div class="flex justify-between items-end mb-10 py-4">
       <input
         v-model="nodeStore.searchLabel"
         type="text"
-        placeholder="Search by label..."
+        :placeholder="$t('search')"
         class="p-2 rounded-md w-80 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
       />
       <Button
-        :loading="nodeStore.isLoading"
         :action="() => handleCreateNode(null)"
         class="w-25 border hover:bg-yellow-500"
       >
-        New
+        {{ $t("new") }}
       </Button>
     </div>
 
@@ -141,8 +153,9 @@ const showNodeDetails = (node: any) => {
     v-if="isCreateNodeModalVisible && selectedParentId !== undefined"
     :parentId="selectedParentId"
     @close="isCreateNodeModalVisible = false"
-    @submit="nodeStore.addNode"
+    @submit="handleNodeCreate"
   />
+  <!-- Node Details Modal -->
   <NodeDetailsModal
     v-if="isDetailsModalVisible && selectedNode != null"
     :nodeData="selectedNode"
@@ -150,6 +163,4 @@ const showNodeDetails = (node: any) => {
   />
 </template>
 
-<style scoped>
-/* Add any additional styles here */
-</style>
+<style scoped></style>

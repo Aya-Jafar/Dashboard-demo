@@ -1,44 +1,19 @@
 <script setup lang="ts">
-import { ref, defineProps, defineEmits, onMounted } from "vue";
+import { useSnackbarStore } from '../stores/snackbar';
 
-// Defining props for message, type, and duration
-const props = defineProps({
-  message: {
-    type: String,
-    required: true,
-  },
-  type: {
-    type: String,
-    default: "info", // Could be success, error, info
-  },
-  duration: {
-    type: Number,
-    default: 3000, // Duration before auto dismiss in ms
-  },
-});
-
-const visible = ref(false);
-
-// Show snackbar and then dismiss after duration
-onMounted(() => {
-  visible.value = true;
-
-  setTimeout(() => {
-    visible.value = false;
-  }, props.duration);
-});
+const snackbarStore = useSnackbarStore();
 </script>
 
 <template>
   <div
-    v-if="visible"
-    class="fixed bottom-5 left-1/2 transform -translate-x-1/2 p-4 max-w-sm w-full bg-blue-500 text-white rounded-md shadow-lg z-50 transition-all"
+    v-if="snackbarStore.visible"
+    class="fixed bottom-5 left-1/2 transform -translate-x-1/2 p-4 max-w-sm w-full text-white rounded-md shadow-lg z-50 transition-all"
     :class="{
-      'bg-blue-500': type === 'info',
-      'bg-green-500': type === 'success',
-      'bg-red-500': type === 'error',
+      'bg-yellow-500': snackbarStore.type === 'info',
+      'bg-sky-500': snackbarStore.type === 'success',
+      'bg-red-500': snackbarStore.type === 'error',
     }"
   >
-    <p>{{ message }}</p>
+    <p>{{ snackbarStore.message }}</p>
   </div>
 </template>

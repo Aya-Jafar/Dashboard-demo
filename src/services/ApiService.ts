@@ -1,3 +1,4 @@
+import { useSnackbarStore } from "../stores/snackbar";
 /**
  * Interface for the options to be passed to the API service.
  *
@@ -64,6 +65,7 @@ export class APIService {
    *   setLoading: (loading) => { this.isLoading = loading; }
    * });
    */
+
   static async request({
     endpoint,
     method = "GET",
@@ -72,12 +74,15 @@ export class APIService {
     setterFunction = null,
     setLoading = null,
   }: APIServiceOptions): Promise<any> {
+    const snackbarStore = useSnackbarStore();
+
     // Start loading
     if (setLoading && typeof setLoading === "function") {
       setLoading(true);
     }
 
     const headers: { [key: string]: string } = {
+      Accept: "application/json",
       "Content-Type": "application/json",
     };
 
@@ -94,12 +99,33 @@ export class APIService {
         body: body ? JSON.stringify(body) : null,
       });
 
+      // Check if the response is a successful one
       if (!response.ok) {
-        throw new Error(`API error: ${response.statusText}`);
+        const errorMessage = await response.text();
+        if (method !== "GET") {
+          snackbarStore.showSnackbar(`API Error: ${errorMessage}`, "error");
+        }
+        throw new Error(`API error: ${errorMessage}`);
       }
 
-      // Parse the response data
-      const data = await response.json();
+      // Try parsing the response as JSON
+      const contentType = response.headers.get("Content-Type");
+      let data = null;
+
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const textResponse = await response.text();
+        if (method !== "GET") {
+          snackbarStore.showSnackbar(`API Error: ${textResponse}`, "error");
+        }
+        throw new Error(`API error: ${textResponse}`);
+      }
+
+      // Show success message (optional) for non-GET requests
+      if (method !== "GET") {
+        snackbarStore.showSnackbar("Request successful!", "success");
+      }
 
       // If a setter function is provided, call it with the data
       if (setterFunction && typeof setterFunction === "function") {
@@ -108,6 +134,9 @@ export class APIService {
       return data;
     } catch (error) {
       console.error("APIService Error:", error);
+      if (method !== "GET") {
+        snackbarStore.showSnackbar(`Error: ${error}`, "error");
+      }
       throw error;
     } finally {
       // Stop loading

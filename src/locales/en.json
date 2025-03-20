@@ -2,5 +2,7 @@
   "welcome_to":"Welcome to ",
   "tasks_demo":"tasks demo!",
   "qi_card":"Qi Card's",
-  "title":"Tasks demo"
+  "title":"Tasks demo",
+  "search":"Search by label...",
+  "new":"New"
 }

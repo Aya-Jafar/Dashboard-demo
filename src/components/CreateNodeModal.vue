@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted } from "vue";
 
 const props = defineProps({
   parentId: {
-    type: String || null,
+    type: [String, null],
     default: null,
   },
 });
@@ -14,15 +14,26 @@ const newNodeLabel = ref("");
 
 // Handle form submission
 const handleSubmit = () => {
-  if (newNodeLabel.value.trim()) {
+  if (newNodeLabel.value.trim() && props.parentId !== null) {
+    const level = props.parentId.split("-").length; // Assuming the parentId follows "dept-<level>..."
     const newNode = {
       label: newNodeLabel.value,
-      id: `node-${Date.now()}`, // Generate a unique ID
+      // id: `dept-${level + 1}-${props.parentId}`, // Create ID with parentId and level
       parentId: props.parentId, // Include the parent ID
     };
     emit("submit", newNode); // Emit the new node data
     newNodeLabel.value = ""; // Clear the input
     emit("close"); // Close the modal
+  } else {
+    // Handle Root nodes
+    const newNode = {
+      label: newNodeLabel.value,
+      // id: `dept-root-blahblah`,
+      parentId: null,
+    };
+    emit("submit", newNode);
+    newNodeLabel.value = "";
+    emit("close");
   }
 };
 
@@ -54,7 +65,7 @@ onUnmounted(() => {
   <div
     class="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50"
   >
-    <div class="bg-gray-800 rounded-lg p-6 w-96" ref="modalRef" >
+    <div class="bg-gray-800 rounded-lg p-6 w-96" ref="modalRef">
       <h2 class="text-xl font-semibold mb-4 text-white">
         Create New Department
       </h2>

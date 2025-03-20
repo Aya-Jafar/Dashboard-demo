@@ -24,11 +24,10 @@ watch(
     <div class="flex justify-between items-center mb-15">
       <div class="flex gap-3 items-center">
         <img src="/src/assets/Qi Card PNG.png" alt="logo" class="w-20 h-20" />
-        <p class="text-4xl font-bold">{{$t("title")}}</p>
+        <p class="text-4xl font-bold">{{ $t("title") }}</p>
       </div>
       <LangougeToggle class="mb-5 flex justify-end items-center" />
     </div>
-
 
     <!-- Tab Navigation -->
     <div class="flex border-b border-gray-700">
@@ -48,7 +47,7 @@ watch(
         :class="{ 'font-bold border-b border-[#F2CE00]': activeTab === 2 }"
         @click="activeTab = 2"
       >
-        Graph
+        Dashboard
         <span
           v-if="activeTab === 2"
           class="absolute bottom-0 left-0 w-full h-0.5 text-[#F2CE00] transition-all"

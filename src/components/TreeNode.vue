@@ -2,6 +2,7 @@
 import { defineProps, defineEmits, ref } from "vue";
 import { APIService } from "../services/ApiService.ts";
 import API_ENDPOINTS from "../utils/endpoints.ts";
+import Snackbar from "./Snackbar.vue";
 
 const props = defineProps({
   node: {
@@ -79,6 +80,7 @@ const createNode = () => {
 </script>
 
 <template>
+  <Snackbar />
   <div v-if="visible" class="space-y-2">
     <!-- Node Header -->
     <div class="flex items-center justify-between">
@@ -184,7 +186,7 @@ const createNode = () => {
         :node="child"
         :visible="child.visible"
         @show-details="emit('show-details', $event)"
-        @create-node="emit('create-node', $event)" 
+        @create-node="emit('create-node', $event)"
       />
     </div>
   </div>
