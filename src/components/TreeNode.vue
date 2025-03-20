@@ -28,48 +28,23 @@ const toggleNode = async (node: any) => {
     try {
       isLoading.value = true;
 
-      const data = await APIService.request({
+      const data = await APIService.request<Node[]>({
         endpoint: `${API_ENDPOINTS.getAllNodeWithoutChildren}?parentId=${node.id}`,
         method: "GET",
         setLoading: (loading: boolean) => (isLoading.value = loading),
         setterFunction: (data: any) => {
-          node.children = data.children || [];
+          node.children = filterByExactParentID(data, node.id);
           node.isOpen = true;
         },
       });
-      hasChildren.value = node.children.length > 0;
-
-      await fetchChildren(node);
+      // hasChildren.value = node.children.length > 0;
     } catch (error) {
       console.error("Error fetching node details:", error);
-      hasChildren.value = false;
     } finally {
       isLoading.value = false;
     }
   } else {
     node.isOpen = !node.isOpen;
-  }
-};
-
-// Function to fetch children dynamically
-const fetchChildren = async (node: any) => {
-  try {
-    isLoading.value = true;
-    const childrenData = await APIService.request({
-      endpoint: `${API_ENDPOINTS.getAllNodeWithoutChildren}?parentId=${node.id}`,
-      method: "GET",
-      setLoading: (loading: boolean) => (isLoading.value = loading),
-      setterFunction: (data: any) => {
-        // The mock API's path parameter is NOT filtering with the exact ID
-        // So if ?parentId=2 the response conatins children with any parentId that contain "2" like "dept-1-2-1-1"
-        // That's why we need the filtering here
-        node.children = filterByExactParentID(data, node.id);
-      },
-    });
-  } catch (error) {
-    console.error("Error fetching children data:", error);
-  } finally {
-    isLoading.value = false;
   }
 };
 

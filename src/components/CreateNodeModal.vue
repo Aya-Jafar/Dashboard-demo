@@ -7,33 +7,30 @@ const props = defineProps({
     default: null,
   },
 });
-
 const emit = defineEmits(["close", "submit"]);
-
 const newNodeLabel = ref("");
+
+const resetAndEmit = (newNode: { label: string; parentId: string | null }) => {
+  emit("submit", newNode); // Emit the new node data
+  newNodeLabel.value = ""; // Clear the input
+  emit("close"); // Close the modal
+};
 
 // Handle form submission
 const handleSubmit = () => {
   if (newNodeLabel.value.trim() && props.parentId !== null) {
-    const level = props.parentId.split("-").length; // Assuming the parentId follows "dept-<level>..."
     const newNode = {
       label: newNodeLabel.value,
-      // id: `dept-${level + 1}-${props.parentId}`, // Create ID with parentId and level
       parentId: props.parentId, // Include the parent ID
     };
-    emit("submit", newNode); // Emit the new node data
-    newNodeLabel.value = ""; // Clear the input
-    emit("close"); // Close the modal
+    resetAndEmit(newNode);
   } else {
     // Handle Root nodes
     const newNode = {
       label: newNodeLabel.value,
-      // id: `dept-root-blahblah`,
       parentId: null,
     };
-    emit("submit", newNode);
-    newNodeLabel.value = "";
-    emit("close");
+    resetAndEmit(newNode);
   }
 };
 

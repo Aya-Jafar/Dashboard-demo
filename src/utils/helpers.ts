@@ -8,5 +8,5 @@ import type { Node } from "../stores/dyanmicTree";
  * @returns 
  */
 export const filterByExactParentID = (data: Array<Node>, parentId: string) => {
-  return data.filter((item: any) => item.parentId == parentId);
+  return data.filter((item: any) => item.parentId === parentId);
 };

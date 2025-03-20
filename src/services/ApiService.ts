@@ -1,26 +1,41 @@
 import { useSnackbarStore } from "../stores/snackbar";
+
+/**
+ * Type for supported HTTP methods.
+ */
+type HTTPMethod = "GET" | "POST" | "PUT" | "DELETE";
+
+/**
+ * Type for a function that sets response data.
+ */
+type SetterFunction<T> = (data: T) => void;
+
+/**
+ * Type for a function that sets loading status.
+ */
+type LoadingFunction = (isLoading: boolean) => void;
+
 /**
  * Interface for the options to be passed to the API service.
- *
- * @interface
  */
-interface APIServiceOptions {
+interface APIServiceOptions<T = any> {
   /**
    * The API endpoint (e.g., "/auth/user").
    * @example "/auth/login"
    */
   endpoint: string;
+
   /**
    * The HTTP method (GET, POST, PUT, DELETE). Default is "GET".
    * @default "GET"
    */
-  method?: "GET" | "POST" | "PUT" | "DELETE";
+  method?: HTTPMethod;
 
   /**
    * The body content for POST/PUT requests. Can be an object or a string.
    * @default ""
    */
-  body?: object | string;
+  body?: Record<string, any> | string;
 
   /**
    * Additional URL path parameters to append to the endpoint (optional).
@@ -32,13 +47,13 @@ interface APIServiceOptions {
    * A function to set the response data (optional).
    * @example (data) => { console.log(data); }
    */
-  setterFunction?: ((data: any) => void) | null;
+  setterFunction?: SetterFunction<T> | null;
 
   /**
    * A function to set the loading status (optional).
    * @example (isLoading) => { this.isLoading = isLoading; }
    */
-  setLoading?: ((isLoading: boolean) => void) | null;
+  setLoading?: LoadingFunction | null;
 }
 
 /**
@@ -46,103 +61,80 @@ interface APIServiceOptions {
  *
  * @class APIService
  */
-
 export class APIService {
   /**
    * Makes an API request to the specified endpoint with the given options.
    *
    * @async
-   * @param {APIServiceOptions} options - The options for the API request.
-   * @returns {Promise<any>} The response data from the API.
+   * @param {APIServiceOptions<T>} options - The options for the API request.
+   * @returns {Promise<T>} The response data from the API.
    * @throws {Error} If the request fails or the response is not successful.
    *
    * @example
    * const data = await APIService.request({
    *   endpoint: "/auth/user",
    *   method: "GET",
-   *   needAuth: true,
    *   setterFunction: (data) => { console.log(data); },
    *   setLoading: (loading) => { this.isLoading = loading; }
    * });
    */
-
-  static async request({
+  static async request<T = any>({
     endpoint,
     method = "GET",
     body = "",
     pathParams = "",
     setterFunction = null,
     setLoading = null,
-  }: APIServiceOptions): Promise<any> {
+  }: APIServiceOptions<T>): Promise<T> {
     const snackbarStore = useSnackbarStore();
 
-    // Start loading
-    if (setLoading && typeof setLoading === "function") {
-      setLoading(true);
-    }
+    if (setLoading) setLoading(true);
 
-    const headers: { [key: string]: string } = {
+    const headers: Record<string, string> = {
       Accept: "application/json",
       "Content-Type": "application/json",
     };
 
-    // Construct the full URL
-    const url = `${import.meta.env.VITE_API_BASE_URL}${endpoint}${
-      pathParams || ""
-    }`;
+    const url = `${import.meta.env.VITE_API_BASE_URL}${endpoint}${pathParams}`;
 
     try {
-      // Make the fetch request
       const response = await fetch(url, {
         method,
         headers,
         body: body ? JSON.stringify(body) : null,
       });
 
-      // Check if the response is a successful one
       if (!response.ok) {
         const errorMessage = await response.text();
-        if (method !== "GET") {
+        if (method !== "GET")
           snackbarStore.showSnackbar(`API Error: ${errorMessage}`, "error");
-        }
-        throw new Error(`API error: ${errorMessage}`);
+        throw new Error(errorMessage);
       }
 
-      // Try parsing the response as JSON
       const contentType = response.headers.get("Content-Type");
-      let data = null;
-
-      if (contentType && contentType.includes("application/json")) {
-        data = await response.json();
-      } else {
+      if (!contentType?.includes("application/json")) {
         const textResponse = await response.text();
         if (method !== "GET") {
           snackbarStore.showSnackbar(`API Error: ${textResponse}`, "error");
         }
-        throw new Error(`API error: ${textResponse}`);
       }
 
-      // Show success message (optional) for non-GET requests
+      const data: T = await response.json();
+
       if (method !== "GET") {
         snackbarStore.showSnackbar("Request successful!", "success");
       }
-
-      // If a setter function is provided, call it with the data
-      if (setterFunction && typeof setterFunction === "function") {
+      if (setterFunction) {
         setterFunction(data);
       }
       return data;
     } catch (error) {
-      console.error("APIService Error:", error);
       if (method !== "GET") {
-        snackbarStore.showSnackbar(`Error: ${error}`, "error");
+        snackbarStore.showSnackbar(`Error: ${String(error)}`, "error");
       }
       throw error;
     } finally {
-      // Stop loading
-      if (setLoading && typeof setLoading === "function") {
-        setLoading(false);
-      }
+      if (setLoading) setLoading(false);
     }
   }
 }

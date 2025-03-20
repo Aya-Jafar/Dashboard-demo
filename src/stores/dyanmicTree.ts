@@ -27,10 +27,14 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
   );
 
   // Fetch Initial data (parentId = null)
-  const fetchMainData = async (page: number, label: string = "") => {
+  const fetchMainData = async (
+    page: number,
+    label: string = ""
+  ): Promise<void> => {
     try {
       isLoading.value = true;
-      const data = await APIService.request({
+
+      const data = await APIService.request<Node[]>({
         endpoint: API_ENDPOINTS.getAllNodeWithoutChildren,
         method: "GET",
         pathParams: `?parentId=null&page=${page}&limit=${
@@ -41,7 +45,6 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
           nodes.value = data;
         },
       });
-      console.log(data);
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -50,7 +53,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
   };
 
   // Toggle the visibility of nodes
-  const toggleNodeVisibility = (nodeId: string) => {
+  const toggleNodeVisibility = (nodeId: string): void => {
     const node = nodes.value.find((node: any) => node.id === nodeId);
     if (node) {
       node.visible = !node.visible;
@@ -58,7 +61,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
   };
 
   // Recursive function to open or close nodes based on the search label
-  const toggleNodesBySearch = (label: string) => {
+  const toggleNodesBySearch = (label: string): void => {
     nodes.value.forEach((node) => {
       if (label === "") {
         node.isOpen = false;
@@ -68,9 +71,9 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     });
   };
 
-  const refetch = async (parentId: string | null) => {
+  const refetch = async (parentId: string | null): Promise<void> => {
     try {
-      const data = await APIService.request({
+      const data = await APIService.request<Node[]>({
         endpoint: API_ENDPOINTS.getAllNodeWithoutChildren,
         method: "GET",
         pathParams: `?parentId=${parentId}&page=1&limit=${pageSize.value}&sortBy=createdAt&order=desc`, // Fetch the first page
@@ -95,10 +98,15 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     }
   };
 
-  const add = async (newNode: Node) => {
+  /**
+   * Sends a POST request to the mock API
+   * @param newNode
+   * @return the new node with successfull request
+   */
+  const add = async (newNode: Node): Promise<void> => {
     try {
       isLoading.value = true;
-      const response = await APIService.request({
+      const response = await APIService.request<Node>({
         endpoint: API_ENDPOINTS.getAllNodeWithoutChildren,
         method: "POST",
         body: newNode,
