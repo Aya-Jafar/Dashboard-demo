@@ -27,7 +27,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
   );
 
   // Fetch Initial data (parentId = null)
-  const fetchData = async (page: number, label: string = "") => {
+  const fetchMainData = async (page: number, label: string = "") => {
     try {
       isLoading.value = true;
       const data = await APIService.request({
@@ -39,9 +39,6 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
         setLoading: (loading: boolean) => (isLoading.value = loading),
         setterFunction: (data: any) => {
           nodes.value = data;
-          //   .sort(
-          //     (node1: Node, node2: Node) => node1.createdAt < node2.createdAt
-          //   );
         },
       });
       console.log(data);
@@ -79,7 +76,18 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
         pathParams: `?parentId=${parentId}&page=1&limit=${pageSize.value}&sortBy=createdAt&order=desc`, // Fetch the first page
         setLoading: (loading: boolean) => (isLoading.value = loading),
         setterFunction: (data: any) => {
-          nodes.value = data;
+          nodes.value = nodes.value.map((node) => {
+            if (node.id === parentId) {
+              // If the node is the parent, update its children
+              return {
+                ...node,
+                children: data.filter(
+                  (item: Node) => item.parentId === parentId
+                ),
+              };
+            }
+            return node; // Otherwise, return the node as is
+          });
         },
       });
     } catch (error) {
@@ -114,9 +122,11 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     searchLabel,
     totalItems,
     totalPages,
-    fetchData,
+    fetchMainData,
     toggleNodeVisibility,
     toggleNodesBySearch,
     add,
   };
 });
+
+export type { Node };

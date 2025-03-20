@@ -25,7 +25,7 @@ watch(
   () => nodeStore.searchLabel,
   (newLabel) => {
     nodeStore.currentPage = 1; // Reset to first page on new search
-    nodeStore.fetchData(nodeStore.currentPage, newLabel).then(() => {
+    nodeStore.fetchMainData(nodeStore.currentPage, newLabel).then(() => {
       nodeStore.toggleNodesBySearch(newLabel); // Open or close nodes based on the search label
     });
   }
@@ -33,14 +33,14 @@ watch(
 
 // Fetch data when component is mounted
 onMounted(() => {
-  nodeStore.fetchData(nodeStore.currentPage, nodeStore.searchLabel);
+  nodeStore.fetchMainData(nodeStore.currentPage, nodeStore.searchLabel);
 });
 
 // Handle next page click
 const goToNextPage = () => {
   if (nodeStore.currentPage < nodeStore.totalPages) {
     nodeStore.currentPage++;
-    nodeStore.fetchData(nodeStore.currentPage, nodeStore.searchLabel);
+    nodeStore.fetchMainData(nodeStore.currentPage, nodeStore.searchLabel);
   }
 };
 
@@ -48,7 +48,7 @@ const goToNextPage = () => {
 const goToPreviousPage = () => {
   if (nodeStore.currentPage > 1) {
     nodeStore.currentPage--;
-    nodeStore.fetchData(nodeStore.currentPage, nodeStore.searchLabel);
+    nodeStore.fetchMainData(nodeStore.currentPage, nodeStore.searchLabel);
   }
 };
 // Modal visibility state

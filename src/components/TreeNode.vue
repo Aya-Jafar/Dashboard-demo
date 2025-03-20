@@ -3,6 +3,8 @@ import { defineProps, defineEmits, ref } from "vue";
 import { APIService } from "../services/ApiService.ts";
 import API_ENDPOINTS from "../utils/endpoints.ts";
 import Snackbar from "./Snackbar.vue";
+import type { Node } from "../stores/dyanmicTree.ts";
+import { filterByExactParentID } from "../utils/helpers.ts";
 
 const props = defineProps({
   node: {
@@ -58,7 +60,10 @@ const fetchChildren = async (node: any) => {
       method: "GET",
       setLoading: (loading: boolean) => (isLoading.value = loading),
       setterFunction: (data: any) => {
-        node.children = data;
+        // The mock API's path parameter is NOT filtering with the exact ID
+        // So if ?parentId=2 the response conatins children with any parentId that contain "2" like "dept-1-2-1-1"
+        // That's why we need the filtering here
+        node.children = filterByExactParentID(data, node.id);
       },
     });
   } catch (error) {
