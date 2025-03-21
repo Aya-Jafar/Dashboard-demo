@@ -2,11 +2,11 @@
 import DynamicTree from "./pages/DynamicTree.vue";
 import Dashboard from "./pages/Dashboard.vue";
 import { ref, watch } from "vue";
-import LangougeToggle from "./components/dynamic-tree/LangougeToggle.vue";
+import LangougeToggle from "./components/common/LangougeToggle.vue";
 
 import { useI18n } from "vue-i18n";
 // Track the active tab
-const activeTab = ref(2);
+const activeTab = ref(1);
 
 const { locale } = useI18n();
 

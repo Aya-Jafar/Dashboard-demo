@@ -114,9 +114,23 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
         body: newNode,
         setLoading: (loading: boolean) => (isLoading.value = loading),
       });
+      // If the new node has a parent, update the parent's children
+      // if (newNode.parentId) {
+      //   const parentNode = nodes.value.find(
+      //     (node) => node.id === newNode.parentId
+      //   );
+      //   if (parentNode) {
+      //     if (!parentNode.children) {
+      //       parentNode.children = [];
+      //     }
+      //     parentNode.children.push(response);
+      //   }
+      // }
+      
 
       //   Refetch data after adding
-      refetch(newNode.parentId);
+      // refetch(newNode.parentId);
+
     } catch (error) {
       snackbarStore.showSnackbar(`API Error: ${error}`, "error");
     } finally {

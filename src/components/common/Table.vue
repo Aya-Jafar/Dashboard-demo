@@ -105,7 +105,10 @@ const handleSort = (column: string) => {
     </div>
 
     <!-- Table -->
-    <table class="min-w-full bg-[#1E2938] text-white"  v-if="sortedAndFilteredRows.length > 0">
+    <table
+      class="min-w-full bg-[#1E2938] text-white"
+      v-if="sortedAndFilteredRows.length > 0"
+    >
       <thead>
         <tr>
           <!-- Dynamic headers with sorting -->
@@ -140,9 +143,7 @@ const handleSort = (column: string) => {
     </table>
 
     <div v-else>
-      <p class="text-xl text-center font-semibold">
-        No data was found.
-      </p>
+      <p class="text-xl text-center font-semibold">No data was found.</p>
     </div>
   </div>
 </template>
