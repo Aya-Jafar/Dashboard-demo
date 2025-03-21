@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 
-// Props for the heatmap
+// Props for the line chart
 const props = defineProps({
   chartOptions: {
     type: Object,
@@ -14,19 +14,20 @@ const props = defineProps({
   series: {
     type: Array as () => Array<{
       name: string;
-      data: Array<{ x: string; y: number }>;
+      data: Array<{ x: number; y: number }>;
     }>,
     required: true,
   },
 });
+
 // Reactive series data
-const heatmapSeries = ref(props.series);
+const lineSeries = ref(props.series);
 
 // Watch for changes in the series prop
 watch(
   () => props.series,
   (newSeries) => {
-    heatmapSeries.value = newSeries;
+    lineSeries.value = newSeries;
   },
   { deep: true }
 );
@@ -34,9 +35,9 @@ watch(
 
 <template>
   <apexchart
-    class="flex-1 h-full !rounded-lg text-gray-900"
-    type="heatmap"
+    class="flex-1 h-full text-gray-900"
+    type="line"
     :options="chartOptions"
-    :series="heatmapSeries"
+    :series="lineSeries"
   ></apexchart>
 </template>

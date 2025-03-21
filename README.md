@@ -31,6 +31,11 @@ Same for it's children and grand children
 
 # Second Task docs - Dashboard 📈
 
+For the second task, I implemented a mock web socket service that mimicks the functionality of a web socket, it generates new data every 3 seconds and push it to the old ones and show it in real time
+
+
+
+
 
 
 [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
