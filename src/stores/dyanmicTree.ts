@@ -3,6 +3,7 @@ import { ref, computed } from "vue";
 import { APIService } from "../services/ApiService.ts";
 import API_ENDPOINTS from "../utils/endpoints.ts";
 import { useSnackbarStore } from "./snackbar.ts";
+import { filterByExactParentID } from "../utils/helpers.ts";
 
 interface Node {
   id?: string;
@@ -46,7 +47,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
         },
       });
     } catch (error) {
-      console.error("Error fetching data:", error);
+      snackbarStore.showSnackbar(`API Error: ${error}`, "error");
     } finally {
       isLoading.value = false;
     }
@@ -87,6 +88,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
                 children: data.filter(
                   (item: Node) => item.parentId === parentId
                 ),
+                // filterByExactParentID(data,parentId)
               };
             }
             return node; // Otherwise, return the node as is
@@ -116,7 +118,40 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
       //   Refetch data after adding
       refetch(newNode.parentId);
     } catch (error) {
-      console.error("Error adding new node:", error);
+      snackbarStore.showSnackbar(`API Error: ${error}`, "error");
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
+  const updateNodeParent = async (
+    draggedNodeId: string,
+    newParentId: string | null
+  ): Promise<void> => {
+    try {
+      isLoading.value = true;
+
+      // Fetch the node to be updated
+      const node = nodes.value.find((n) => n.id === draggedNodeId);
+      if (!node) {
+        throw new Error("Node not found");
+      }
+
+      // Update the parentId of the node
+      const updatedNode = { ...node, parentId: newParentId };
+
+      // Send a PUT request to update the node
+      const response = await APIService.request<Node>({
+        endpoint: `${API_ENDPOINTS.getAllNodeWithoutChildren}/${draggedNodeId}`,
+        method: "PUT",
+        body: updatedNode,
+        setLoading: (loading: boolean) => (isLoading.value = loading),
+      });
+
+      // Refetch data after updating
+      refetch(newParentId);
+    } catch (error) {
+      snackbarStore.showSnackbar(`API Error: ${error}`, "error");
     } finally {
       isLoading.value = false;
     }
@@ -134,6 +169,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     toggleNodeVisibility,
     toggleNodesBySearch,
     add,
+    updateNodeParent,
   };
 });
 

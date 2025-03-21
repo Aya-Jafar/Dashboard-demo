@@ -95,7 +95,7 @@ export class APIService {
       "Content-Type": "application/json",
     };
 
-    const url = `${import.meta.env.VITE_API_BASE_URL}${endpoint}${pathParams}`;
+    const url = `${import.meta.env.VITE_API_BASE_URL}/${endpoint}${pathParams}`;
 
     try {
       const response = await fetch(url, {
@@ -112,6 +112,7 @@ export class APIService {
       }
 
       const contentType = response.headers.get("Content-Type");
+
       if (!contentType?.includes("application/json")) {
         const textResponse = await response.text();
         if (method !== "GET") {

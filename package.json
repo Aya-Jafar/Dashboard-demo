@@ -9,9 +9,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "apexcharts": "^4.5.0",
     "pinia": "^3.0.1",
     "vue": "^3.5.13",
-    "vue-i18n": "^11.1.2"
+    "vue-i18n": "^11.1.2",
+    "vue3-apexcharts": "^1.8.0"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.14",

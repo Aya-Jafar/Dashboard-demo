@@ -7,8 +7,11 @@ const props = defineProps({
     default: null,
   },
 });
+// Reactive states
+const modalRef = ref<HTMLElement | null>(null);
 const emit = defineEmits(["close", "submit"]);
 const newNodeLabel = ref("");
+
 
 const resetAndEmit = (newNode: { label: string; parentId: string | null }) => {
   emit("submit", newNode); // Emit the new node data
@@ -34,8 +37,6 @@ const handleSubmit = () => {
   }
 };
 
-// Ref for the modal container
-const modalRef = ref<HTMLElement | null>(null);
 
 // Click outside handler
 const handleClickOutside = (event: MouseEvent) => {

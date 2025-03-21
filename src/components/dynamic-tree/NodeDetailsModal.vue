@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
-import { useDynamicTreeStore } from "../stores/dyanmicTree.ts";
+import { useDynamicTreeStore } from "../../stores/dyanmicTree.ts";
+
 
 // Define props to accept node data
 const props = defineProps({

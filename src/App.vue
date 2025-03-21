@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import DynamicTree from "./pages/DynamicTree.vue";
-import Graph from "./pages/Graph.vue";
+import Dashboard from "./pages/Dashboard.vue";
 import { ref, watch } from "vue";
-import LangougeToggle from "./components/LangougeToggle.vue";
+import LangougeToggle from "./components/dynamic-tree/LangougeToggle.vue";
 
 import { useI18n } from "vue-i18n";
 // Track the active tab
-const activeTab = ref(1);
+const activeTab = ref(2);
 
 const { locale } = useI18n();
 
@@ -63,7 +63,7 @@ watch(
       </div>
       <div v-if="activeTab === 2">
         <!-- Graph Tab -->
-        <Graph />
+        <Dashboard />
       </div>
     </div>
   </div>

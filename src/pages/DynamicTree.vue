@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import Button from "../components/Button.vue";
-import TreeNode from "../components/TreeNode.vue";
-import CreateNodeModal from "../components/CreateNodeModal.vue"; // Modal for creating new nodes
+import TreeNode from "../components/dynamic-tree/TreeNode.vue";
+import CreateNodeModal from "../components/dynamic-tree/CreateNodeModal.vue"; // Modal for creating new nodes
 import { useDynamicTreeStore } from "../stores/dyanmicTree.ts";
-import NodeDetailsModal from "../components/NodeDetailsModal.vue";
+import NodeDetailsModal from "../components/dynamic-tree/NodeDetailsModal.vue";
 
 // Use the store
-const nodeStore = useDynamicTreeStore();
+const store = useDynamicTreeStore();
 
 // Modal visibility states
 const isCreateNodeModalVisible = ref(false); // For "Create New Node" modal
@@ -22,33 +22,33 @@ const handleCreateNode = (parentId: string | null) => {
 // Watch for changes in the search label and trigger search
 // TODO: FIX THIS auto toggle
 watch(
-  () => nodeStore.searchLabel,
+  () => store.searchLabel,
   (newLabel) => {
-    nodeStore.currentPage = 1; // Reset to first page on new search
-    nodeStore.fetchMainData(nodeStore.currentPage, newLabel).then(() => {
-      nodeStore.toggleNodesBySearch(newLabel); // Open or close nodes based on the search label
+    store.currentPage = 1; // Reset to first page on new search
+    store.fetchMainData(store.currentPage, newLabel).then(() => {
+      store.toggleNodesBySearch(newLabel); // Open or close nodes based on the search label
     });
   }
 );
 
 // Fetch data when component is mounted
 onMounted(() => {
-  nodeStore.fetchMainData(nodeStore.currentPage, nodeStore.searchLabel);
+  store.fetchMainData(store.currentPage, store.searchLabel);
 });
 
 // Handle next page click
 const goToNextPage = () => {
-  if (nodeStore.currentPage < nodeStore.totalPages) {
-    nodeStore.currentPage++;
-    nodeStore.fetchMainData(nodeStore.currentPage, nodeStore.searchLabel);
+  if (store.currentPage < store.totalPages) {
+    store.currentPage++;
+    store.fetchMainData(store.currentPage, store.searchLabel);
   }
 };
 
 // Handle previous page click
 const goToPreviousPage = () => {
-  if (nodeStore.currentPage > 1) {
-    nodeStore.currentPage--;
-    nodeStore.fetchMainData(nodeStore.currentPage, nodeStore.searchLabel);
+  if (store.currentPage > 1) {
+    store.currentPage--;
+    store.fetchMainData(store.currentPage, store.searchLabel);
   }
 };
 // Modal visibility state
@@ -68,13 +68,18 @@ const handleNodeCreate = (newNode: {
   parentId: string | null;
 }) => {
   // Add the new node to the tree (assuming you have a store method for this)
-  nodeStore.add({
+  store.add({
     label: newNode.label,
     parentId: newNode.parentId,
     createdAt: new Date().getTime(),
   });
   // Close the modal
   isCreateNodeModalVisible.value = false;
+};
+
+
+const handleNodeMove = async (draggedNodeId: string, newParentId: string | null) => {
+  await store.updateNodeParent(draggedNodeId, newParentId); // Update the parentId in the store
 };
 </script>
 
@@ -85,7 +90,7 @@ const handleNodeCreate = (newNode: {
     <!-- Search and New Button -->
     <div class="flex justify-between items-end mb-10 py-4">
       <input
-        v-model="nodeStore.searchLabel"
+        v-model="store.searchLabel"
         type="text"
         :placeholder="$t('search')"
         class="p-2 rounded-md w-80 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
@@ -100,7 +105,7 @@ const handleNodeCreate = (newNode: {
 
     <!-- Loading State -->
     <div
-      v-if="nodeStore.isLoading"
+      v-if="store.isLoading"
       class="flex justify-center items-center py-8"
     >
       <div
@@ -111,7 +116,7 @@ const handleNodeCreate = (newNode: {
     <!-- Tree Rendering -->
     <div v-else>
       <div
-        v-for="(node, index) in nodeStore.nodes"
+        v-for="(node, index) in store.nodes"
         :key="node.id"
         class="mb-4 p-4 bg-gray-800 rounded-lg shadow-md"
       >
@@ -119,26 +124,27 @@ const handleNodeCreate = (newNode: {
         <TreeNode
           :node="node"
           :visible="node.visible"
-          @toggle="nodeStore.toggleNodeVisibility(node.id)"
+          @toggle="store.toggleNodeVisibility(node.id)"
           @show-details="showNodeDetails"
           @create-node="handleCreateNode"
+           @node-move="handleNodeMove"
         />
       </div>
 
       <!-- Pagination Controls -->
       <div class="flex justify-center mt-8">
         <button
-          :disabled="nodeStore.currentPage === 1"
+          :disabled="store.currentPage === 1"
           @click="goToPreviousPage"
           class="px-4 py-2 bg-gray-700 text-white rounded-l hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Previous
         </button>
         <span class="px-4 py-2 bg-gray-700 text-white">
-          Page {{ nodeStore.currentPage }} of {{ nodeStore.totalPages }}
+          Page {{ store.currentPage }} of {{ store.totalPages }}
         </span>
         <button
-          :disabled="nodeStore.currentPage === nodeStore.totalPages"
+          :disabled="store.currentPage === store.totalPages"
           @click="goToNextPage"
           class="px-4 py-2 bg-gray-700 text-white rounded-r hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
         >
