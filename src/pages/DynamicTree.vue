@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
-import Button from "../components/Button.vue";
+import Button from "../components/common/Button.vue";
 import TreeNode from "../components/dynamic-tree/TreeNode.vue";
 import CreateNodeModal from "../components/dynamic-tree/CreateNodeModal.vue"; // Modal for creating new nodes
 import { useDynamicTreeStore } from "../stores/dyanmicTree.ts";

@@ -2,7 +2,7 @@
 import { defineProps, defineEmits, ref } from "vue";
 import { APIService } from "../../services/ApiService.ts";
 import API_ENDPOINTS from "../../utils/endpoints.ts";
-import Snackbar from "../Snackbar.vue";
+import Snackbar from "../common/Snackbar.vue";
 import { useDynamicTreeStore, type Node } from "../../stores/dyanmicTree.ts";
 import { filterByExactParentID } from "../../utils/helpers.ts";
 
