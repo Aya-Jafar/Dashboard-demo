@@ -41,11 +41,11 @@ export class MockWebSocket {
 }
 
 // Function to generate mock merchant data
-function generateMerchantData() {
+const generateMerchantData = () => {
   const merchants = ["Merchant A", "Merchant B", "Merchant C", "Merchant D"];
   return merchants.map((name) => ({
     name,
     count: Math.floor(Math.random() * 100),
     value: Math.floor(Math.random() * 10000),
   }));
-}
+};
