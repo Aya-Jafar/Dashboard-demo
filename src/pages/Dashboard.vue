@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { MockWebSocket } from "../services/WebSocketService";
 
-// Dark theme color palette with yellow accent
+// Dark theme color palette
 const colors = {
   primary: "#4936FC",
   secondary: "#10B981",
@@ -10,7 +11,7 @@ const colors = {
   grid: "#364051",
 };
 
-// Line Chart Options (unchanged)
+// Line Chart Options
 const lineChartOptions = ref({
   chart: {
     id: "vuechart-example",
@@ -144,7 +145,7 @@ const lineChartOptions = ref({
   },
 });
 
-// Line Chart Data (unchanged)
+// Line Chart Data (initial data)
 const lineSeries = ref([
   {
     name: "Transaction Volume",
@@ -162,7 +163,7 @@ const lineSeries = ref([
   },
 ]);
 
-// Heatmap Options (Updated)
+// Heatmap Options (unchanged)
 const heatmapOptions = ref({
   chart: {
     id: "vuechart-heatmap",
@@ -170,18 +171,45 @@ const heatmapOptions = ref({
     height: "100%",
     toolbar: {
       show: false,
+      tools: {
+        download: true,
+        zoom: true,
+        reset: true,
+      },
     },
     background: colors.background,
     foreColor: colors.text,
   },
-  colors: [colors.primary, colors.secondary], // Use primary and secondary colors
+  colors: [colors.primary, colors.secondary],
   dataLabels: {
-    enabled: false, // Disable data labels for cleaner look
+    enabled: false,
   },
   xaxis: {
     categories: [
-      "12 AM", "1 AM", "2 AM", "3 AM", "4 AM", "5 AM", "6 AM", "7 AM", "8 AM", "9 AM", "10 AM", "11 AM",
-      "12 PM", "1 PM", "2 PM", "3 PM", "4 PM", "5 PM", "6 PM", "7 PM", "8 PM", "9 PM", "10 PM", "11 PM"
+      "12 AM",
+      "1 AM",
+      "2 AM",
+      "3 AM",
+      "4 AM",
+      "5 AM",
+      "6 AM",
+      "7 AM",
+      "8 AM",
+      "9 AM",
+      "10 AM",
+      "11 AM",
+      "12 PM",
+      "1 PM",
+      "2 PM",
+      "3 PM",
+      "4 PM",
+      "5 PM",
+      "6 PM",
+      "7 PM",
+      "8 PM",
+      "9 PM",
+      "10 PM",
+      "11 PM",
     ],
     labels: {
       style: {
@@ -192,14 +220,14 @@ const heatmapOptions = ref({
     },
     axisBorder: {
       show: true,
-      color: colors.grid, // Border color for x-axis
+      color: colors.grid,
     },
     axisTicks: {
-      color: colors.grid, // Border color for x-axis ticks
+      color: colors.grid,
     },
   },
   yaxis: {
-    show: true, // Show y-axis for row labels
+    show: true,
     labels: {
       style: {
         colors: colors.text,
@@ -209,7 +237,7 @@ const heatmapOptions = ref({
     },
     axisBorder: {
       show: true,
-      color: colors.grid, // Border color for y-axis
+      color: colors.grid,
     },
   },
   tooltip: {
@@ -226,70 +254,34 @@ const heatmapOptions = ref({
   },
   plotOptions: {
     heatmap: {
-      distributed: true, // Enable row-based display
+      distributed: true,
       colorScale: {
         inverse: false,
         ranges: [
-          {
-            from: 0,
-            to: 50,
-            name: "Low",
-            color: "#4936FC", // Gradient start color (primary)
-          },
-          {
-            from: 51,
-            to: 100,
-            name: "Medium",
-            color: "#10B981", // Gradient middle color (secondary)
-          },
-          {
-            from: 101,
-            to: 200,
-            name: "High",
-            color: "#3189F2", // Gradient end color (bright blue)
-          },
+          { from: 0, to: 50, name: "Low", color: "#4936FC" },
+          { from: 51, to: 100, name: "Medium", color: "#10B981" },
+          { from: 101, to: 200, name: "High", color: "#3189F2" },
         ],
       },
     },
   },
   grid: {
     show: true,
-    borderColor: "#FFD700", // Change border color to yellow (accent color)
+    borderColor: "#FFD700",
     strokeDashArray: 4,
     position: "back",
   },
 });
 
-// Heatmap Data (updated for row-based display)
+// Heatmap Data (initial data)
 const heatmapSeries = ref([
-  {
-    name: "Monday",
-    data: generateHeatmapRowData(),
-  },
-  {
-    name: "Tuesday",
-    data: generateHeatmapRowData(),
-  },
-  {
-    name: "Wednesday",
-    data: generateHeatmapRowData(),
-  },
-  {
-    name: "Thursday",
-    data: generateHeatmapRowData(),
-  },
-  {
-    name: "Friday",
-    data: generateHeatmapRowData(),
-  },
-  {
-    name: "Saturday",
-    data: generateHeatmapRowData(),
-  },
-  {
-    name: "Sunday",
-    data: generateHeatmapRowData(),
-  },
+  { name: "Monday", data: generateHeatmapRowData() },
+  { name: "Tuesday", data: generateHeatmapRowData() },
+  { name: "Wednesday", data: generateHeatmapRowData() },
+  { name: "Thursday", data: generateHeatmapRowData() },
+  { name: "Friday", data: generateHeatmapRowData() },
+  { name: "Saturday", data: generateHeatmapRowData() },
+  { name: "Sunday", data: generateHeatmapRowData() },
 ]);
 
 // Function to generate heatmap row data
@@ -306,23 +298,43 @@ function generateHeatmapRowData() {
   return data;
 }
 
+// Initialize WebSocket and update chart data
 onMounted(() => {
-  setTimeout(() => {
-    heatmapSeries.value[0].data = generateHeatmapRowData();
-  }, 2000);
-});
-onMounted(() => {
-  // Simulate fetching data and updating the chart series dynamically
-  // You can replace this with a fetch request to get data from an API
-  setTimeout(() => {
-    lineSeries.value[0].data = [
-      { x: new Date("2025-03-01").getTime(), y: 120 },
-      { x: new Date("2025-03-02").getTime(), y: 180 },
-      { x: new Date("2025-03-03").getTime(), y: 250 },
-      { x: new Date("2025-03-04").getTime(), y: 280 },
-      { x: new Date("2025-03-05").getTime(), y: 300 },
-    ];
-  }, 2000); // Simulate a delay in fetching data
+  const ws = new MockWebSocket(import.meta.env.VITE_MOCK_WEB_SOCKET_URL);
+  ws.connect();
+
+  // Simulate real-time data updates for the line chart
+  ws.onmessage((message) => {
+    console.log("WebSocket message received:", message);
+
+    // Simulate new data for the line chart
+    const newLineData = {
+      x: new Date().getTime(), // Use current timestamp
+      y: Math.floor(Math.random() * 1000), // Random value between 0 and 1000
+    };
+
+    // Append new data to the existing line series
+    lineSeries.value[0].data.push(newLineData);
+
+    // Limit the number of data points to 20 to avoid overcrowding
+    if (lineSeries.value[0].data.length > 20) {
+      lineSeries.value[0].data.shift(); // Remove the oldest data point
+    }
+
+    // Simulate new data for the heatmap
+    const newHeatmapData = heatmapSeries.value.map((day) => ({
+      ...day,
+      data: generateHeatmapRowData(), // Regenerate data for each day
+    }));
+
+    // Update the heatmap series
+    heatmapSeries.value = newHeatmapData;
+  });
+
+  // Simulate periodic WebSocket messages
+  setInterval(() => {
+    ws.send("Update charts");
+  }, 3000); // Send a message every 3 seconds
 });
 </script>
 
@@ -357,6 +369,6 @@ onMounted(() => {
 body {
   font-family: "Inter", sans-serif;
   background-color: #111827;
-  color: #F3F4F6;
+  color: #f3f4f6;
 }
 </style>
