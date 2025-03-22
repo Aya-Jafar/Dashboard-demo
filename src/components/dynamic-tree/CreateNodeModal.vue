@@ -7,12 +7,15 @@ const props = defineProps({
     default: null,
   },
 });
+
 // Reactive states
 const modalRef = ref<HTMLElement | null>(null);
 const emit = defineEmits(["close", "submit"]);
 const newNodeLabel = ref("");
+const isInputValid = ref(true); // Track input validity
+const errorMessage = ref(""); 
 
-
+// Reset and emit new node data
 const resetAndEmit = (newNode: { label: string; parentId: string | null }) => {
   emit("submit", newNode); // Emit the new node data
   newNodeLabel.value = ""; // Clear the input
@@ -21,7 +24,18 @@ const resetAndEmit = (newNode: { label: string; parentId: string | null }) => {
 
 // Handle form submission
 const handleSubmit = () => {
-  if (newNodeLabel.value.trim() && props.parentId !== null) {
+  // Validate input
+  if (!newNodeLabel.value.trim()) {
+    isInputValid.value = false;
+    errorMessage.value = "Node label cannot be empty.";
+    return; // Stop submission if input is invalid
+  }
+
+  // If input is valid, proceed with submission
+  isInputValid.value = true;
+  errorMessage.value = "";
+
+  if (props.parentId !== null) {
     const newNode = {
       label: newNodeLabel.value,
       parentId: props.parentId, // Include the parent ID
@@ -36,7 +50,6 @@ const handleSubmit = () => {
     resetAndEmit(newNode);
   }
 };
-
 
 // Click outside handler
 const handleClickOutside = (event: MouseEvent) => {
@@ -74,8 +87,13 @@ onUnmounted(() => {
           v-model="newNodeLabel"
           type="text"
           placeholder="Enter node label..."
-          class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-4"
+          class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-2"
+          :class="{ 'border-red-400': !isInputValid }"
         />
+        <!-- Error message -->
+        <p v-if="!isInputValid" class="text-red-400 text-sm mb-4">
+          {{ errorMessage }}
+        </p>
         <div class="flex justify-end">
           <button
             type="button"
