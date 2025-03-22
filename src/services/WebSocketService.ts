@@ -1,5 +1,5 @@
 import { useDashboardStore } from "../stores/dashboard";
-export class MockWebSocket {
+class MockWebSocket {
   private url: string;
   private listeners: Array<(message: any) => void>;
 
@@ -49,3 +49,5 @@ const generateMerchantData = () => {
     value: Math.floor(Math.random() * 10000),
   }));
 };
+
+export default MockWebSocket;

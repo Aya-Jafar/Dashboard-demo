@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
-import { MockWebSocket } from "../services/WebSocketService";
+import MockWebSocket from "../services/WebSocketService";
 import LineChart from "../components/dashboard/LineChart.vue";
 import HeatMap from "../components/dashboard/HeatMap.vue";
 import { useDashboardStore } from "../stores/dashboard";
 import Table from "../components/common/Table.vue";
+
 
 // Access the store
 const store = useDashboardStore();

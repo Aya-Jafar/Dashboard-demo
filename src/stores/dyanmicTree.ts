@@ -36,7 +36,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
       isLoading.value = true;
 
       const data = await APIService.request<Node[]>({
-        endpoint: API_ENDPOINTS.getAllNodeWithoutChildren,
+        endpoint: API_ENDPOINTS.getAllDepartments,
         method: "GET",
         pathParams: `?parentId=null&page=${page}&limit=${
           pageSize.value
@@ -75,7 +75,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
   const refetch = async (parentId: string | null): Promise<void> => {
     try {
       const data = await APIService.request<Node[]>({
-        endpoint: API_ENDPOINTS.getAllNodeWithoutChildren,
+        endpoint: API_ENDPOINTS.getAllDepartments,
         method: "GET",
         pathParams: `?parentId=${parentId}&page=1&limit=${pageSize.value}&sortBy=createdAt&order=desc`, // Fetch the first page
         setLoading: (loading: boolean) => (isLoading.value = loading),
@@ -109,7 +109,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     try {
       isLoading.value = true;
       const response = await APIService.request<Node>({
-        endpoint: API_ENDPOINTS.getAllNodeWithoutChildren,
+        endpoint: API_ENDPOINTS.getAllDepartments,
         method: "POST",
         body: newNode,
         setLoading: (loading: boolean) => (isLoading.value = loading),
@@ -159,7 +159,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
 
       // Send a PUT request to update the node
       const response = await APIService.request<Node>({
-        endpoint: `${API_ENDPOINTS.getAllNodeWithoutChildren}/${draggedNodeId}`,
+        endpoint: `${API_ENDPOINTS.getAllDepartments}/${draggedNodeId}`,
         method: "PUT",
         body: updatedNode,
         setLoading: (loading: boolean) => (isLoading.value = loading),

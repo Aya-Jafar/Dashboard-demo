@@ -9,7 +9,7 @@ const props = defineProps({
     type: Object,
     default: () => ({
       label: "",
-      departmentDescription: "",
+      description: "",
       numberOfEmployees: 0,
     }),
   },
@@ -60,7 +60,7 @@ onUnmounted(() => {
         <p class="text-white">
           <strong>Description:</strong>
           {{
-            nodeData.departmentDescription ||
+            nodeData.description ||
             "This department is responsible for overseeing various projects, ensuring smooth operations, and coordinating between different teams. It plays a crucial role in strategic planning and execution, driving efficiency and innovation within the organization."
           }}
         </p>

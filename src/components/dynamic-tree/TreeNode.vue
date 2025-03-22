@@ -31,7 +31,7 @@ const toggleNode = async (node: any) => {
       isLoading.value = true;
 
       const data = await APIService.request({
-        endpoint: `${API_ENDPOINTS.getAllNodeWithoutChildren}?parentId=${node.id}`,
+        endpoint: `${API_ENDPOINTS.getAllDepartments}?parentId=${node.id}`,
         method: "GET",
         setLoading: (loading: boolean) => (isLoading.value = loading),
         setterFunction: (data: any) => {
@@ -75,45 +75,45 @@ const onDragOver = (event: DragEvent) => {
 
 // Drop Handler (Reorder children based on drop)
 const onDrop = async (event: DragEvent, targetNodeId: string) => {
-  console.log("Node dropped:", targetNodeId);
-  event.preventDefault();
+  // console.log("Node dropped:", targetNodeId);
+  // event.preventDefault();
 
-  const draggedNodeId = event.dataTransfer?.getData("nodeId"); // Get the dragged node's ID
-  const draggedNodeParentId = event.dataTransfer?.getData("parentId"); // Get its original parent ID
+  // const draggedNodeId = event.dataTransfer?.getData("nodeId"); // Get the dragged node's ID
+  // const draggedNodeParentId = event.dataTransfer?.getData("parentId"); // Get its original parent ID
 
-  if (!draggedNodeId || draggedNodeId === targetNodeId) return; // Avoid self-drop
+  // if (!draggedNodeId || draggedNodeId === targetNodeId) return; // Avoid self-drop
 
-  console.log("Dragged Node ID:", draggedNodeId);
-  console.log("Target Node ID:", targetNodeId);
-  console.log("Store Nodes:", store.nodes);
+  // console.log("Dragged Node ID:", draggedNodeId);
+  // console.log("Target Node ID:", targetNodeId);
+  // console.log("Store Nodes:", store.nodes);
 
-  const draggedNode = store.nodes.find((node) => {
-    console.log("Node", node.id, "dragged", draggedNodeId);
-    return node.id === draggedNodeId;
-  });
+  // const draggedNode = store.nodes.find((node) => {
+  //   console.log("Node", node.id, "dragged", draggedNodeId);
+  //   return node.id === draggedNodeId;
+  // });
 
-  const targetNode = store.nodes.find((node) => {
-    console.log("Node", node.id, "target", targetNodeId);
-    return node.id === targetNodeId;
-  });
+  // const targetNode = store.nodes.find((node) => {
+  //   console.log("Node", node.id, "target", targetNodeId);
+  //   return node.id === targetNodeId;
+  // });
 
-  console.log("Target Node:", targetNode);
-  console.log("Dragged Node:", draggedNode);
+  // console.log("Target Node:", targetNode);
+  // console.log("Dragged Node:", draggedNode);
 
-  if (!draggedNode || !targetNode) {
-    console.error("Dragged node or target node not found");
-    return;
-  }
+  // if (!draggedNode || !targetNode) {
+  //   console.error("Dragged node or target node not found");
+  //   return;
+  // }
 
-  console.log("🔴 Old Parent Node:", draggedNodeParentId);
-  console.log("🟢 Dragged Node:", draggedNode);
-  console.log("🔵 Target Node (New Position):", targetNode);
+  // console.log("🔴 Old Parent Node:", draggedNodeParentId);
+  // console.log("🟢 Dragged Node:", draggedNode);
+  // console.log("🔵 Target Node (New Position):", targetNode);
 
-  // Update the dragged node's parentId to match the target node's parentId
-  draggedNode.parentId = targetNode.parentId;
+  // // Update the dragged node's parentId to match the target node's parentId
+  // draggedNode.parentId = targetNode.parentId;
 
-  // Force reactivity by reassigning the nodes array
-  store.nodes = [...store.nodes];
+  // // Force reactivity by reassigning the nodes array
+  // store.nodes = [...store.nodes];
 };
 </script>
 

@@ -80,7 +80,7 @@ export const useDashboardStore = defineStore("dashboard", () => {
       type: "heatmap",
       height: "100%",
       toolbar: {
-        show: false,
+        show: true,
         tools: {
           download: true,
           zoom: true,
