@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref } from "vue";
+import { defineProps, defineEmits, ref, onMounted, watch } from "vue";
 import { APIService } from "../../services/ApiService.ts";
 import API_ENDPOINTS from "../../utils/endpoints.ts";
 import Snackbar from "../common/Snackbar.vue";
 import { useDynamicTreeStore, type Node } from "../../stores/dyanmicTree.ts";
 import { filterByExactParentID } from "../../utils/helpers.ts";
+import OpenIcon from "./OpenIcon.vue";
+import Icon from "../common/Icon.vue";
 
 const props = defineProps({
   node: {
@@ -19,10 +21,13 @@ const props = defineProps({
 
 const emit = defineEmits(["show-details", "create-node", "node-move"]);
 const store = useDynamicTreeStore();
+const noChildrenText = ref<null | string>(null);
 
 const isLoading = ref(false);
-// TODO: Add childrenCount to each object in json
-const hasChildren = ref<boolean>(true);
+
+onMounted(() => {
+  console.log(props.node);
+});
 
 // Function to handle toggling a node
 const toggleNode = async (node: any) => {
@@ -34,6 +39,10 @@ const toggleNode = async (node: any) => {
         endpoint: `${API_ENDPOINTS.getAllDepartments}?parentId=${node.id}`,
         method: "GET",
         setLoading: (loading: boolean) => (isLoading.value = loading),
+        setError: (message) => {
+          node.isOpen = true;
+          noChildrenText.value = message;
+        },
         setterFunction: (data: any) => {
           /**
            * The mock API's path parameter is NOT filtering with the exact ID
@@ -128,39 +137,9 @@ const onDrop = async (event: DragEvent, targetNodeId: string) => {
         :aria-label="`Toggle ${node.label}`"
       >
         <span class="mr-2">
-          <svg
-            v-if="node.isOpen"
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5 transform rotate-90"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-          <svg
-            v-else
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M5 15l7-7 7 7"
-            />
-          </svg>
+          <OpenIcon :isOpen="node.isOpen" />
         </span>
+
         <span class="font-medium text-gray-100">{{ node.label }}</span>
       </div>
 
@@ -172,27 +151,11 @@ const onDrop = async (event: DragEvent, targetNodeId: string) => {
           :aria-label="`View details of ${node.label}`"
           class="px-2 py-1 text-white rounded hover:bg-[#F2CE00] focus:outline-none"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-            />
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"
-            />
-          </svg>
+          <Icon
+            iconClass="h-6 w-6 text-blue-500 text-white"
+            strokeWidth="1.5"
+            :d="'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z'"
+          />
         </button>
 
         <!-- Plus Icon Button for Creating New Node -->
@@ -201,21 +164,11 @@ const onDrop = async (event: DragEvent, targetNodeId: string) => {
           class="px-2 py-1 text-white rounded hover:bg-[#F2CE00] focus:outline-none"
           :aria-label="`Create new node under ${node.label}`"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 4v16m8-8H4"
-            />
-          </svg>
+          <Icon
+            :d="'M12 4v16m8-8H4'"
+            iconClass="h-6 w-6 text-white"
+            strokeWidth="1.5"
+          />
         </button>
       </div>
     </div>
@@ -233,6 +186,7 @@ const onDrop = async (event: DragEvent, targetNodeId: string) => {
           class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-yellow-400"
         ></div>
       </div>
+      <div v-else-if="noChildrenText !== null">{{ noChildrenText }}</div>
       <TreeNode
         v-else
         v-for="(child, idx) in node.children"

@@ -7,7 +7,7 @@ import LangougeToggle from "./components/common/LangougeToggle.vue";
 import { useI18n } from "vue-i18n";
 
 // Track the active tab
-const activeTab = ref(1);
+const activeTab = ref(2);
 
 const { locale } = useI18n();
 

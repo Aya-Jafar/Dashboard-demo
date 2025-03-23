@@ -4,7 +4,7 @@
  */
 
 enum API_ENDPOINTS {
-  getAllDepartments="/mock-api/departments"
+  getAllDepartments="mock-api/departments"
 }
 
 

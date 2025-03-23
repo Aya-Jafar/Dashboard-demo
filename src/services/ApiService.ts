@@ -16,6 +16,11 @@ type SetterFunction<T> = (data: T) => void;
 type LoadingFunction = (isLoading: boolean) => void;
 
 /**
+ * Type for a function that sets error messages.
+ */
+type ErrorFunction = (errorMessage: string) => void;
+
+/**
  * Interface for the options to be passed to the API service.
  */
 interface APIServiceOptions<T = any> {
@@ -54,6 +59,12 @@ interface APIServiceOptions<T = any> {
    * @example (isLoading) => { this.isLoading = isLoading; }
    */
   setLoading?: LoadingFunction | null;
+
+  /**
+   * A function to set the error message (optional).
+   * @example (errorMessage) => { this.errorMessage = errorMessage; }
+   */
+  setError?: ErrorFunction | null;
 }
 
 /**
@@ -85,6 +96,7 @@ export class APIService {
     pathParams = "",
     setterFunction = null,
     setLoading = null,
+    setError = null,
   }: APIServiceOptions<T>): Promise<T> {
     const snackbarStore = useSnackbarStore();
 
@@ -128,11 +140,17 @@ export class APIService {
       if (setterFunction) {
         setterFunction(data);
       }
+
       return data;
     } catch (error) {
       if (method !== "GET") {
         snackbarStore.showSnackbar(`Error: ${String(error)}`, "error");
       }
+      if (String(error) === 'Error: "Not found"' && setError !== null) {
+        console.log(String(error) === 'Error: "Not found"');
+        setError("No children avaliable.");
+      }
+
       throw error;
     } finally {
       if (setLoading) setLoading(false);

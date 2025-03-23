@@ -12,14 +12,15 @@ const store = useDynamicTreeStore();
 const { locale } = useI18n();
 
 // Modal visibility states
-const isCreateNodeModalVisible = ref(false); // For "Create New Node" modal
-const selectedParentId = ref<string | null>(null); // Store the parent ID for the new node
+const isCreateNodeModalVisible = ref(false); 
+const selectedParentId = ref<string | null>(null); 
 
 // Function to handle creating a new node
 const handleCreateNode = (parentId: string | null) => {
   selectedParentId.value = parentId ?? null; // Set the parent ID
   isCreateNodeModalVisible.value = true; // Show the modal
 };
+
 
 // Watch for changes in the search label and trigger search
 // TODO: FIX THIS auto toggle
@@ -74,6 +75,7 @@ const handleNodeCreate = (newNode: {
     label: newNode.label,
     parentId: newNode.parentId,
     createdAt: new Date().getTime(),
+    hasChildren: false,
   });
   // Close the modal
   isCreateNodeModalVisible.value = false;
@@ -138,35 +140,39 @@ const isRTL = computed(() => locale.value === "ar");
       </div>
 
       <!-- Pagination Controls -->
-   <div :dir="isRTL ? 'rtl' : 'ltr'">
-    <div class="flex justify-center mt-8">
-      <button
-        :disabled="store.currentPage === store.totalPages"
-        @click="goToNextPage"
-        class="px-4 py-2 bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-        :class="{
-          'rounded-r': isRTL,
-          'rounded-l': !isRTL,
-        }"
-      >
-        {{ isRTL ? "التالي" : "Next" }}
-      </button>
-      <span class="px-4 py-2 bg-gray-700 text-white">
-        {{ isRTL ? `صفحة ${store.currentPage} من ${store.totalPages}` : `Page ${store.currentPage} of ${store.totalPages}` }}
-      </span>
-      <button
-        :disabled="store.currentPage === 1"
-        @click="goToPreviousPage"
-        class="px-4 py-2 bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-        :class="{
-          'rounded-l': isRTL,
-          'rounded-r': !isRTL,
-        }"
-      >
-        {{ isRTL ? "السابق" : "Previous" }}
-      </button>
-    </div>
-  </div>
+      <div :dir="isRTL ? 'rtl' : 'ltr'">
+        <div class="flex justify-center mt-8">
+          <button
+            :disabled="store.currentPage === store.totalPages"
+            @click="goToNextPage"
+            class="px-4 py-2 bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            :class="{
+              'rounded-r': isRTL,
+              'rounded-l': !isRTL,
+            }"
+          >
+            {{ isRTL ? "التالي" : "Next" }}
+          </button>
+          <span class="px-4 py-2 bg-gray-700 text-white">
+            {{
+              isRTL
+                ? `صفحة ${store.currentPage} من ${store.totalPages}`
+                : `Page ${store.currentPage} of ${store.totalPages}`
+            }}
+          </span>
+          <button
+            :disabled="store.currentPage === 1"
+            @click="goToPreviousPage"
+            class="px-4 py-2 bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            :class="{
+              'rounded-l': isRTL,
+              'rounded-r': !isRTL,
+            }"
+          >
+            {{ isRTL ? "السابق" : "Previous" }}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
