@@ -25,12 +25,10 @@ const noChildrenText = ref<null | string>(null);
 
 const isLoading = ref(false);
 
-onMounted(() => {
-  console.log(props.node);
-});
-
 // Function to handle toggling a node
 const toggleNode = async (node: any) => {
+  if (isLoading.value) return; // Disable toggle if loading
+
   if (!node.isOpen) {
     try {
       isLoading.value = true;
@@ -51,6 +49,9 @@ const toggleNode = async (node: any) => {
            * That's why we need the filtering here
            *  */
           node.children = filterByExactParentID(data, node.id);
+          if (node.children.length === 0) {
+            noChildrenText.value = "No children available";
+          }
           node.isOpen = true;
         },
       });
@@ -135,6 +136,7 @@ const onDrop = async (event: DragEvent, targetNodeId: string) => {
         @click="toggleNode(node)"
         role="button"
         :aria-label="`Toggle ${node.label}`"
+        :disabled="isLoading"
       >
         <span class="mr-2">
           <OpenIcon :isOpen="node.isOpen" />
