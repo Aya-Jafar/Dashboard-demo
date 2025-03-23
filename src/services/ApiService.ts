@@ -148,7 +148,7 @@ export class APIService {
       }
       if (String(error) === 'Error: "Not found"' && setError !== null) {
         console.log(String(error) === 'Error: "Not found"');
-        setError("No children avaliable.");
+        setError("No sub-sections avaliable.");
       }
 
       throw error;

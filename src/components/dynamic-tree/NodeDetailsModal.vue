@@ -54,7 +54,7 @@ onUnmounted(() => {
         </p>
         <br />
         <p class="text-white">
-          <strong>Number of Employees: </strong>
+          <strong> {{$t("employeesCount")}}</strong>
           <span class="text-[#F2CE00] font-bold">
             {{ nodeData.numberOfEmployees || 10 }}
           </span>

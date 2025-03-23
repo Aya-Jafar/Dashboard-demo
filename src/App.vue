@@ -46,7 +46,7 @@ watch(
         :class="{ 'font-bold border-b border-[#F2CE00]': activeTab === 1 }"
         @click="activeTab = 1"
       >
-        Dashboard
+        {{ $t("dashboard") }}
         <span
           v-if="activeTab === 1"
           class="absolute bottom-0 left-0 w-full h-0.5 text-[#F2CE00] transition-all"
@@ -58,7 +58,7 @@ watch(
         :class="{ 'font-bold border-b border-[#F2CE00]': activeTab === 2 }"
         @click="activeTab = 2"
       >
-        Dynamic Tree
+        {{ $t("departments") }}
         <span
           v-if="activeTab === 2"
           class="absolute bottom-0 left-0 w-full h-0.5 text-[#F2CE00] transition-all"

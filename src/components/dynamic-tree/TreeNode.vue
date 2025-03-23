@@ -7,6 +7,7 @@ import { useDynamicTreeStore, type Node } from "../../stores/dyanmicTree.ts";
 import { filterByExactParentID } from "../../utils/helpers.ts";
 import OpenIcon from "./OpenIcon.vue";
 import Icon from "../common/Icon.vue";
+import { useI18n } from "vue-i18n";
 
 const props = defineProps({
   node: {
@@ -21,6 +22,7 @@ const props = defineProps({
 
 const emit = defineEmits(["show-details", "create-node", "node-move"]);
 const store = useDynamicTreeStore();
+const { t } = useI18n();
 const noChildrenText = ref<null | string>(null);
 
 const isLoading = ref(false);
@@ -50,7 +52,7 @@ const toggleNode = async (node: any) => {
            *  */
           node.children = filterByExactParentID(data, node.id);
           if (node.children.length === 0) {
-            noChildrenText.value = "No children available";
+            noChildrenText.value = t("noSubSectionsAvailable");
           }
           node.isOpen = true;
         },
@@ -188,7 +190,7 @@ const onDrop = async (event: DragEvent, targetNodeId: string) => {
           class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-yellow-400"
         ></div>
       </div>
-      <div v-else-if="noChildrenText !== null">{{ noChildrenText }}</div>
+      <div v-else-if="noChildrenText !== null">{{ $t(noChildrenText) }}</div>
       <TreeNode
         v-else
         v-for="(child, idx) in node.children"

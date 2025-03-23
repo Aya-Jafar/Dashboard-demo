@@ -17,5 +17,16 @@
   "pending": "قيد الانتظار",
   "filterBy": "تصفية حسب:",
   "selectColumn": "اختر العمود",
-  "enterFilterValue": "أدخل قيمة التصفية"
+  "enterFilterValue": "أدخل قيمة التصفية",
+  "noSubSectionsAvailable": "لا توجد أقسام فرعية متاحة.",
+  "employeesCount": "عدد الموظفين:",
+  "createNewDepartment": "إنشاء قسم جديد",
+  "enterNodeLabel": "أدخل تسمية العقدة...",
+  "enterNumberOfEmployees": "أدخل عدد الموظفين...",
+  "enterDescription": "أدخل الوصف...",
+  "cancel": "إلغاء",
+  "create": "إنشاء",
+  "createNode": "إنشاء عقدة",
+  "dashboard": "لوحة التحكم",
+  "departments": "الأقسام"
 }

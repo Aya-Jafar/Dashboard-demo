@@ -17,5 +17,16 @@
   "pending": "Pending",
   "filterBy": "Filter by:",
   "selectColumn": "Select Column",
-  "enterFilterValue": "Enter filter value"
+  "enterFilterValue": "Enter filter value",
+  "noSubSectionsAvailable": "No sub-sections available.",
+  "employeesCount": "Number of Employees: ",
+  "createNewDepartment": "Create New Department",
+  "enterNodeLabel": "Enter node label...",
+  "enterNumberOfEmployees": "Enter number of employees...",
+  "enterDescription": "Enter description...",
+  "cancel": "Cancel",
+  "create": "Create",
+  "createNode": "Create node",
+  "dashboard": "Dashboard",
+  "departments": "Departments"
 }
