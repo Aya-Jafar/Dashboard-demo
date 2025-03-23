@@ -3,6 +3,19 @@
   "tasks_demo": "عرض المهام",
   "qi_card": "لـ Qi Card",
   "title": "عرض المهام",
-  "search":"ابحث حسب العنوان...",
-  "new":"إنشاء"
+  "search": "ابحث حسب العنوان...",
+  "new": "إنشاء",
+  "table_title": "أفضل التجار",
+  "charts_title": "إحصائيات المعاملات",
+  "merchant": "التاجر",
+  "transactionCount": "عدد المعاملات",
+  "transactionAmount": "مبلغ المعاملة",
+  "date": "التاريخ",
+  "status": "الحالة",
+  "active": "نشط",
+  "inactive": "غير نشط",
+  "pending": "قيد الانتظار",
+  "filterBy": "تصفية حسب:",
+  "selectColumn": "اختر العمود",
+  "enterFilterValue": "أدخل قيمة التصفية"
 }

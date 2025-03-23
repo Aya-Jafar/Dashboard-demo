@@ -17,7 +17,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["show-details", "create-node", "node-move"]); // Add create-node event
+const emit = defineEmits(["show-details", "create-node", "node-move"]);
 const store = useDynamicTreeStore();
 
 const isLoading = ref(false);
@@ -77,41 +77,31 @@ const onDragOver = (event: DragEvent) => {
 const onDrop = async (event: DragEvent, targetNodeId: string) => {
   // console.log("Node dropped:", targetNodeId);
   // event.preventDefault();
-
   // const draggedNodeId = event.dataTransfer?.getData("nodeId"); // Get the dragged node's ID
   // const draggedNodeParentId = event.dataTransfer?.getData("parentId"); // Get its original parent ID
-
   // if (!draggedNodeId || draggedNodeId === targetNodeId) return; // Avoid self-drop
-
   // console.log("Dragged Node ID:", draggedNodeId);
   // console.log("Target Node ID:", targetNodeId);
   // console.log("Store Nodes:", store.nodes);
-
   // const draggedNode = store.nodes.find((node) => {
   //   console.log("Node", node.id, "dragged", draggedNodeId);
   //   return node.id === draggedNodeId;
   // });
-
   // const targetNode = store.nodes.find((node) => {
   //   console.log("Node", node.id, "target", targetNodeId);
   //   return node.id === targetNodeId;
   // });
-
   // console.log("Target Node:", targetNode);
   // console.log("Dragged Node:", draggedNode);
-
   // if (!draggedNode || !targetNode) {
   //   console.error("Dragged node or target node not found");
   //   return;
   // }
-
   // console.log("🔴 Old Parent Node:", draggedNodeParentId);
   // console.log("🟢 Dragged Node:", draggedNode);
   // console.log("🔵 Target Node (New Position):", targetNode);
-
   // // Update the dragged node's parentId to match the target node's parentId
   // draggedNode.parentId = targetNode.parentId;
-
   // // Force reactivity by reassigning the nodes array
   // store.nodes = [...store.nodes];
 };
@@ -127,8 +117,16 @@ const onDrop = async (event: DragEvent, targetNodeId: string) => {
       @dragstart="onDragStart($event, node.id, node.parentId)"
       @dragover="onDragOver($event)"
       @drop.stop="onDrop($event, node.id)"
+      role="treeitem"
+      :aria-expanded="node.isOpen ? 'true' : 'false'"
+      :aria-labelledby="`node-label-${node.id}`"
     >
-      <div class="flex items-center cursor-pointer" @click="toggleNode(node)">
+      <div
+        class="flex items-center cursor-pointer"
+        @click="toggleNode(node)"
+        role="button"
+        :aria-label="`Toggle ${node.label}`"
+      >
         <span class="mr-2">
           <svg
             v-if="node.isOpen"
@@ -137,6 +135,7 @@ const onDrop = async (event: DragEvent, targetNodeId: string) => {
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            aria-hidden="true"
           >
             <path
               stroke-linecap="round"
@@ -152,6 +151,7 @@ const onDrop = async (event: DragEvent, targetNodeId: string) => {
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            aria-hidden="true"
           >
             <path
               stroke-linecap="round"
@@ -169,6 +169,7 @@ const onDrop = async (event: DragEvent, targetNodeId: string) => {
         <!-- Eye Icon Button for Details -->
         <button
           @click.stop="showDetails"
+          :aria-label="`View details of ${node.label}`"
           class="px-2 py-1 text-white rounded hover:bg-[#F2CE00] focus:outline-none"
         >
           <svg
@@ -177,6 +178,7 @@ const onDrop = async (event: DragEvent, targetNodeId: string) => {
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            aria-hidden="true"
           >
             <path
               stroke-linecap="round"
@@ -197,6 +199,7 @@ const onDrop = async (event: DragEvent, targetNodeId: string) => {
         <button
           @click.stop="createNode"
           class="px-2 py-1 text-white rounded hover:bg-[#F2CE00] focus:outline-none"
+          :aria-label="`Create new node under ${node.label}`"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -204,6 +207,7 @@ const onDrop = async (event: DragEvent, targetNodeId: string) => {
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
+            aria-hidden="true"
           >
             <path
               stroke-linecap="round"
@@ -217,9 +221,15 @@ const onDrop = async (event: DragEvent, targetNodeId: string) => {
     </div>
 
     <!-- Children -->
-    <div v-if="node.isOpen" class="ml-6">
+    <div
+      v-if="node.isOpen"
+      class="ml-6"
+      role="group"
+      :aria-labelledby="`node-label-${node.id}`"
+    >
       <div v-if="isLoading" class="flex justify-center items-center py-4">
         <div
+          aria-label="Loading"
           class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-yellow-400"
         ></div>
       </div>

@@ -1,19 +1,29 @@
 <script setup lang="ts">
 import DynamicTree from "./pages/DynamicTree.vue";
 import Dashboard from "./pages/Dashboard.vue";
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import LangougeToggle from "./components/common/LangougeToggle.vue";
 
 import { useI18n } from "vue-i18n";
+
 // Track the active tab
 const activeTab = ref(1);
 
 const { locale } = useI18n();
 
+// Initialize locale from localStorage
+const savedLocale = localStorage.getItem("language");
+if (savedLocale) {
+  locale.value = savedLocale; // Set the locale to the saved value
+  document.documentElement.dir = savedLocale === "ar" ? "rtl" : "ltr"; // Apply RTL/LTR
+}
+
+// Watch for changes to the locale
 watch(
   locale,
   (newLocale) => {
-    document.documentElement.dir = newLocale === "ar" ? "rtl" : "ltr";
+    localStorage.setItem("language", newLocale); // Save the new locale to localStorage
+    document.documentElement.dir = newLocale === "ar" ? "rtl" : "ltr"; // Apply RTL/LTR
   },
   { immediate: true }
 );
@@ -36,18 +46,19 @@ watch(
         :class="{ 'font-bold border-b border-[#F2CE00]': activeTab === 1 }"
         @click="activeTab = 1"
       >
-        Dynamic Tree
+        Dashboard
         <span
           v-if="activeTab === 1"
           class="absolute bottom-0 left-0 w-full h-0.5 text-[#F2CE00] transition-all"
         ></span>
       </button>
+
       <button
         class="py-2 px-4 text-lg font-medium relative"
         :class="{ 'font-bold border-b border-[#F2CE00]': activeTab === 2 }"
         @click="activeTab = 2"
       >
-        Dashboard
+        Dynamic Tree
         <span
           v-if="activeTab === 2"
           class="absolute bottom-0 left-0 w-full h-0.5 text-[#F2CE00] transition-all"
@@ -58,12 +69,12 @@ watch(
     <!-- Tab Content -->
     <div class="mt-8">
       <div v-if="activeTab === 1">
-        <!-- Dynamic Tree Tab -->
-        <DynamicTree />
-      </div>
-      <div v-if="activeTab === 2">
         <!-- Graph Tab -->
         <Dashboard />
+      </div>
+      <div v-if="activeTab === 2">
+        <!-- Dynamic Tree Tab -->
+        <DynamicTree />
       </div>
     </div>
   </div>

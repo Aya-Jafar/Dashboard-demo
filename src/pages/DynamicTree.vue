@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import Button from "../components/common/Button.vue";
 import TreeNode from "../components/dynamic-tree/TreeNode.vue";
 import CreateNodeModal from "../components/dynamic-tree/CreateNodeModal.vue"; // Modal for creating new nodes
 import { useDynamicTreeStore } from "../stores/dyanmicTree.ts";
 import NodeDetailsModal from "../components/dynamic-tree/NodeDetailsModal.vue";
+import { useI18n } from "vue-i18n";
 
 // Use the store
 const store = useDynamicTreeStore();
+const { locale } = useI18n();
 
 // Modal visibility states
 const isCreateNodeModalVisible = ref(false); // For "Create New Node" modal
@@ -77,21 +79,28 @@ const handleNodeCreate = (newNode: {
   isCreateNodeModalVisible.value = false;
 };
 
-
-const handleNodeMove = async (draggedNodeId: string, newParentId: string | null) => {
+const handleNodeMove = async (
+  draggedNodeId: string,
+  newParentId: string | null
+) => {
   await store.updateNodeParent(draggedNodeId, newParentId); // Update the parentId in the store
 };
+
+const isRTL = computed(() => locale.value === "ar");
 </script>
 
 <template>
   <div
     :class="{ 'blur-sm': isCreateNodeModalVisible || isDetailsModalVisible }"
+    aria-modal="true"
+    aria-labelledby="modal-title"
   >
     <!-- Search and New Button -->
     <div class="flex justify-between items-end mb-10 py-4">
       <input
         v-model="store.searchLabel"
         type="text"
+        aria-label="Node search input"
         :placeholder="$t('search')"
         class="p-2 rounded-md w-80 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
       />
@@ -104,10 +113,7 @@ const handleNodeMove = async (draggedNodeId: string, newParentId: string | null)
     </div>
 
     <!-- Loading State -->
-    <div
-      v-if="store.isLoading"
-      class="flex justify-center items-center py-8"
-    >
+    <div v-if="store.isLoading" class="flex justify-center items-center py-8">
       <div
         class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F2CE00]"
       ></div>
@@ -127,30 +133,40 @@ const handleNodeMove = async (draggedNodeId: string, newParentId: string | null)
           @toggle="store.toggleNodeVisibility(node.id)"
           @show-details="showNodeDetails"
           @create-node="handleCreateNode"
-           @node-move="handleNodeMove"
+          @node-move="handleNodeMove"
         />
       </div>
 
       <!-- Pagination Controls -->
-      <div class="flex justify-center mt-8">
-        <button
-          :disabled="store.currentPage === 1"
-          @click="goToPreviousPage"
-          class="px-4 py-2 bg-gray-700 text-white rounded-l hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Previous
-        </button>
-        <span class="px-4 py-2 bg-gray-700 text-white">
-          Page {{ store.currentPage }} of {{ store.totalPages }}
-        </span>
-        <button
-          :disabled="store.currentPage === store.totalPages"
-          @click="goToNextPage"
-          class="px-4 py-2 bg-gray-700 text-white rounded-r hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Next
-        </button>
-      </div>
+   <div :dir="isRTL ? 'rtl' : 'ltr'">
+    <div class="flex justify-center mt-8">
+      <button
+        :disabled="store.currentPage === store.totalPages"
+        @click="goToNextPage"
+        class="px-4 py-2 bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+        :class="{
+          'rounded-r': isRTL,
+          'rounded-l': !isRTL,
+        }"
+      >
+        {{ isRTL ? "التالي" : "Next" }}
+      </button>
+      <span class="px-4 py-2 bg-gray-700 text-white">
+        {{ isRTL ? `صفحة ${store.currentPage} من ${store.totalPages}` : `Page ${store.currentPage} of ${store.totalPages}` }}
+      </span>
+      <button
+        :disabled="store.currentPage === 1"
+        @click="goToPreviousPage"
+        class="px-4 py-2 bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+        :class="{
+          'rounded-l': isRTL,
+          'rounded-r': !isRTL,
+        }"
+      >
+        {{ isRTL ? "السابق" : "Previous" }}
+      </button>
+    </div>
+  </div>
     </div>
   </div>
 

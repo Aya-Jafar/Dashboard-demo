@@ -1,8 +1,21 @@
 {
-  "welcome_to":"Welcome to ",
-  "tasks_demo":"tasks demo!",
-  "qi_card":"Qi Card's",
-  "title":"Tasks demo",
-  "search":"Search by label...",
-  "new":"New"
+  "welcome_to": "Welcome to ",
+  "tasks_demo": "tasks demo!",
+  "qi_card": "Qi Card's",
+  "title": "Tasks demo",
+  "search": "Search by label...",
+  "new": "New",
+  "table_title": "Top Merchants",
+  "charts_title": "Transaction statistics",
+  "merchant": "Merchant",
+  "transactionCount": "Transaction Count",
+  "transactionAmount": "Transaction Amount",
+  "date": "Date",
+  "status": "Status",
+  "active": "Active",
+  "inactive": "Inactive",
+  "pending": "Pending",
+  "filterBy": "Filter by:",
+  "selectColumn": "Select Column",
+  "enterFilterValue": "Enter filter value"
 }

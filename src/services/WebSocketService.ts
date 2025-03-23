@@ -22,7 +22,7 @@ class MockWebSocket {
       const newData = {
         lineData: {
           x: new Date().getTime(),
-          y: Math.floor(Math.random() * 1000),
+          y: Math.floor(Math.random() * 1500),
         },
         heatmapData: useDashboardStore().generateHeatmapRowData(),
         merchantData: generateMerchantData(),
@@ -43,10 +43,18 @@ class MockWebSocket {
 // Function to generate mock merchant data
 const generateMerchantData = () => {
   const merchants = ["Merchant A", "Merchant B", "Merchant C", "Merchant D"];
+  const statusOptions = ["Active", "Inactive", "Pending"];
+
   return merchants.map((name) => ({
     name,
-    count: Math.floor(Math.random() * 100),
-    value: Math.floor(Math.random() * 10000),
+    count: Math.floor(Math.random() * 100), // Random transaction count (0-99)
+    value: Math.floor(Math.random() * 10000), // Random transaction amount (0-9999)
+    date: new Date(
+      Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)
+    )
+      .toISOString()
+      .split("T")[0], // Random date within the last 30 days
+    status: statusOptions[Math.floor(Math.random() * statusOptions.length)], // Random status
   }));
 };
 

@@ -13,7 +13,7 @@ const modalRef = ref<HTMLElement | null>(null);
 const emit = defineEmits(["close", "submit"]);
 const newNodeLabel = ref("");
 const isInputValid = ref(true); // Track input validity
-const errorMessage = ref(""); 
+const errorMessage = ref("");
 
 // Reset and emit new node data
 const resetAndEmit = (newNode: { label: string; parentId: string | null }) => {
@@ -89,6 +89,7 @@ onUnmounted(() => {
           placeholder="Enter node label..."
           class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-2"
           :class="{ 'border-red-400': !isInputValid }"
+          aria-label="Node label input"
         />
         <!-- Error message -->
         <p v-if="!isInputValid" class="text-red-400 text-sm mb-4">
@@ -98,12 +99,14 @@ onUnmounted(() => {
           <button
             type="button"
             @click="emit('close')"
+            aria-label="Cancel"
             class="mr-2 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500"
           >
             Cancel
           </button>
           <button
             type="submit"
+            aria-label="Create node"
             class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
           >
             Create

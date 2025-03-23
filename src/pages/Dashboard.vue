@@ -6,7 +6,6 @@ import HeatMap from "../components/dashboard/HeatMap.vue";
 import { useDashboardStore } from "../stores/dashboard";
 import Table from "../components/common/Table.vue";
 
-
 // Access the store
 const store = useDashboardStore();
 
@@ -52,13 +51,13 @@ onMounted(() => {
   // Simulate periodic WebSocket messages
   setInterval(() => {
     ws.send("Update charts");
-  }, 3000); // Send a message every 3 seconds
+  }, 5000); // Send a message every 5 seconds
 });
 </script>
 
 <template>
   <div class="bg-[#1F2937] gap-6 p-6 rounded-t-lg">
-    <p class="font-bold text-2xl">Transaction statistics</p>
+    <p class="font-bold text-2xl">{{ $t("charts_title") }}</p>
   </div>
   <div
     class="flex items-center justify-center bg-[#1F2937] gap-6 p-6 !rounded-b-lg !h-[50vh]"
@@ -80,10 +79,31 @@ onMounted(() => {
 
   <!-- Merchant Table -->
   <Table
+    :title="$t('table_title')"
     :rows="store.tableRows"
     :headers="store.tableHeaders"
     class="mt-5 rounded-lg"
-  />
+  >
+    <!-- Custom rendering for the "Status" column -->
+    <template #status="{ value }">
+      <span
+        :class="{
+          'bg-sky-600': value === 'Active',
+          'bg-red-400': value === 'Inactive',
+          'bg-yellow-500': value === 'Pending',
+        }"
+        class="px-2 py-1 rounded-full text-white inline-block"
+      >
+        {{
+          value === "Active"
+            ? $t("active")
+            : value === "Inactive"
+            ? $t("inactive")
+            : $t("pending")
+        }}
+      </span>
+    </template>
+  </Table>
 </template>
 
 <style></style>

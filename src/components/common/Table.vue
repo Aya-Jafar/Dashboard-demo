@@ -1,14 +1,19 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { getCurrentLanguage } from "../../utils/helpers";
 
 // Props for the table
 const props = defineProps({
+  title: {
+    type: String,
+    required: true,
+  },
   headers: {
-    type: Array as () => Array<string>,
+    type: Array<string>,
     required: true,
   },
   rows: {
-    type: Array as () => Array<any>,
+    type: Array<any>,
     required: true,
   },
 });
@@ -27,6 +32,17 @@ const sortedAndFilteredRows = computed(() => {
 
   // Apply filtering
   if (filterColumn.value && filterValue.value) {
+    // Apply exact filtering with status
+    if (filterColumn.value === "status") {
+      filteredRows = filteredRows.filter((row) => {
+        const columnIndex = props.headers.indexOf(filterColumn.value!);
+        return (
+          String(row[columnIndex]).toLowerCase() ===
+          filterValue.value.toLowerCase()
+        );
+      });
+    }
+
     filteredRows = filteredRows.filter((row) => {
       const columnIndex = props.headers.indexOf(filterColumn.value!);
       return String(row[columnIndex])
@@ -82,26 +98,31 @@ const handleSort = (column: string) => {
 <template>
   <div class="overflow-x-auto">
     <!-- Filter Input -->
-    <div class="mb-4 w-50 flex flex-col justify-end">
-      <label for="filter" class="block text-sm font-medium text-gray-300">
-        Filter by:
-      </label>
-      <select
-        v-model="filterColumn"
-        class="mt-1 block w-full p-2 border border-gray-600 bg-gray-700 text-white rounded-md"
-      >
-        <option :value="null">Select Column</option>
-        <option v-for="header in headers" :key="header" :value="header">
-          {{ header }}
-        </option>
-      </select>
-      <input
-        v-if="filterColumn"
-        v-model="filterValue"
-        type="text"
-        placeholder="Enter filter value"
-        class="mt-1 block w-full p-2 border border-gray-600 bg-gray-700 text-white rounded-md"
-      />
+    <div class="flex justify-between items-center">
+      <p class="text-2xl font-bold">
+        {{ title }}
+      </p>
+      <div class="mb-4 w-50 flex flex-col justify-end">
+        <label for="filter" class="block text-sm font-medium text-gray-300">
+          {{ $t("filterBy") }}
+        </label>
+        <select
+          v-model="filterColumn"
+          class="mt-1 block w-full p-2 border border-gray-600 bg-gray-700 text-white rounded-md"
+        >
+          <option :value="null">{{ $t("selectColumn") }}</option>
+          <option v-for="header in headers" :key="header" :value="header">
+            {{ $t(header) }}
+          </option>
+        </select>
+        <input
+          v-if="filterColumn"
+          v-model="filterValue"
+          type="text"
+          :placeholder="$t('enterFilterValue')"
+          class="mt-1 block w-full p-2 border border-gray-600 bg-gray-700 text-white rounded-md"
+        />
+      </div>
     </div>
 
     <!-- Table -->
@@ -115,11 +136,17 @@ const handleSort = (column: string) => {
           <th
             v-for="header in headers"
             :key="header"
+            :class="{
+              'text-left': getCurrentLanguage() === 'en',
+              'text-right': getCurrentLanguage() === 'ar',
+            }"
             class="px-4 py-3 text-left text-sm font-semibold cursor-pointer hover:bg-gray-700"
             @click="handleSort(header)"
           >
-            {{ header }}
-            {{ sortDirection === "asc" ? "↑" : "↓" }}
+            {{ $t(header) }}
+            <span v-if="sortColumn === header">
+              {{ sortDirection === "asc" ? "↑" : "↓" }}
+            </span>
           </th>
         </tr>
       </thead>
@@ -136,7 +163,10 @@ const handleSort = (column: string) => {
             :key="cellIndex"
             class="px-4 py-2 text-sm border-b border-gray-600"
           >
-            {{ cell }}
+            <!-- Use slots for custom rendering -->
+            <slot :name="headers[cellIndex]" :value="cell" :row="row">
+              {{ cell }}
+            </slot>
           </td>
         </tr>
       </tbody>

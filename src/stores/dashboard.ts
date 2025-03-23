@@ -1,7 +1,19 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
+import { useI18n } from "vue-i18n";
 
 export const useDashboardStore = defineStore("dashboard", () => {
+  const { t } = useI18n();
+
+  // Dark theme color palette
+  const colors = {
+    primary: "#4936FC",
+    secondary: "#10B981",
+    background: "#1F2937",
+    text: "#fff",
+    grid: "#364051",
+  };
+
   // Function to generate heatmap row data
   const generateHeatmapRowData = () => {
     const data = [];
@@ -16,33 +28,29 @@ export const useDashboardStore = defineStore("dashboard", () => {
     return data;
   };
 
-  // Dark theme color palette
-  const colors = {
-    primary: "#4936FC",
-    secondary: "#10B981",
-    background: "#1E2938",
-    text: "#fff",
-    grid: "#364051",
-  };
-
   // Initial data for the line chart
   const lineSeries = ref([
     {
-      name: "Transaction Volume",
+      name: "",
       data: [
-        { x: new Date("2025-03-01").getTime(), y: 100 },
-        { x: new Date("2025-03-02").getTime(), y: 150 },
-        { x: new Date("2025-03-03").getTime(), y: 200 },
-        { x: new Date("2025-03-04").getTime(), y: 220 },
-        { x: new Date("2025-03-05").getTime(), y: 250 },
-        { x: new Date("2025-03-06").getTime(), y: 150 },
-        { x: new Date("2025-03-07").getTime(), y: 150 },
-        { x: new Date("2025-03-08").getTime(), y: 250 },
-        { x: new Date("2025-03-09").getTime(), y: 2100 },
+        { x: new Date("2025-03-01").getTime(), y: 1200 },
+        { x: new Date("2025-03-02").getTime(), y: 800 },
+        { x: new Date("2025-03-03").getTime(), y: 900 },
+        { x: new Date("2025-03-04").getTime(), y: 1000 },
+        { x: new Date("2025-03-05").getTime(), y: 1100 },
+        { x: new Date("2025-03-06").getTime(), y: 1050 },
+        { x: new Date("2025-03-07").getTime(), y: 1300 },
+        { x: new Date("2025-03-08").getTime(), y: 950 },
+        { x: new Date("2025-03-09").getTime(), y: 1400 },
+        { x: new Date("2025-03-10").getTime(), y: 1000 },
+        { x: new Date("2025-03-11").getTime(), y: 850 },
+        { x: new Date("2025-03-12").getTime(), y: 1200 },
+        { x: new Date("2025-03-13").getTime(), y: 1100 },
+        { x: new Date("2025-03-14").getTime(), y: 1300 },
+        { x: new Date("2025-03-15").getTime(), y: 900 },
       ],
     },
   ]);
-
   // Initial data for the heatmap
   const heatmapSeries = ref([
     { name: "Monday", data: generateHeatmapRowData() },
@@ -56,13 +64,43 @@ export const useDashboardStore = defineStore("dashboard", () => {
 
   // Initial data for the merchant table
   const merchants = ref([
-    { name: "Merchant A", count: 50, value: 5000 },
-    { name: "Merchant B", count: 40, value: 4000 },
-    { name: "Merchant C", count: 30, value: 3000 },
-    { name: "Merchant D", count: 20, value: 2000 },
+    {
+      name: "Merchant A",
+      count: 50,
+      value: 5000,
+      date: "2023-10-01",
+      status: "Active",
+    },
+    {
+      name: "Merchant B",
+      count: 40,
+      value: 4000,
+      date: "2023-09-25",
+      status: "Inactive",
+    },
+    {
+      name: "Merchant C",
+      count: 30,
+      value: 3000,
+      date: "2023-10-05",
+      status: "Active",
+    },
+    {
+      name: "Merchant D",
+      count: 20,
+      value: 2000,
+      date: "2023-09-30",
+      status: "Pending",
+    },
   ]);
 
-  const tableHeaders = ["Merchant", "Transaction Count", "Transaction Value"];
+  const tableHeaders = [
+    "merchant",
+    "transactionCount",
+    "transactionAmount",
+    "date",
+    "status",
+  ];
   const tableRows = ref(
     merchants.value.map((merchant) => Object.values(merchant))
   );
@@ -254,9 +292,9 @@ export const useDashboardStore = defineStore("dashboard", () => {
     yaxis: [
       {
         title: {
-          text: "Transactions",
+          text: "Transaction Volume (IQD)",
           style: {
-            color:colors.text,
+            color: colors.text,
             fontSize: "12px",
             fontFamily: "Inter, sans-serif",
           },
@@ -276,7 +314,7 @@ export const useDashboardStore = defineStore("dashboard", () => {
       {
         opposite: true,
         title: {
-          text: "Transaction Volume",
+          // text: "Transaction Volume",
           style: {
             color: colors.text,
             fontSize: "12px",
@@ -284,11 +322,7 @@ export const useDashboardStore = defineStore("dashboard", () => {
           },
         },
         labels: {
-          style: {
-            colors: colors.text,
-            fontSize: "12px",
-            fontFamily: "Inter, sans-serif",
-          },
+          show: false, // Hide labels for the right y-axis
         },
       },
     ],

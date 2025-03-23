@@ -15,12 +15,6 @@ const props = defineProps({
   },
 });
 
-// Use the store
-const nodeStore = useDynamicTreeStore();
-
-// New node label input (if needed for editing)
-const newNodeLabel = ref(props.nodeData.label);
-
 // Emit events to close the modal
 const emit = defineEmits(["close"]);
 
