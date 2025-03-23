@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { onMounted } from "vue";
+import { onMounted, ref, computed } from "vue";
 import MockWebSocket from "../services/WebSocketService";
 import LineChart from "../components/dashboard/LineChart.vue";
 import HeatMap from "../components/dashboard/HeatMap.vue";
 import { useDashboardStore } from "../stores/dashboard";
 import Table from "../components/common/Table.vue";
+import { useLayoutStore } from "../stores/layout";
 
 // Access the store
 const store = useDashboardStore();
+const { isSidebarOpen } = useLayoutStore();
 
 // Initialize WebSocket and update chart data
 onMounted(() => {
@@ -53,14 +55,19 @@ onMounted(() => {
     ws.send("Update charts");
   }, 5000); // Send a message every 5 seconds
 });
+
+// Compute height based on side bar visibility
+const heightValue = computed(() => (isSidebarOpen ? "h-40" : "h-50"));
 </script>
 
 <template>
   <div class="bg-[#1F2937] gap-6 p-6 rounded-t-lg">
     <p class="font-bold text-2xl">{{ $t("charts_title") }}</p>
   </div>
+
   <div
-    class="flex items-center justify-center bg-[#1F2937] gap-6 p-6 !rounded-b-lg !h-[50vh]"
+    class="flex items-center justify-center bg-[#1F2937] gap-6 p-2 !rounded-b-lg"
+    :style="{ height: heightValue }"
   >
     <!-- Line Chart -->
     <LineChart

@@ -4,12 +4,13 @@ import { useI18n } from "vue-i18n";
 
 export const useDashboardStore = defineStore("dashboard", () => {
   const { t } = useI18n();
+  const isSidebarOpen = ref(true);
 
   // Dark theme color palette
   const colors = {
     primary: "#4936FC",
     secondary: "#10B981",
-    background: "#1F2937",
+    background: "#1E2938",
     text: "#fff",
     grid: "#364051",
   };
@@ -361,5 +362,6 @@ export const useDashboardStore = defineStore("dashboard", () => {
     updateTableRows,
     heatmapOptions,
     lineChartOptions,
+    isSidebarOpen,
   };
 });
