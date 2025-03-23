@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 
-
-
 // Define props to accept node data
 const props = defineProps({
   nodeData: {
@@ -52,10 +50,7 @@ onUnmounted(() => {
       <!-- Display Node Data -->
       <div class="mb-4">
         <p class="text-white">
-          {{
-            nodeData.description ||
-            "This department is responsible for overseeing various projects, ensuring smooth operations, and coordinating between different teams. It plays a crucial role in strategic planning and execution, driving efficiency and innovation within the organization."
-          }}
+          {{ nodeData.description }}
         </p>
         <br />
         <p class="text-white">

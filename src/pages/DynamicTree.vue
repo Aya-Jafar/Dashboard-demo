@@ -6,21 +6,21 @@ import CreateNodeModal from "../components/dynamic-tree/CreateNodeModal.vue"; //
 import { useDynamicTreeStore } from "../stores/dyanmicTree.ts";
 import NodeDetailsModal from "../components/dynamic-tree/NodeDetailsModal.vue";
 import { useI18n } from "vue-i18n";
+import type { Node } from "../stores/dyanmicTree.ts";
 
 // Use the store
 const store = useDynamicTreeStore();
 const { locale } = useI18n();
 
 // Modal visibility states
-const isCreateNodeModalVisible = ref(false); 
-const selectedParentId = ref<string | null>(null); 
+const isCreateNodeModalVisible = ref(false);
+const selectedParentId = ref<string | null>(null);
 
 // Function to handle creating a new node
 const handleCreateNode = (parentId: string | null) => {
   selectedParentId.value = parentId ?? null; // Set the parent ID
   isCreateNodeModalVisible.value = true; // Show the modal
 };
-
 
 // Watch for changes in the search label and trigger search
 // TODO: FIX THIS auto toggle
@@ -65,17 +65,14 @@ const showNodeDetails = (node: any) => {
   isDetailsModalVisible.value = true; // Show the modal
 };
 
-const handleNodeCreate = (newNode: {
-  label: string;
-  id: string;
-  parentId: string | null;
-}) => {
+const handleNodeCreate = (newNode: Node) => {
   // Add the new node to the tree (assuming you have a store method for this)
   store.add({
     label: newNode.label,
     parentId: newNode.parentId,
     createdAt: new Date().getTime(),
-    hasChildren: false,
+    numberOfEmployees: newNode.numberOfEmployees,
+    description: newNode.description,
   });
   // Close the modal
   isCreateNodeModalVisible.value = false;

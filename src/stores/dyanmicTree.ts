@@ -10,6 +10,8 @@ interface Node {
   parentId: string | null;
   label: string;
   createdAt: number;
+  description: string;
+  numberOfEmployees: number;
 }
 
 export const useDynamicTreeStore = defineStore("tree-node", () => {
