@@ -25,7 +25,7 @@ const handleClick = () => {
   <button
     :disabled="props.disabled"
     @click="handleClick"
-    class="!font-bold py-2 bg-gray-800 text-white rounded-md hover:bg-gray-700"
+    class="!font-bold py-2 bg-slate-800 text-white rounded-md hover:bg-gray-700"
   >
     <span v-if="props.loading">Loading...</span>
     <span><slot /></span>

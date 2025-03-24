@@ -3,7 +3,6 @@ import { ref, computed } from "vue";
 import { APIService } from "../services/ApiService.ts";
 import API_ENDPOINTS from "../utils/endpoints.ts";
 import { useSnackbarStore } from "./snackbar.ts";
-import { filterByExactParentID } from "../utils/helpers.ts";
 
 // ==================== TYPE DEFINITIONS ====================
 interface Node {
@@ -169,37 +168,26 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     }
   };
 
-  const updateNodeParent = async (
-    draggedNodeId: string,
-    newParentId: string | null
-  ): Promise<void> => {
-    // try {
-    //   isLoading.value = true;
 
-    //   // Fetch the node to be updated
-    //   const node = nodes.value.find((n) => n.id === draggedNodeId);
-    //   if (!node) {
-    //     throw new Error("Node not found");
-    //   }
 
-    //   // Update the parentId of the node
-    //   const updatedNode = { ...node, parentId: newParentId };
+  const handleNodeMove = ({
+    nodeId,
+    targetNodeId,
+  }: {
+    nodeId: string;
+    targetNodeId: string;
+  }) => {
+    // Find the node being moved
+    const nodeToMoveIndex = nodes.value.findIndex((node) => node.id === nodeId);
+    const targetNodeIndex = nodes.value.findIndex(
+      (node: Node) => node.id === targetNodeId
+    );
 
-    //   // Send a PUT request to update the node
-    //   const response = await APIService.request<Node>({
-    //     endpoint: `${API_ENDPOINTS.DEPARTMENTS}/${draggedNodeId}`,
-    //     method: "PUT",
-    //     body: updatedNode,
-    //     setLoading: (loading: boolean) => (isLoading.value = loading),
-    //   });
-
-    //   // Refetch data after updating
-    //   refetch(newParentId);
-    // } catch (error) {
-    //   snackbarStore.showSnackbar(`API Error: ${error}`, "error");
-    // } finally {
-    //   isLoading.value = false;
-    // }
+    if (nodeToMoveIndex !== -1 && targetNodeIndex !== -1) {
+      // Swap the positions in the root-level nodes array
+      const [movedNode] = nodes.value.splice(nodeToMoveIndex, 1);
+      nodes.value.splice(targetNodeIndex, 0, movedNode);
+    }
   };
 
   return {
@@ -214,7 +202,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     toggleNodeVisibility,
     toggleNodesBySearch,
     add,
-    updateNodeParent,
+    handleNodeMove,
   };
 });
 

@@ -61,12 +61,12 @@ const heightValue = computed(() => (isSidebarOpen ? "h-40" : "h-50"));
 </script>
 
 <template>
-  <div class="bg-[#1F2937] gap-6 p-6 rounded-t-lg">
+  <div class="bg-slate-900 gap-6 p-6 rounded-t-lg">
     <p class="font-bold text-2xl">{{ $t("charts_title") }}</p>
   </div>
 
   <div
-    class="flex items-center justify-center bg-[#1F2937] gap-6 p-2 !rounded-b-lg"
+    class="flex items-center justify-center bg-slate-900 gap-6 p-2 !rounded-b-lg"
     :style="{ height: heightValue }"
   >
     <!-- Line Chart -->

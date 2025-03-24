@@ -7,6 +7,7 @@ import { useDynamicTreeStore } from "../stores/dyanmicTree.ts";
 import NodeDetailsModal from "../components/dynamic-tree/NodeDetailsModal.vue";
 import { useI18n } from "vue-i18n";
 import type { Node } from "../stores/dyanmicTree.ts";
+import TestDrag from "./TestDrag.vue";
 
 // Use the store
 const store = useDynamicTreeStore();
@@ -15,6 +16,12 @@ const { locale } = useI18n();
 // Modal visibility states
 const isCreateNodeModalVisible = ref(false);
 const selectedParentId = ref<string | null>(null);
+
+// Modal visibility state
+const isDetailsModalVisible = ref(false);
+
+// Selected node data for the modal
+const selectedNode = ref(null);
 
 // Function to handle creating a new node
 const handleCreateNode = (parentId: string | null) => {
@@ -55,11 +62,6 @@ const goToPreviousPage = () => {
     store.fetchMainData(store.currentPage, store.searchLabel);
   }
 };
-// Modal visibility state
-const isDetailsModalVisible = ref(false);
-
-// Selected node data for the modal
-const selectedNode = ref(null);
 
 const showNodeDetails = (node: any) => {
   selectedNode.value = node; // Set the selected node data
@@ -78,14 +80,6 @@ const handleNodeCreate = (newNode: Node) => {
   // Close the modal
   isCreateNodeModalVisible.value = false;
 };
-
-const handleNodeMove = async (
-  draggedNodeId: string,
-  newParentId: string | null
-) => {
-  // await store.updateNodeParent(draggedNodeId, newParentId); // Update the parentId in the store
-};
-
 const isRTL = computed(() => locale.value === "ar");
 </script>
 
@@ -102,7 +96,7 @@ const isRTL = computed(() => locale.value === "ar");
         type="text"
         aria-label="Node search input"
         :placeholder="$t('search')"
-        class="p-2 rounded-md w-80 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+        class="p-2 rounded-md w-80 bg-slate-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
       />
       <Button
         :action="() => handleCreateNode(null)"
@@ -124,7 +118,7 @@ const isRTL = computed(() => locale.value === "ar");
       <div
         v-for="(node, index) in store.nodes"
         :key="node.id"
-        class="mb-4 p-4 bg-gray-800 rounded-lg shadow-md"
+        class="mb-4 p-4 bg-slate-900 rounded-lg shadow-md"
       >
         <!-- Root Level Node -->
         <TreeNode
@@ -133,7 +127,7 @@ const isRTL = computed(() => locale.value === "ar");
           @toggle="store.toggleNodeVisibility(node.id)"
           @show-details="showNodeDetails"
           @create-node="handleCreateNode"
-          @node-move="handleNodeMove"
+          @node-move="store.handleNodeMove"
         />
       </div>
 
@@ -143,7 +137,7 @@ const isRTL = computed(() => locale.value === "ar");
           <button
             :disabled="store.currentPage === store.totalPages"
             @click="goToNextPage"
-            class="px-4 py-2 bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-4 py-2 bg-slate-800 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             :class="{
               'rounded-r': isRTL,
               'rounded-l': !isRTL,
@@ -151,7 +145,7 @@ const isRTL = computed(() => locale.value === "ar");
           >
             {{ isRTL ? "التالي" : "Next" }}
           </button>
-          <span class="px-4 py-2 bg-gray-700 text-white">
+          <span class="px-4 py-2 bg-slate-800 text-white">
             {{
               isRTL
                 ? `صفحة ${store.currentPage} من ${store.totalPages}`
@@ -161,7 +155,7 @@ const isRTL = computed(() => locale.value === "ar");
           <button
             :disabled="store.currentPage === 1"
             @click="goToPreviousPage"
-            class="px-4 py-2 bg-gray-700 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="px-4 py-2 bg-slate-800 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             :class="{
               'rounded-l': isRTL,
               'rounded-r': !isRTL,

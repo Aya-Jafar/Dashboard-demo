@@ -104,7 +104,7 @@ onUnmounted(() => {
   <div
     class="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50"
   >
-    <div class="bg-gray-800 rounded-lg p-6 w-96" ref="modalRef">
+    <div class="bg-slate-900 rounded-lg p-6 w-96" ref="modalRef">
       <h2 class="text-xl font-semibold mb-4 text-white">
         {{ $t("createNewDepartment") }}
       </h2>
@@ -116,7 +116,7 @@ onUnmounted(() => {
           v-model="newNodeLabel"
           type="text"
           :placeholder="$t('enterNodeLabel')"
-          class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-2"
+          class="w-full p-2 rounded-md bg-slate-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-2"
           :class="{ 'border-red-400': errorMessages.label }"
           aria-label="Node label input"
         />
@@ -130,7 +130,7 @@ onUnmounted(() => {
           v-model.number="numberOfEmployees"
           type="number"
           :placeholder="$t('enterNumberOfEmployees')"
-          class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-2"
+          class="w-full p-2 rounded-md bg-slate-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-2"
           :class="{ 'border-red-400': errorMessages.numberOfEmployees }"
           aria-label="Number of employees input"
         />
@@ -146,7 +146,7 @@ onUnmounted(() => {
         <textarea
           v-model="description"
           :placeholder="$t('enterDescription')"
-          class="w-full p-2 rounded-md bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-2"
+          class="w-full p-2 rounded-md bg-slate-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400 mb-2"
           :class="{ 'border-red-400': errorMessages.description }"
           aria-label="Description input"
         ></textarea>
@@ -161,7 +161,7 @@ onUnmounted(() => {
             type="button"
             @click="emit('close')"
             :aria-label="$t('cancel')"
-            class="mr-2 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-500"
+            class="mr-2 px-4 py-2 bg-slate-700 text-white rounded hover:bg-gray-500"
           >
             {{ $t("cancel") }}
           </button>

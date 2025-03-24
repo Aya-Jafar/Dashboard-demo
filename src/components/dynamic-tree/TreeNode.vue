@@ -74,48 +74,21 @@ const showDetails = () => emit("show-details", props.node); // Emit the node dat
 const createNode = () => emit("create-node", props.node.id); // Emit the parent node's ID
 
 // Drag-and-drop handlers
-// Drag Start Handler
 const onDragStart = (event: DragEvent, nodeId: string, parentId: string) => {
-  event.dataTransfer?.setData("nodeId", nodeId); // Save dragged node's ID
-  event.dataTransfer?.setData("parentId", parentId); // Save dragged node's parent ID
+  event.dataTransfer?.setData("nodeId", nodeId);
+  event.dataTransfer?.setData("parentId", parentId);
 };
 
-// Drag Over Handler (Allow dropping)
 const onDragOver = (event: DragEvent) => {
-  event.preventDefault(); // Allow dropping
+  event.preventDefault();
 };
 
-// Drop Handler (Reorder children based on drop)
-const onDrop = async (event: DragEvent, targetNodeId: string) => {
-  // console.log("Node dropped:", targetNodeId);
-  // event.preventDefault();
-  // const draggedNodeId = event.dataTransfer?.getData("nodeId"); // Get the dragged node's ID
-  // const draggedNodeParentId = event.dataTransfer?.getData("parentId"); // Get its original parent ID
-  // if (!draggedNodeId || draggedNodeId === targetNodeId) return; // Avoid self-drop
-  // console.log("Dragged Node ID:", draggedNodeId);
-  // console.log("Target Node ID:", targetNodeId);
-  // console.log("Store Nodes:", store.nodes);
-  // const draggedNode = store.nodes.find((node) => {
-  //   console.log("Node", node.id, "dragged", draggedNodeId);
-  //   return node.id === draggedNodeId;
-  // });
-  // const targetNode = store.nodes.find((node) => {
-  //   console.log("Node", node.id, "target", targetNodeId);
-  //   return node.id === targetNodeId;
-  // });
-  // console.log("Target Node:", targetNode);
-  // console.log("Dragged Node:", draggedNode);
-  // if (!draggedNode || !targetNode) {
-  //   console.error("Dragged node or target node not found");
-  //   return;
-  // }
-  // console.log("🔴 Old Parent Node:", draggedNodeParentId);
-  // console.log("🟢 Dragged Node:", draggedNode);
-  // console.log("🔵 Target Node (New Position):", targetNode);
-  // // Update the dragged node's parentId to match the target node's parentId
-  // draggedNode.parentId = targetNode.parentId;
-  // // Force reactivity by reassigning the nodes array
-  // store.nodes = [...store.nodes];
+const onDrop = (event: DragEvent, targetNodeId: string) => {
+  const nodeId = event.dataTransfer?.getData("nodeId");
+  const parentId = event.dataTransfer?.getData("parentId");
+  if (nodeId && parentId) {
+    emit("node-move", { nodeId, parentId, targetNodeId });
+  }
 };
 
 const matchesSearch = computed(() => {
@@ -199,7 +172,7 @@ watch(
     <!-- Children -->
     <div
       v-if="node.isOpen"
-      class="ml-6"
+      class="ml-6 "
       role="group"
       :aria-labelledby="`node-label-${node.id}`"
     >
@@ -217,7 +190,8 @@ watch(
         :node="child"
         :visible="child.visible"
         @show-details="emit('show-details', $event)"
-        @create-node="emit('create-node', $event)"
+        @node-move="emit('node-move', $event)"
+        class="!cursor-grab"
       />
     </div>
   </div>

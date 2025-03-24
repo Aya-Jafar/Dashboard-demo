@@ -9,7 +9,7 @@
   color: rgba(255, 255, 255, 0.87);
   /* background-color: #101010; */
 
-  @apply bg-gray-900;
+  @apply bg-[#000e21];
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;

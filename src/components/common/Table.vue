@@ -108,7 +108,7 @@ const handleSort = (column: string) => {
         </label>
         <select
           v-model="filterColumn"
-          class="mt-1 block w-full p-2 border border-gray-600 bg-gray-700 text-white rounded-md"
+          class="mt-1 block w-full p-2 border border-gray-600 bg-slate-900 text-white rounded-md"
         >
           <option :value="null">{{ $t("selectColumn") }}</option>
           <option v-for="header in headers" :key="header" :value="header">
@@ -120,14 +120,14 @@ const handleSort = (column: string) => {
           v-model="filterValue"
           type="text"
           :placeholder="$t('enterFilterValue')"
-          class="mt-1 block w-full p-2 border border-gray-600 bg-gray-700 text-white rounded-md"
+          class="mt-2 block w-full p-2 border border-gray-600 bg-slate-900 text-white rounded-md"
         />
       </div>
     </div>
 
     <!-- Table -->
     <table
-      class="min-w-full bg-[#1E2938] text-white"
+      class="min-w-full bg-slate-900 text-white"
       v-if="sortedAndFilteredRows.length > 0"
     >
       <thead>
@@ -173,7 +173,7 @@ const handleSort = (column: string) => {
     </table>
 
     <div v-else>
-      <p class="text-xl text-center font-semibold">No data was found.</p>
+      <p class="text-xl text-center font-semibold">{{ $t("empty_data") }}</p>
     </div>
   </div>
 </template>

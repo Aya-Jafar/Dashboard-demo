@@ -38,7 +38,7 @@ export const useDashboardStore = defineStore("dashboard", () => {
   const colors = {
     primary: "#4936FC",
     secondary: "#10B981",
-    background: "#1E2938",
+    background: "#0E172B",
     text: "#fff",
     grid: "#364051",
   };

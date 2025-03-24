@@ -44,7 +44,7 @@ onUnmounted(() => {
   <div
     class="fixed inset-0 flex items-center justify-center bg-opacity-50 z-50"
   >
-    <div ref="modalRef" class="bg-gray-800 rounded-lg p-6 w-96">
+    <div ref="modalRef" class="bg-slate-900 rounded-lg p-6 w-96">
       <h2 class="text-xl font-bold mb-4 text-white">{{ nodeData.label }}</h2>
 
       <!-- Display Node Data -->

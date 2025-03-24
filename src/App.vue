@@ -16,15 +16,21 @@ const { isSidebarOpen, tabs } = storeToRefs(layoutStore);
 </script>
 
 <template>
-  <div class="min-h-screen bg-gray-900 text-gray-100 font-sans flex">
+  <div class="min-h-screen text-gray-100 font-sans flex">
     <!-- Sidebar -->
     <div
-      class="!bg-[#1E2938] w-60 p-4 transition-all duration-300 ease-in-out rounded-md"
+      class="!bg-slate-900 w-60 p-4 transition-all duration-300 ease-in-out rounded-md"
       :class="{ '-ml-64': !isSidebarOpen }"
     >
       <!-- Sidebar Header -->
       <div class="flex items-center justify-between mb-6">
-        <h2 class="text-xl font-semibold">{{ $t("menu") }}</h2>
+        <!-- <h2 class="text-xl font-semibold">{{ $t("menu") }}</h2> -->
+        <img
+            src="/src/assets/Qi Card PNG.png"
+            alt="logo"
+            class="w-13 h-13"
+            fetchPriority="high"
+          />
         <!-- Toggle Button Inside Sidebar -->
         <button
           v-if="isSidebarOpen"
@@ -63,15 +69,9 @@ const { isSidebarOpen, tabs } = storeToRefs(layoutStore);
     <div class="flex-1 px-5">
       <!-- Header -->
       <div
-        class="flex justify-between items-center mb-5 bg-[#1F2937] rounded-md py-1 px-3"
+        class="flex justify-between items-center mb-5 bg-slate-900 rounded-md py-10 h-15 px-5"
       >
         <div class="flex gap-2 items-center">
-          <img
-            src="/src/assets/Qi Card PNG.png"
-            alt="logo"
-            class="w-18 h-18"
-            fetchPriority="high"
-          />
           <p class="text-2xl font-bold">{{ $t("title") }}</p>
         </div>
         <LangougeToggle class="flex justify-end items-center" />

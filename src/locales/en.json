@@ -29,5 +29,6 @@
   "createNode": "Create node",
   "dashboard": "Dashboard",
   "departments": "Departments",
-  "menu":"Menu"
+  "menu":"Menu",
+  "empty_data":"No data was found."
 }
