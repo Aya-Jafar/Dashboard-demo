@@ -22,6 +22,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
   const pageSize = ref(10); // Number of items per page (limit)
   const searchLabel = ref(""); // Search input for node label
   const totalItems = ref(20); // Total items
+  // const noSearchResult = ref<null | string>(null);
 
   const snackbarStore = useSnackbarStore();
 

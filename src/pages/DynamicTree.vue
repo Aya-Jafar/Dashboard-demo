@@ -112,6 +112,13 @@ const isRTL = computed(() => locale.value === "ar");
       ></div>
     </div>
 
+    <div
+      v-else-if="!store.isLoading && store.nodes.length === 0"
+      class="flex justify-center items-center py-8"
+    >
+      {{ $t("noDepartmentsAvailable") }}
+    </div>
+
     <!-- Tree Rendering -->
     <div v-else>
       <div
