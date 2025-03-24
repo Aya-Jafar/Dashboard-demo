@@ -28,5 +28,6 @@
   "create": "إنشاء",
   "createNode": "إنشاء عقدة",
   "dashboard": "لوحة التحكم",
-  "departments": "الأقسام"
+  "departments": "الأقسام",
+  "menu":"القائمة"
 }

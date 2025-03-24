@@ -12,7 +12,7 @@ const props = defineProps({
     required: true,
   },
   series: {
-    type: Array as () => Array<{
+    type: Array<{
       name: string;
       data: Array<{ x: number; y: number }>;
     }>,

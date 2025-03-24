@@ -28,5 +28,6 @@
   "create": "Create",
   "createNode": "Create node",
   "dashboard": "Dashboard",
-  "departments": "Departments"
+  "departments": "Departments",
+  "menu":"Menu"
 }
