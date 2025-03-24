@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, onMounted, watch, computed } from "vue";
-import { APIService } from "../../services/ApiService.ts";
-import API_ENDPOINTS from "../../utils/endpoints.ts";
-import Snackbar from "../common/Snackbar.vue";
-import { useDynamicTreeStore, type Node } from "../../stores/dyanmicTree.ts";
-import { filterByExactParentID } from "../../utils/helpers.ts";
-import OpenIcon from "./OpenIcon.vue";
-import Icon from "../common/Icon.vue";
+import { defineProps, defineEmits, ref, watch, computed } from "vue";
+import { APIService } from "@/services/ApiService.ts";
+import API_ENDPOINTS from "@/utils/endpoints.ts";
+import Snackbar from "@components/common/Snackbar.vue";
+import { useDynamicTreeStore } from "@stores/dyanmicTree";
+import { filterByExactParentID } from "@/utils/helpers.ts";
+import OpenIcon from "@/components/dynamic-tree/OpenIcon.vue";
+import Icon from "@/components/common/Icon.vue";
 import { useI18n } from "vue-i18n";
 
 const props = defineProps({
@@ -35,7 +35,7 @@ const toggleNode = async (node: any) => {
     try {
       isLoading.value = true;
 
-      const data = await APIService.request({
+       await APIService.request({
         endpoint: `${API_ENDPOINTS.DEPARTMENTS}?parentId=${node.id}`,
         method: "GET",
         setLoading: (loading: boolean) => (isLoading.value = loading),
@@ -185,7 +185,7 @@ watch(
       <div v-else-if="noChildrenText !== null">{{ $t(noChildrenText) }}</div>
       <TreeNode
         v-else
-        v-for="(child, idx) in node.children"
+        v-for="(child) in node.children"
         :key="child.id"
         :node="child"
         :visible="child.visible"

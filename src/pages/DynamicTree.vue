@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from "vue";
-import Button from "../components/common/Button.vue";
-import TreeNode from "../components/dynamic-tree/TreeNode.vue";
-import CreateNodeModal from "../components/dynamic-tree/CreateNodeModal.vue"; // Modal for creating new nodes
-import { useDynamicTreeStore } from "../stores/dyanmicTree.ts";
-import NodeDetailsModal from "../components/dynamic-tree/NodeDetailsModal.vue";
+import Button from "@components/common/Button.vue";
+import TreeNode from "@components/dynamic-tree/TreeNode.vue";
+import CreateNodeModal from "@components/dynamic-tree/CreateNodeModal.vue"; // Modal for creating new nodes
+import { useDynamicTreeStore } from "@stores/dyanmicTree";
+import NodeDetailsModal from "@components/dynamic-tree/NodeDetailsModal.vue";
 import { useI18n } from "vue-i18n";
-import type { Node } from "../stores/dyanmicTree.ts";
-import TestDrag from "./TestDrag.vue";
+import type { Node } from "@stores/dyanmicTree";
 
 // Use the store
 const store = useDynamicTreeStore();
@@ -116,7 +115,7 @@ const isRTL = computed(() => locale.value === "ar");
     <!-- Tree Rendering -->
     <div v-else>
       <div
-        v-for="(node, index) in store.nodes"
+        v-for="(node) in store.nodes"
         :key="node.id"
         class="mb-4 p-4 bg-slate-900 rounded-lg shadow-md"
       >

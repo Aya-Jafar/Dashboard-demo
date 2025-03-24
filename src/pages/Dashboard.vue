@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue";
+import { onMounted, computed } from "vue";
 import MockWebSocket from "../services/WebSocketService";
-import LineChart from "../components/dashboard/LineChart.vue";
-import HeatMap from "../components/dashboard/HeatMap.vue";
-import { useDashboardStore } from "../stores/dashboard";
-import Table from "../components/common/Table.vue";
-import { useLayoutStore } from "../stores/layout";
+import LineChart from "@components/dashboard/LineChart.vue";
+import HeatMap from "@components/dashboard/HeatMap.vue";
+import { useDashboardStore } from "@stores/dashboard";
+import { useLayoutStore } from "@stores/layout";
+import Table from "@components/common/Table.vue";
 
 // Access the store
 const store = useDashboardStore();
@@ -27,13 +27,13 @@ onMounted(() => {
     };
 
     // Append new data to the existing line series
-    store.lineSeries[0].data.push(newLineData);
+    if (store.lineSeries[0]?.data) {
+      store.lineSeries[0].data.push(newLineData);
 
-    // Limit the number of data points to 20 to avoid overcrowding
-    if (store.lineSeries[0].data.length > 20) {
-      store.lineSeries[0].data.shift(); // Remove the oldest data point
+      if (store.lineSeries[0].data.length > 20) {
+        store.lineSeries[0].data.shift();
+      }
     }
-
     // Simulate new data for the heatmap
     const newHeatmapData = store.heatmapSeries.map((day) => ({
       ...day,

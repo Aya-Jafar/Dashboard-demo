@@ -1,4 +1,4 @@
-import { useDashboardStore } from "../stores/dashboard";
+import { useDashboardStore } from "@/stores/dashboard";
 
 /**
  * A mock WebSocket implementation for testing and development purposes.
@@ -11,6 +11,7 @@ import { useDashboardStore } from "../stores/dashboard";
  * socket.send('ping');
  */
 class MockWebSocket {
+  // @ts-ignore
   private url: string;
   private listeners: Array<(message: any) => void>;
 

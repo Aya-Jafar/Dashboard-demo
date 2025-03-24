@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
-import { useI18n } from "vue-i18n";
 
 // ==================== TYPE DEFINITIONS ====================
 interface Merchant {
@@ -32,8 +31,6 @@ interface HeatmapSeries {
 
 // ==================== STORE DEFINITION ====================
 export const useDashboardStore = defineStore("dashboard", () => {
-  const { t } = useI18n();
-
   // Dark theme color palette
   const colors = {
     primary: "#4936FC",
@@ -57,7 +54,7 @@ export const useDashboardStore = defineStore("dashboard", () => {
     return data;
   };
 
-  const generateMerchantData = (): Merchant[] => {
+  const generateMerchantData = () => {
     const merchants = ["Merchant A", "Merchant B", "Merchant C", "Merchant D"];
     const statusOptions = ["Active", "Inactive", "Pending"] as const;
 

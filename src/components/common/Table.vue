@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { getCurrentLanguage } from "../../utils/helpers";
+import { getCurrentLanguage } from "@/utils/helpers";
 
 // Props for the table
 const props = defineProps({

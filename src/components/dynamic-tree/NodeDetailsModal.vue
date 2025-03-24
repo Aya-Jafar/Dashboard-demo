@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from "vue";
 
 // Define props to accept node data
-const props = defineProps({
+defineProps({
   nodeData: {
     type: Object,
     default: () => ({

@@ -1,8 +1,8 @@
 import { defineStore } from "pinia";
 import { ref, computed } from "vue";
-import { APIService } from "../services/ApiService.ts";
-import API_ENDPOINTS from "../utils/endpoints.ts";
-import { useSnackbarStore } from "./snackbar.ts";
+import { APIService } from "@/services/ApiService";
+import API_ENDPOINTS from "@/utils/endpoints";
+import { useSnackbarStore } from "@/stores/snackbar";
 
 // ==================== TYPE DEFINITIONS ====================
 interface Node {
@@ -38,7 +38,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     try {
       isLoading.value = true;
 
-      const data = await APIService.request<Node[]>({
+      await APIService.request<Node[]>({
         endpoint: API_ENDPOINTS.DEPARTMENTS,
         method: "GET",
         pathParams: `?parentId=null&page=${page}&limit=${
@@ -101,7 +101,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
 
   const refetch = async (parentId: string | null): Promise<void> => {
     try {
-      const data = await APIService.request<Node[]>({
+      await APIService.request<Node[]>({
         endpoint: API_ENDPOINTS.DEPARTMENTS,
         method: "GET",
         pathParams: `?parentId=${parentId}&page=1&limit=${pageSize.value}&sortBy=createdAt&order=desc`, // Fetch the first page
@@ -167,8 +167,6 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
       isLoading.value = false;
     }
   };
-
-
 
   const handleNodeMove = ({
     nodeId,

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import DynamicTree from "./pages/DynamicTree.vue";
-import Dashboard from "./pages/Dashboard.vue";
+import DynamicTree from "@/pages/DynamicTree.vue";
+import Dashboard from "@/pages/Dashboard.vue";
 import { ref } from "vue";
-import LangougeToggle from "./components/common/LangougeToggle.vue";
-import { useLayoutStore } from "./stores/layout";
-import Icon from "./components/common/Icon.vue";
+import LangougeToggle from "@components/common/LangougeToggle.vue";
+import { useLayoutStore } from "@stores/layout";
+import Icon from "@components/common/Icon.vue";
 import { storeToRefs } from "pinia";
 
 // Track the active tab
@@ -16,6 +16,7 @@ const { isSidebarOpen, tabs } = storeToRefs(layoutStore);
 </script>
 
 <template>
+
   <div class="min-h-screen text-gray-100 font-sans flex">
     <!-- Sidebar -->
     <div
