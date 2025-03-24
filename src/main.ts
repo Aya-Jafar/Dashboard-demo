@@ -21,6 +21,6 @@ const app = createApp(App);
 
 app.use(createPinia());
 app.use(i18n);
-app.use(VueApexCharts); // Register VueApexCharts globally
+app.use(VueApexCharts);
 
 app.mount("#app");

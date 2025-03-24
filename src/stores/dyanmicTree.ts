@@ -5,6 +5,7 @@ import API_ENDPOINTS from "../utils/endpoints.ts";
 import { useSnackbarStore } from "./snackbar.ts";
 import { filterByExactParentID } from "../utils/helpers.ts";
 
+// ==================== TYPE DEFINITIONS ====================
 interface Node {
   id?: string;
   parentId: string | null;
@@ -14,6 +15,7 @@ interface Node {
   numberOfEmployees: number;
 }
 
+// ==================== STORE DEFINITION ====================
 export const useDynamicTreeStore = defineStore("tree-node", () => {
   const isLoading = ref(false);
   const nodes = ref<any[]>([]);
@@ -38,7 +40,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
       isLoading.value = true;
 
       const data = await APIService.request<Node[]>({
-        endpoint: API_ENDPOINTS.getAllDepartments,
+        endpoint: API_ENDPOINTS.DEPARTMENTS,
         method: "GET",
         pathParams: `?parentId=null&page=${page}&limit=${
           pageSize.value
@@ -65,10 +67,34 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
 
   // Recursive function to open or close nodes based on the search label
   const toggleNodesBySearch = (label: string): void => {
-    nodes.value.forEach((node) => {
-      if (label === "") {
+    const searchTerm = label.toLowerCase();
+
+    if (!searchTerm) {
+      // If search is empty, close all nodes
+      nodes.value.forEach((node) => {
         node.isOpen = false;
-      } else if (node.label.toLowerCase().includes(label.toLowerCase())) {
+      });
+      return;
+    }
+
+    // Recursive function to check if node or any children match search
+    const checkNodeMatches = (node: any): boolean => {
+      const nodeMatches = node.label.toLowerCase().includes(searchTerm);
+
+      if (node.children) {
+        const childMatches = node.children.some(checkNodeMatches);
+        return nodeMatches || childMatches;
+      }
+
+      return nodeMatches;
+    };
+
+    nodes.value.forEach((node) => {
+      // Open the node if it matches or has matching children
+      node.isOpen = checkNodeMatches(node);
+
+      // If node matches, ensure its parent is also open
+      if (node.label.toLowerCase().includes(searchTerm)) {
         node.isOpen = true;
       }
     });
@@ -77,7 +103,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
   const refetch = async (parentId: string | null): Promise<void> => {
     try {
       const data = await APIService.request<Node[]>({
-        endpoint: API_ENDPOINTS.getAllDepartments,
+        endpoint: API_ENDPOINTS.DEPARTMENTS,
         method: "GET",
         pathParams: `?parentId=${parentId}&page=1&limit=${pageSize.value}&sortBy=createdAt&order=desc`, // Fetch the first page
         setLoading: (loading: boolean) => (isLoading.value = loading),
@@ -111,7 +137,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     try {
       isLoading.value = true;
       const response = await APIService.request<Node>({
-        endpoint: API_ENDPOINTS.getAllDepartments,
+        endpoint: API_ENDPOINTS.DEPARTMENTS,
         method: "POST",
         body: newNode,
         setLoading: (loading: boolean) => (isLoading.value = loading),
@@ -147,33 +173,33 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     draggedNodeId: string,
     newParentId: string | null
   ): Promise<void> => {
-    try {
-      isLoading.value = true;
+    // try {
+    //   isLoading.value = true;
 
-      // Fetch the node to be updated
-      const node = nodes.value.find((n) => n.id === draggedNodeId);
-      if (!node) {
-        throw new Error("Node not found");
-      }
+    //   // Fetch the node to be updated
+    //   const node = nodes.value.find((n) => n.id === draggedNodeId);
+    //   if (!node) {
+    //     throw new Error("Node not found");
+    //   }
 
-      // Update the parentId of the node
-      const updatedNode = { ...node, parentId: newParentId };
+    //   // Update the parentId of the node
+    //   const updatedNode = { ...node, parentId: newParentId };
 
-      // Send a PUT request to update the node
-      const response = await APIService.request<Node>({
-        endpoint: `${API_ENDPOINTS.getAllDepartments}/${draggedNodeId}`,
-        method: "PUT",
-        body: updatedNode,
-        setLoading: (loading: boolean) => (isLoading.value = loading),
-      });
+    //   // Send a PUT request to update the node
+    //   const response = await APIService.request<Node>({
+    //     endpoint: `${API_ENDPOINTS.DEPARTMENTS}/${draggedNodeId}`,
+    //     method: "PUT",
+    //     body: updatedNode,
+    //     setLoading: (loading: boolean) => (isLoading.value = loading),
+    //   });
 
-      // Refetch data after updating
-      refetch(newParentId);
-    } catch (error) {
-      snackbarStore.showSnackbar(`API Error: ${error}`, "error");
-    } finally {
-      isLoading.value = false;
-    }
+    //   // Refetch data after updating
+    //   refetch(newParentId);
+    // } catch (error) {
+    //   snackbarStore.showSnackbar(`API Error: ${error}`, "error");
+    // } finally {
+    //   isLoading.value = false;
+    // }
   };
 
   return {

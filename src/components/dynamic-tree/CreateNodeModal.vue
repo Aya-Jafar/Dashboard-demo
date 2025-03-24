@@ -14,8 +14,8 @@ const emit = defineEmits(["close", "submit"]);
 const newNodeLabel = ref("");
 const description = ref("");
 const numberOfEmployees = ref<number | null>(null);
-const isInputValid = ref(true); // Track overall form validity
-const errorMessages = ref<Record<string, string>>({}); // Track individual field errors
+const isInputValid = ref(true); 
+const errorMessages = ref<Record<string, string>>({}); 
 
 // Reset and emit new node data
 const resetAndEmit = (newNode: {

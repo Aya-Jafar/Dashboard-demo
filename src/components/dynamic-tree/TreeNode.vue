@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, ref, onMounted, watch } from "vue";
+import { defineProps, defineEmits, ref, onMounted, watch, computed } from "vue";
 import { APIService } from "../../services/ApiService.ts";
 import API_ENDPOINTS from "../../utils/endpoints.ts";
 import Snackbar from "../common/Snackbar.vue";
@@ -36,7 +36,7 @@ const toggleNode = async (node: any) => {
       isLoading.value = true;
 
       const data = await APIService.request({
-        endpoint: `${API_ENDPOINTS.getAllDepartments}?parentId=${node.id}`,
+        endpoint: `${API_ENDPOINTS.DEPARTMENTS}?parentId=${node.id}`,
         method: "GET",
         setLoading: (loading: boolean) => (isLoading.value = loading),
         setError: (message) => {
@@ -117,6 +117,25 @@ const onDrop = async (event: DragEvent, targetNodeId: string) => {
   // // Force reactivity by reassigning the nodes array
   // store.nodes = [...store.nodes];
 };
+
+const matchesSearch = computed(() => {
+  if (!store.searchLabel) return true;
+  return props.node.label
+    .toLowerCase()
+    .includes(store.searchLabel.toLowerCase());
+});
+
+// In TreeNode.vue
+watch(
+  () => store.searchLabel,
+  async (newSearch) => {
+    if (newSearch && matchesSearch.value) {
+      // Automatically expand when node matches search
+      await toggleNode(props.node);
+    }
+  },
+  { immediate: true }
+);
 </script>
 
 <template>

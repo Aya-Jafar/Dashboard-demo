@@ -2,9 +2,37 @@ import { defineStore } from "pinia";
 import { ref } from "vue";
 import { useI18n } from "vue-i18n";
 
+// ==================== TYPE DEFINITIONS ====================
+interface Merchant {
+  name: string;
+  count: number;
+  value: number;
+  date: string;
+  status: "Active" | "Inactive" | "Pending";
+}
+
+interface HeatmapDataPoint {
+  x: string;
+  y: number;
+}
+
+interface LineDataPoint {
+  x: number; // timestamp
+  y: number;
+}
+interface LineSeries {
+  name: string;
+  data: LineDataPoint[];
+}
+
+interface HeatmapSeries {
+  name: string;
+  data: HeatmapDataPoint[];
+}
+
+// ==================== STORE DEFINITION ====================
 export const useDashboardStore = defineStore("dashboard", () => {
   const { t } = useI18n();
-  const isSidebarOpen = ref(true);
 
   // Dark theme color palette
   const colors = {
@@ -16,8 +44,8 @@ export const useDashboardStore = defineStore("dashboard", () => {
   };
 
   // Function to generate heatmap row data
-  const generateHeatmapRowData = () => {
-    const data = [];
+  const generateHeatmapRowData = (): HeatmapDataPoint[] => {
+    const data: HeatmapDataPoint[] = [];
     const hours = 24;
 
     for (let hour = 0; hour < hours; hour++) {
@@ -29,8 +57,25 @@ export const useDashboardStore = defineStore("dashboard", () => {
     return data;
   };
 
+  const generateMerchantData = (): Merchant[] => {
+    const merchants = ["Merchant A", "Merchant B", "Merchant C", "Merchant D"];
+    const statusOptions = ["Active", "Inactive", "Pending"] as const;
+
+    return merchants.map((name) => ({
+      name,
+      count: Math.floor(Math.random() * 100), // Random transaction count (0-99)
+      value: Math.floor(Math.random() * 10000), // Random transaction amount (0-9999)
+      date: new Date(
+        Date.now() - Math.floor(Math.random() * 30 * 24 * 60 * 60 * 1000)
+      )
+        .toISOString()
+        .split("T")[0], // Random date within the last 30 days
+      status: statusOptions[Math.floor(Math.random() * statusOptions.length)], // Random status
+    }));
+  };
+
   // Initial data for the line chart
-  const lineSeries = ref([
+  const lineSeries = ref<LineSeries[]>([
     {
       name: "",
       data: [
@@ -53,7 +98,7 @@ export const useDashboardStore = defineStore("dashboard", () => {
     },
   ]);
   // Initial data for the heatmap
-  const heatmapSeries = ref([
+  const heatmapSeries = ref<HeatmapSeries[]>([
     { name: "Monday", data: generateHeatmapRowData() },
     { name: "Tuesday", data: generateHeatmapRowData() },
     { name: "Wednesday", data: generateHeatmapRowData() },
@@ -64,7 +109,7 @@ export const useDashboardStore = defineStore("dashboard", () => {
   ]);
 
   // Initial data for the merchant table
-  const merchants = ref([
+  const merchants = ref<Merchant[]>([
     {
       name: "Merchant A",
       count: 50,
@@ -95,14 +140,14 @@ export const useDashboardStore = defineStore("dashboard", () => {
     },
   ]);
 
-  const tableHeaders = [
+  const tableHeaders: string[] = [
     "merchant",
     "transactionCount",
     "transactionAmount",
     "date",
     "status",
   ];
-  const tableRows = ref(
+  const tableRows = ref<(string | number)[][]>(
     merchants.value.map((merchant) => Object.values(merchant))
   );
 
@@ -362,6 +407,6 @@ export const useDashboardStore = defineStore("dashboard", () => {
     updateTableRows,
     heatmapOptions,
     lineChartOptions,
-    isSidebarOpen,
+    generateMerchantData,
   };
 });

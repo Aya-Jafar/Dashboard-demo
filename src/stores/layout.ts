@@ -4,10 +4,10 @@ import { useI18n } from "vue-i18n";
 
 export const useLayoutStore = defineStore("layout", () => {
   const isSidebarOpen = ref(true);
+  const { locale } = useI18n();
 
   const toggleSidebar = () => (isSidebarOpen.value = !isSidebarOpen.value);
 
-  const { locale } = useI18n();
 
   // Initialize locale from localStorage
   const savedLocale = localStorage.getItem("language");

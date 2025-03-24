@@ -3,13 +3,12 @@ import DynamicTree from "./pages/DynamicTree.vue";
 import Dashboard from "./pages/Dashboard.vue";
 import { ref } from "vue";
 import LangougeToggle from "./components/common/LangougeToggle.vue";
-import { useI18n } from "vue-i18n";
 import { useLayoutStore } from "./stores/layout";
 import Icon from "./components/common/Icon.vue";
 import { storeToRefs } from "pinia";
 
 // Track the active tab
-const activeTab = ref(1);
+const activeTab = ref(2);
 
 // Use the layout store
 const layoutStore = useLayoutStore();

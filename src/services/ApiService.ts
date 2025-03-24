@@ -146,7 +146,11 @@ export class APIService {
       if (method !== "GET") {
         snackbarStore.showSnackbar(`Error: ${String(error)}`, "error");
       }
-      if (String(error) === 'Error: "Not found"' && setError !== null) {
+      if (
+        String(error) === 'Error: "Not found"' &&
+        setError !== null &&
+        method !== "GET"
+      ) {
         console.log(String(error) === 'Error: "Not found"');
         setError("No sub-sections avaliable.");
       }

@@ -23,15 +23,16 @@ const handleCreateNode = (parentId: string | null) => {
 };
 
 // Watch for changes in the search label and trigger search
-// TODO: FIX THIS auto toggle
 watch(
   () => store.searchLabel,
   (newLabel) => {
     store.currentPage = 1; // Reset to first page on new search
     store.fetchMainData(store.currentPage, newLabel).then(() => {
-      store.toggleNodesBySearch(newLabel); // Open or close nodes based on the search label
+      // Only toggle nodes after data is loaded
+      store.toggleNodesBySearch(newLabel);
     });
-  }
+  },
+  { immediate: true } // Run this watcher immediately on component mount
 );
 
 // Fetch data when component is mounted
@@ -82,7 +83,7 @@ const handleNodeMove = async (
   draggedNodeId: string,
   newParentId: string | null
 ) => {
-  await store.updateNodeParent(draggedNodeId, newParentId); // Update the parentId in the store
+  // await store.updateNodeParent(draggedNodeId, newParentId); // Update the parentId in the store
 };
 
 const isRTL = computed(() => locale.value === "ar");
@@ -97,7 +98,7 @@ const isRTL = computed(() => locale.value === "ar");
     <!-- Search and New Button -->
     <div class="flex justify-between items-end mb-10 py-4">
       <input
-        v-model="store.searchLabel"
+        v-model.lazy="store.searchLabel"
         type="text"
         aria-label="Node search input"
         :placeholder="$t('search')"
@@ -128,7 +129,7 @@ const isRTL = computed(() => locale.value === "ar");
         <!-- Root Level Node -->
         <TreeNode
           :node="node"
-          :visible="node.visible"
+          :visible="node.visible !== false"
           @toggle="store.toggleNodeVisibility(node.id)"
           @show-details="showNodeDetails"
           @create-node="handleCreateNode"
