@@ -115,7 +115,7 @@ const isRTL = computed(() => locale.value === "ar");
     <!-- Tree Rendering -->
     <div v-else>
       <div
-        v-for="(node) in store.nodes"
+        v-for="node in store.nodes"
         :key="node.id"
         class="mb-4 p-4 bg-slate-900 rounded-lg shadow-md"
       >
@@ -134,15 +134,15 @@ const isRTL = computed(() => locale.value === "ar");
       <div :dir="isRTL ? 'rtl' : 'ltr'">
         <div class="flex justify-center mt-8">
           <button
-            :disabled="store.currentPage === store.totalPages"
-            @click="goToNextPage"
+            :disabled="store.currentPage === 1"
+            @click="goToPreviousPage"
             class="px-4 py-2 bg-slate-800 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             :class="{
-              'rounded-r': isRTL,
               'rounded-l': !isRTL,
+              'rounded-r': isRTL,
             }"
           >
-            {{ isRTL ? "التالي" : "Next" }}
+            {{ isRTL ? "السابق" : "Previous" }}
           </button>
           <span class="px-4 py-2 bg-slate-800 text-white">
             {{
@@ -152,15 +152,15 @@ const isRTL = computed(() => locale.value === "ar");
             }}
           </span>
           <button
-            :disabled="store.currentPage === 1"
-            @click="goToPreviousPage"
+            :disabled="store.currentPage === store.totalPages"
+            @click="goToNextPage"
             class="px-4 py-2 bg-slate-800 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
             :class="{
-              'rounded-l': isRTL,
               'rounded-r': !isRTL,
+              'rounded-l': isRTL,
             }"
           >
-            {{ isRTL ? "السابق" : "Previous" }}
+            {{ isRTL ? "التالي" : "Next" }}
           </button>
         </div>
       </div>
