@@ -148,11 +148,9 @@ export class APIService {
       }
       if (
         String(error) === 'Error: "Not found"' &&
-        setError !== null &&
-        method !== "GET"
+        setError !== null 
       ) {
-        console.log(String(error) === 'Error: "Not found"');
-        setError("No sub-sections avaliable.");
+        setError("noSubSectionsAvailable");
       }
 
       throw error;

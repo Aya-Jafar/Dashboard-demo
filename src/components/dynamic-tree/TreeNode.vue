@@ -52,7 +52,7 @@ const toggleNode = async (node: any) => {
            *  */
           node.children = filterByExactParentID(data, node.id);
           if (node.children.length === 0) {
-            noChildrenText.value = t("noSubSectionsAvailable");
+            noChildrenText.value = "noSubSectionsAvailable";
           }
           node.isOpen = true;
         },
