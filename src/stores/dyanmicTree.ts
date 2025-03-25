@@ -12,6 +12,7 @@ interface Node {
   createdAt: number;
   description: string;
   numberOfEmployees: number;
+  children?: Array<any>;
 }
 
 // ==================== STORE DEFINITION ====================
@@ -169,24 +170,70 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     }
   };
 
-  const handleNodeMove = ({
+  const moveNode = ({
     nodeId,
     targetNodeId,
   }: {
     nodeId: string;
     targetNodeId: string;
   }) => {
-    // Find the node being moved
-    const nodeToMoveIndex = nodes.value.findIndex((node) => node.id === nodeId);
-    const targetNodeIndex = nodes.value.findIndex(
-      (node: Node) => node.id === targetNodeId
+    // First try to find and move in root nodes
+    const rootFromIndex = nodes.value.findIndex((node) => node.id === nodeId);
+    const rootToIndex = nodes.value.findIndex(
+      (node) => node.id === targetNodeId
     );
 
-    if (nodeToMoveIndex !== -1 && targetNodeIndex !== -1) {
-      // Swap the positions in the root-level nodes array
-      const [movedNode] = nodes.value.splice(nodeToMoveIndex, 1);
-      nodes.value.splice(targetNodeIndex, 0, movedNode);
+    if (rootFromIndex !== -1 && rootToIndex !== -1) {
+      // Root-level move
+      const [movedNode] = nodes.value.splice(rootFromIndex, 1);
+      nodes.value.splice(rootToIndex, 0, movedNode);
+      return;
     }
+
+    // Recursive function to find parent node containing both nodes
+    const findCommonParent = (
+      nodes: Node[]
+    ): {
+      parent: Node;
+      children: Node[];
+      fromIndex: number;
+      toIndex: number;
+    } | null => {
+      for (const node of nodes) {
+        if (!node.children) continue;
+
+        // Check if both nodes are in this parent's children
+        const fromIndex = node.children.findIndex(
+          (child) => child.id === nodeId
+        );
+        const toIndex = node.children.findIndex(
+          (child) => child.id === targetNodeId
+        );
+
+        if (fromIndex !== -1 && toIndex !== -1) {
+          return { parent: node, children: node.children, fromIndex, toIndex };
+        }
+
+        // Recursively check deeper levels
+        const foundInChildren = findCommonParent(node.children);
+        if (foundInChildren) return foundInChildren;
+      }
+      return null;
+    };
+    const commonParent = findCommonParent(nodes.value);
+
+    if (commonParent) {
+      const { children, fromIndex, toIndex } = commonParent;
+      const [movedNode] = children.splice(fromIndex, 1);
+      children.splice(toIndex, 0, movedNode as any);
+      return;
+    }
+    
+    // TODO: make it a snackbar instead 
+    console.warn(
+      `Could not complete move - nodes not found or not in same parent group`,
+      { nodeId, targetNodeId }
+    );
   };
 
   return {
@@ -201,7 +248,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     toggleNodeVisibility,
     toggleNodesBySearch,
     add,
-    handleNodeMove,
+    moveNode,
   };
 });
 

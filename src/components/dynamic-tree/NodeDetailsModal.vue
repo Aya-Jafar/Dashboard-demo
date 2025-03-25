@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
 
-// Define props to accept node data
+// Props to accept node data
 defineProps({
   nodeData: {
     type: Object,
@@ -26,15 +26,15 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 };
 
-// Add event listener when the component is mounted
+//  event listener when the component is mounted
 onMounted(() => {
-  // Use a slight delay to ensure the modal is fully rendered before adding the event listener
+  // a slight delay to ensure the modal is fully rendered before adding the event listener
   setTimeout(() => {
     document.addEventListener("click", handleClickOutside);
   }, 0);
 });
 
-// Remove event listener when the component is unmounted
+//  event listener when the component is unmounted
 onUnmounted(() => {
   document.removeEventListener("click", handleClickOutside);
 });

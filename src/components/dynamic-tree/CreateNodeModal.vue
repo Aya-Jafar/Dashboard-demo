@@ -17,21 +17,27 @@ const numberOfEmployees = ref<number | null>(null);
 const isInputValid = ref(true); 
 const errorMessages = ref<Record<string, string>>({}); 
 
-// Reset and emit new node data
+/**
+ * @function
+ *  Reset and emit new node data
+ *  */
 const resetAndEmit = (newNode: {
   label: string;
   parentId: string | null;
   description: string;
   numberOfEmployees: number | null;
 }) => {
-  emit("submit", newNode); // Emit the new node data
-  newNodeLabel.value = ""; // Clear the input
-  description.value = ""; // Clear the description
-  numberOfEmployees.value = null; // Clear the number of employees
-  emit("close"); // Close the modal
+  emit("submit", newNode); 
+  newNodeLabel.value = ""; 
+  description.value = ""; 
+  numberOfEmployees.value = null; 
+  emit("close");
 };
 
-// Validate the form
+/**
+ * @function
+ *  Validate the form
+ *  */
 const validateForm = () => {
   const errors: Record<string, string> = {};
 
@@ -58,7 +64,10 @@ const validateForm = () => {
   return Object.keys(errors).length === 0;
 };
 
-// Handle form submission
+/**
+ * @function
+ * Handle form submission
+ *  */ 
 const handleSubmit = () => {
   // Validate the form
   if (!validateForm()) {

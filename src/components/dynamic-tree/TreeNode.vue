@@ -7,7 +7,8 @@ import { useDynamicTreeStore } from "@stores/dyanmicTree";
 import { filterByExactParentID } from "@/utils/helpers.ts";
 import OpenIcon from "@/components/dynamic-tree/OpenIcon.vue";
 import Icon from "@/components/common/Icon.vue";
-import { useI18n } from "vue-i18n";
+import { useSnackbarStore } from "@/stores/snackbar";
+import type { Node } from "@stores/dyanmicTree";
 
 const props = defineProps({
   node: {
@@ -20,11 +21,10 @@ const props = defineProps({
   },
 });
 
+// Reactive states and emits
 const emit = defineEmits(["show-details", "create-node", "node-move"]);
 const store = useDynamicTreeStore();
-const { t } = useI18n();
 const noChildrenText = ref<null | string>(null);
-
 const isLoading = ref(false);
 
 // Function to handle toggling a node
@@ -35,7 +35,7 @@ const toggleNode = async (node: any) => {
     try {
       isLoading.value = true;
 
-       await APIService.request({
+      await APIService.request({
         endpoint: `${API_ENDPOINTS.DEPARTMENTS}?parentId=${node.id}`,
         method: "GET",
         setLoading: (loading: boolean) => (isLoading.value = loading),
@@ -68,11 +68,12 @@ const toggleNode = async (node: any) => {
 };
 
 // Function to show node details
-const showDetails = () => emit("show-details", props.node); // Emit the node data to the parent
+const showDetails = () => emit("show-details", props.node);
 
 // Function to handle creating a new node
-const createNode = () => emit("create-node", props.node.id); // Emit the parent node's ID
+const createNode = () => emit("create-node", props.node.id);
 
+// TODO: Fix these handlers
 // Drag-and-drop handlers
 const onDragStart = (event: DragEvent, nodeId: string, parentId: string) => {
   event.dataTransfer?.setData("nodeId", nodeId);
@@ -98,7 +99,6 @@ const matchesSearch = computed(() => {
     .includes(store.searchLabel.toLowerCase());
 });
 
-// In TreeNode.vue
 watch(
   () => store.searchLabel,
   async (newSearch) => {
@@ -172,7 +172,7 @@ watch(
     <!-- Children -->
     <div
       v-if="node.isOpen"
-      class="ml-6 "
+      class="ml-6"
       role="group"
       :aria-labelledby="`node-label-${node.id}`"
     >
@@ -185,7 +185,7 @@ watch(
       <div v-else-if="noChildrenText !== null">{{ $t(noChildrenText) }}</div>
       <TreeNode
         v-else
-        v-for="(child) in node.children"
+        v-for="child in node.children"
         :key="child.id"
         :node="child"
         :visible="child.visible"

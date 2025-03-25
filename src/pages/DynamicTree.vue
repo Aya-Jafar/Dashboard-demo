@@ -133,7 +133,7 @@ const isRTL = computed(() => locale.value === "ar");
           @toggle="store.toggleNodeVisibility(node.id)"
           @show-details="showNodeDetails"
           @create-node="handleCreateNode"
-          @node-move="store.handleNodeMove"
+          @node-move="store.moveNode"
         />
       </div>
 
