@@ -177,65 +177,75 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     nodeId: string;
     targetNodeId: string;
   }) => {
-    // First try to find and move in root nodes
-    const rootFromIndex = nodes.value.findIndex((node) => node.id === nodeId);
-    const rootToIndex = nodes.value.findIndex(
-      (node) => node.id === targetNodeId
-    );
-
-    if (rootFromIndex !== -1 && rootToIndex !== -1) {
-      // Root-level move
-      const [movedNode] = nodes.value.splice(rootFromIndex, 1);
-      nodes.value.splice(rootToIndex, 0, movedNode);
-      return;
-    }
-
-    // Recursive function to find parent node containing both nodes
-    const findCommonParent = (
-      nodes: Node[]
-    ): {
-      parent: Node;
-      children: Node[];
-      fromIndex: number;
-      toIndex: number;
-    } | null => {
+    // Helper function to find node, its parent, and siblings array
+    const findNodeContext = (
+      nodes: Node[],
+      id: string
+    ): { node: Node | null; parent: Node | null; siblings: Node[] } => {
       for (const node of nodes) {
-        if (!node.children) continue;
-
-        // Check if both nodes are in this parent's children
-        const fromIndex = node.children.findIndex(
-          (child) => child.id === nodeId
-        );
-        const toIndex = node.children.findIndex(
-          (child) => child.id === targetNodeId
-        );
-
-        if (fromIndex !== -1 && toIndex !== -1) {
-          return { parent: node, children: node.children, fromIndex, toIndex };
+        if (node.id === id) return { node, parent: null, siblings: nodes };
+        if (node.children) {
+          const childMatch = node.children.find((child) => child.id === id);
+          if (childMatch)
+            return { node: childMatch, parent: node, siblings: node.children };
+          const found = findNodeContext(node.children, id);
+          if (found.node) return found;
         }
-
-        // Recursively check deeper levels
-        const foundInChildren = findCommonParent(node.children);
-        if (foundInChildren) return foundInChildren;
       }
-      return null;
+      return { node: null, parent: null, siblings: [] };
     };
-    const commonParent = findCommonParent(nodes.value);
 
-    if (commonParent) {
-      const { children, fromIndex, toIndex } = commonParent;
-      const [movedNode] = children.splice(fromIndex, 1);
-      children.splice(toIndex, 0, movedNode as any);
+    // Find contexts for both nodes
+    const source = findNodeContext(nodes.value, nodeId);
+    const target = findNodeContext(nodes.value, targetNodeId);
+
+    if (!source.node || !target.node) {
+      console.error("Nodes not found");
       return;
     }
-    
-    // TODO: make it a snackbar instead 
-    console.warn(
-      `Could not complete move - nodes not found or not in same parent group`,
-      { nodeId, targetNodeId }
-    );
-  };
 
+    // Determine new parent (use target's parent)
+    const newParentId = target.parent?.id ?? null;
+
+    // Clone state for immutability
+    const newNodes = JSON.parse(JSON.stringify(nodes.value));
+
+    // 1. Remove from original position
+    const updatedSource = findNodeContext(newNodes, nodeId);
+    if (!updatedSource.node) return;
+
+    updatedSource.siblings.splice(
+      updatedSource.siblings.findIndex((n) => n.id === nodeId),
+      1
+    );
+
+    // 2. Update parent reference
+    updatedSource.node.parentId = newParentId;
+
+    // 3. Determine new siblings array
+    let newSiblings: Node[];
+    if (newParentId === null) {
+      newSiblings = newNodes;
+    } else {
+      const newParent = findNodeContext(newNodes, newParentId).node;
+      if (!newParent) return;
+      newParent.children = newParent.children || [];
+      newSiblings = newParent.children;
+    }
+
+    // 4. Find insertion position
+    const targetIndex = newSiblings.findIndex((n) => n.id === targetNodeId);
+    if (targetIndex === -1) {
+      // If target not found in new siblings, append to end
+      newSiblings.push(updatedSource.node);
+    } else {
+      // Insert before target node
+      newSiblings.splice(targetIndex, 0, updatedSource.node);
+    }
+
+    // 5. Update state
+    nodes.value = newNodes;
+  };
   return {
     isLoading,
     nodes,

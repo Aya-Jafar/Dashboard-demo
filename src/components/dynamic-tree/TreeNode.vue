@@ -75,20 +75,32 @@ const createNode = () => emit("create-node", props.node.id);
 
 // TODO: Fix these handlers
 // Drag-and-drop handlers
-const onDragStart = (event: DragEvent, nodeId: string, parentId: string) => {
-  event.dataTransfer?.setData("nodeId", nodeId);
-  event.dataTransfer?.setData("parentId", parentId);
+const onDragStart = (event: DragEvent) => {
+  event.dataTransfer?.setData("nodeId", props.node.id);
+  event.dataTransfer?.setData("parentId", props.node.parentId ?? "null");
+  event.dataTransfer?.setData("type", "node");
+  event.stopPropagation();
 };
 
 const onDragOver = (event: DragEvent) => {
   event.preventDefault();
 };
 
-const onDrop = (event: DragEvent, targetNodeId: string) => {
+const onDrop = (event: DragEvent) => {
+  (event.currentTarget as HTMLElement)?.classList.remove("drop-target");
+  event.preventDefault();
+  event.stopPropagation();
+
   const nodeId = event.dataTransfer?.getData("nodeId");
   const parentId = event.dataTransfer?.getData("parentId");
-  if (nodeId && parentId) {
-    emit("node-move", { nodeId, parentId, targetNodeId });
+
+  if (nodeId) {
+    emit("node-move", {
+      nodeId,
+      targetNodeId: props.node.id,
+      newParentId: props.node.parentId ?? null,
+      oldParentId: parentId === "null" ? null : parentId,
+    });
   }
 };
 
@@ -118,9 +130,9 @@ watch(
     <div
       class="flex items-center justify-between"
       draggable="true"
-      @dragstart="onDragStart($event, node.id, node.parentId)"
+      @dragstart="onDragStart"
       @dragover="onDragOver($event)"
-      @drop.stop="onDrop($event, node.id)"
+      @drop.stop="onDrop"
       role="treeitem"
       :aria-expanded="node.isOpen ? 'true' : 'false'"
       :aria-labelledby="`node-label-${node.id}`"
