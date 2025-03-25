@@ -12,24 +12,27 @@ export const filterByExactParentID = (data: Node[], parentId: string) => {
 };
 
 /**
- *
- * @returns the current language
+ * Gets the current application language
+ * @returns The current language code from localStorage or i18n locale
  */
 export const getCurrentLanguage = () => {
-  const { locale } = useI18n();
-
   if (localStorage.getItem("language")) {
     return localStorage.getItem("language");
   }
+  const { locale } = useI18n();
   return locale;
 };
 
-export const debounce = <T extends (...args: any[]) => void>(
-  func: T,
-  wait: number
-): ((...args: Parameters<T>) => void) => {
-  let timeout: ReturnType<typeof setTimeout>;
-  return function (this: any, ...args: Parameters<T>) {
+/**
+ * Creates a debounced function that delays execution
+ * @param func - The function to debounce
+ * @param wait - Number of milliseconds to delay
+ * @returns A debounced version of the passed function
+ */
+export const debounce = (func: Function, wait: number) => {
+  let timeout: number;
+
+  return function (this: any, ...args: any[]) {
     clearTimeout(timeout);
     timeout = setTimeout(() => func.apply(this, args), wait);
   };

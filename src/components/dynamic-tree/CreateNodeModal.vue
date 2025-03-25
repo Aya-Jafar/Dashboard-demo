@@ -8,53 +8,50 @@ const props = defineProps({
   },
 });
 
-// Reactive states
+// Reactive states and emits
 const modalRef = ref<HTMLElement | null>(null);
 const emit = defineEmits(["close", "submit"]);
 const newNodeLabel = ref("");
 const description = ref("");
 const numberOfEmployees = ref<number | null>(null);
-const isInputValid = ref(true); 
-const errorMessages = ref<Record<string, string>>({}); 
+const isInputValid = ref(true);
+const errorMessages = ref<Record<string, string>>({});
 
 /**
- * @function
  *  Reset and emit new node data
- *  */
+ **/
 const resetAndEmit = (newNode: {
   label: string;
   parentId: string | null;
   description: string;
   numberOfEmployees: number | null;
 }) => {
-  emit("submit", newNode); 
-  newNodeLabel.value = ""; 
-  description.value = ""; 
-  numberOfEmployees.value = null; 
+  emit("submit", newNode);
+  newNodeLabel.value = "";
+  description.value = "";
+  numberOfEmployees.value = null;
   emit("close");
 };
 
 /**
- * @function
  *  Validate the form
- *  */
+ **/
 const validateForm = () => {
   const errors: Record<string, string> = {};
 
   // Validate label
   if (!newNodeLabel.value.trim()) {
-    errors.label = "Node label cannot be empty.";
+    errors.label = "empty_node_label";
   }
 
   // Validate description
   if (!description.value.trim()) {
-    errors.description = "Description cannot be empty.";
+    errors.description = "empty_description";
   }
 
   // Validate number of employees
   if (numberOfEmployees.value === null || numberOfEmployees.value < 0) {
-    errors.numberOfEmployees =
-      "Number of employees must be a non-negative number.";
+    errors.numberOfEmployees = "invalid_employee_count";
   }
 
   // Update error messages
@@ -65,9 +62,8 @@ const validateForm = () => {
 };
 
 /**
- * @function
  * Handle form submission
- *  */ 
+ **/
 const handleSubmit = () => {
   // Validate the form
   if (!validateForm()) {
@@ -131,7 +127,7 @@ onUnmounted(() => {
         />
         <!-- Error message for label -->
         <p v-if="errorMessages.label" class="text-red-400 text-sm mb-4">
-          {{ errorMessages.label }}
+          {{ $t(errorMessages.label) }}
         </p>
 
         <!-- Number of Employees Input -->
@@ -148,7 +144,7 @@ onUnmounted(() => {
           v-if="errorMessages.numberOfEmployees"
           class="text-red-400 text-sm mb-4"
         >
-          {{ errorMessages.numberOfEmployees }}
+          {{ $t(errorMessages.numberOfEmployees) }}
         </p>
 
         <!-- Description Input -->
@@ -161,7 +157,7 @@ onUnmounted(() => {
         ></textarea>
         <!-- Error message for description -->
         <p v-if="errorMessages.description" class="text-red-400 text-sm mb-4">
-          {{ errorMessages.description }}
+          {{ $t(errorMessages.description) }}
         </p>
 
         <!-- Buttons -->
@@ -187,5 +183,4 @@ onUnmounted(() => {
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

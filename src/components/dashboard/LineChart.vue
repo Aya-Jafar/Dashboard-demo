@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 
-// Props for the line chart
 const props = defineProps({
   chartOptions: {
     type: Object,

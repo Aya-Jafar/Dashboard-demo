@@ -3,6 +3,7 @@ import { ref, watch } from "vue";
 import { useI18n } from "vue-i18n";
 import ICONS from "@/utils/icons";
 
+// ==================== TYPE DEFINITIONS ====================
 interface Tab {
   id: number;
   label: string;
@@ -10,6 +11,7 @@ interface Tab {
   component: any;
 }
 
+// ==================== STORE DEFINITION ====================
 export const useLayoutStore = defineStore("layout", () => {
   const isSidebarOpen = ref(true);
   const { locale } = useI18n();

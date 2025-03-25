@@ -3,21 +3,20 @@ import { onMounted, computed, ref } from "vue";
 import MockWebSocket from "../services/WebSocketService";
 import LineChart from "@components/dashboard/LineChart.vue";
 import HeatMap from "@components/dashboard/HeatMap.vue";
-import { useDashboardStore } from "@stores/dashboard";
+import { useDashboardStore, type WebSocketStatus } from "@stores/dashboard";
 import { useLayoutStore } from "@stores/layout";
 import Table from "@components/common/Table.vue";
 
 // Store and states
 const store = useDashboardStore();
 const { isSidebarOpen } = useLayoutStore();
-const connectionStatus = ref<
-  "disconnected" | "connecting" | "connected" | "error"
->("disconnected");
+const connectionStatus = ref<WebSocketStatus>("disconnected");
 const ws = ref<MockWebSocket | null>(null);
 const isOnline = ref(navigator.onLine);
 
 // Initialize WebSocket and update chart data
 const initWebSocket = () => {
+  // Check connection status
   if (!isOnline.value) {
     return;
   }

@@ -13,20 +13,16 @@ import type { Node } from "@stores/dyanmicTree";
 const store = useDynamicTreeStore();
 const { locale } = useI18n();
 const isOnline = ref(navigator.onLine);
+const selectedParentId = ref<string | null>(null);
+const selectedNode = ref(null); // Selected node data for the modal
 
 // Modal visibility states
 const isCreateNodeModalVisible = ref(false);
-const selectedParentId = ref<string | null>(null);
-
-// Modal visibility state
 const isDetailsModalVisible = ref(false);
-
-// Selected node data for the modal
-const selectedNode = ref(null);
 
 // Function to handle creating a new node
 const handleCreateNode = (parentId: string | null) => {
-  selectedParentId.value = parentId ?? null; // Set the parent ID
+  selectedParentId.value = parentId ?? null; // Set parent ID
   isCreateNodeModalVisible.value = true; // Show the modal
 };
 
@@ -42,7 +38,7 @@ watch(
       });
     }
   },
-  { immediate: true } // Run this watcher immediately on component mount
+  { immediate: true } // Run this on component mount
 );
 
 // Fetch data when component is mounted
@@ -62,7 +58,6 @@ const goToNextPage = () => {
   }
 };
 
-
 // Handle previous page click
 const goToPreviousPage = () => {
   if (isOnline.value) {
@@ -72,16 +67,16 @@ const goToPreviousPage = () => {
     }
   }
 };
-
+// Handle showing the details modal
 const showNodeDetails = (node: any) => {
   selectedNode.value = node;
   isDetailsModalVisible.value = true;
 };
 
-const handleNodeCreate = (newNode: Node) => {
+const handleNodeCreate = async (newNode: Node) => {
   // Add the new node to the tree
   if (isOnline.value) {
-    store.add({
+    await store.add({
       label: newNode.label,
       parentId: newNode.parentId,
       createdAt: new Date().getTime(),

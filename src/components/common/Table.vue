@@ -2,7 +2,7 @@
 import { ref, computed } from "vue";
 import { getCurrentLanguage } from "@/utils/helpers";
 
-// Props for the table
+
 const props = defineProps({
   title: {
     type: String,
@@ -215,13 +215,12 @@ const handleSort = (column: string) => {
 </template>
 
 <style scoped>
-/* Thin and slightly transparent borders */
 table {
   border-collapse: collapse;
 }
 
 th,
 td {
-  border: 1px solid rgba(255, 255, 255, 0.1); /* Thin and transparent border */
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 </style>

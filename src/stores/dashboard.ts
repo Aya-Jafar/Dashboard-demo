@@ -28,6 +28,11 @@ interface HeatmapSeries {
   name: string;
   data: HeatmapDataPoint[];
 }
+export type WebSocketStatus =
+  | "disconnected"
+  | "connecting"
+  | "connected"
+  | "error";
 
 // ==================== STORE DEFINITION ====================
 export const useDashboardStore = defineStore("dashboard", () => {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue";
 
-// Props for the heatmap
+
 const props = defineProps({
   chartOptions: {
     type: Object,

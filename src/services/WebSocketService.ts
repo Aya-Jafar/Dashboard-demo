@@ -1,4 +1,4 @@
-import { useDashboardStore } from "@/stores/dashboard";
+import { useDashboardStore, type WebSocketStatus } from "@/stores/dashboard";
 
 /**
  * A mock WebSocket implementation for testing and development purposes.
@@ -15,11 +15,7 @@ class MockWebSocket {
   // @ts-ignore
   private url: string;
   private listeners: Array<(message: any) => void>;
-  private connectionState:
-    | "disconnected"
-    | "connecting"
-    | "connected"
-    | "error";
+  private connectionState: WebSocketStatus;
   private reconnectAttempts: number;
   private maxReconnectAttempts: number;
   private reconnectInterval: number;
