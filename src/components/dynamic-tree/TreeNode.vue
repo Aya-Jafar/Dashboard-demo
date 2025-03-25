@@ -7,8 +7,6 @@ import { useDynamicTreeStore } from "@stores/dyanmicTree";
 import { filterByExactParentID } from "@/utils/helpers.ts";
 import OpenIcon from "@/components/dynamic-tree/OpenIcon.vue";
 import Icon from "@/components/common/Icon.vue";
-import { useSnackbarStore } from "@/stores/snackbar";
-import type { Node } from "@stores/dyanmicTree";
 
 const props = defineProps({
   node: {
@@ -26,6 +24,7 @@ const emit = defineEmits(["show-details", "create-node", "node-move"]);
 const store = useDynamicTreeStore();
 const noChildrenText = ref<null | string>(null);
 const isLoading = ref(false);
+const isOnline = ref(navigator.onLine);
 
 // Function to handle toggling a node
 const toggleNode = async (node: any) => {
@@ -51,7 +50,7 @@ const toggleNode = async (node: any) => {
            * That's why we need the filtering here
            *  */
           node.children = filterByExactParentID(data, node.id);
-          if (node.children.length === 0) {
+          if (node.children?.length === 0) {
             noChildrenText.value = "noSubSectionsAvailable";
           }
           node.isOpen = true;
@@ -73,7 +72,6 @@ const showDetails = () => emit("show-details", props.node);
 // Function to handle creating a new node
 const createNode = () => emit("create-node", props.node.id);
 
-// TODO: Fix these handlers
 // Drag-and-drop handlers
 const onDragStart = (event: DragEvent) => {
   event.dataTransfer?.setData("nodeId", props.node.id);
@@ -194,7 +192,9 @@ watch(
           class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-yellow-400"
         ></div>
       </div>
-      <div v-else-if="noChildrenText !== null">{{ $t(noChildrenText) }}</div>
+      <div v-else-if="noChildrenText !== null && isOnline">
+        {{ $t(noChildrenText) }}
+      </div>
       <TreeNode
         v-else
         v-for="child in node.children"

@@ -23,7 +23,6 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
   const pageSize = ref(10); // Number of items per page (limit)
   const searchLabel = ref(""); // Search input for node label
   const totalItems = ref(20); // Total items
-  // const noSearchResult = ref<null | string>(null);
 
   const snackbarStore = useSnackbarStore();
 
@@ -170,7 +169,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     }
   };
 
-  const moveNode = ({
+  const moveNode = async ({
     nodeId,
     targetNodeId,
   }: {
@@ -211,7 +210,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     // Clone state for immutability
     const newNodes = JSON.parse(JSON.stringify(nodes.value));
 
-    // 1. Remove from original position
+    // Remove from original position
     const updatedSource = findNode(newNodes, nodeId);
     if (!updatedSource.node) return;
 
@@ -220,10 +219,10 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
       1
     );
 
-    // 2. Update parent reference
+    // Update parent reference
     updatedSource.node.parentId = newParentId;
 
-    // 3. Determine new siblings array
+    // Determine new siblings array
     let newSiblings: Node[];
     if (newParentId === null) {
       newSiblings = newNodes;
@@ -234,7 +233,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
       newSiblings = newParent.children;
     }
 
-    // 4. Find insertion position
+    // Find insertion position
     const targetIndex = newSiblings.findIndex((n) => n.id === targetNodeId);
     if (targetIndex === -1) {
       // If target not found in new siblings, append to end
@@ -244,8 +243,35 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
       newSiblings.splice(targetIndex, 0, updatedSource.node);
     }
 
-    // 5. Update state
+    //  Update state
     nodes.value = newNodes;
+
+    // try {
+    //   isLoading.value = true;
+
+    //   // Prepare request body with updated hierarchy
+    //   const updatedNode = {
+    //     id: updatedSource.node.id,
+    //     parentId: updatedSource.node.parentId,
+    //     label: updatedSource.node.label,
+    //     description: updatedSource.node.description,
+    //     numberOfEmployees: updatedSource.node.numberOfEmployees,
+    //     createdAt: updatedSource.node.createdAt,
+    //   };
+
+    //   await APIService.request({
+    //     endpoint: `${API_ENDPOINTS.DEPARTMENTS}/${nodeId}`,
+    //     method: "PUT",
+    //     body: updatedNode,
+    //     setLoading: (loading: boolean) => (isLoading.value = loading),
+    //   });
+
+    //   snackbarStore.showSnackbar(`Node moved successfully`, "success");
+    // } catch (error) {
+    //   snackbarStore.showSnackbar(`API Error: ${error}`, "error");
+    // } finally {
+    //   isLoading.value = false;
+    // }
   };
   return {
     isLoading,

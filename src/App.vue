@@ -1,67 +1,111 @@
 <script setup lang="ts">
-import DynamicTree from "@/pages/DynamicTree.vue";
-import Dashboard from "@/pages/Dashboard.vue";
-import { ref } from "vue";
-import LangougeToggle from "@components/common/LangougeToggle.vue";
+import { ref, computed, defineAsyncComponent, onUnmounted } from "vue";
 import { useLayoutStore } from "@stores/layout";
-import Icon from "@components/common/Icon.vue";
 import { storeToRefs } from "pinia";
+import Icon from "@components/common/Icon.vue";
+import LangougeToggle from "@components/common/LangougeToggle.vue";
+import Loading from "@components/common/Loading.vue";
 
 // Track the active tab
-const activeTab = ref(2);
+const activeTab = ref(1);
 
 // Use the layout store
 const layoutStore = useLayoutStore();
-const { isSidebarOpen, tabs } = storeToRefs(layoutStore); 
+const { isSidebarOpen, tabs } = storeToRefs(layoutStore);
+
+// Track loaded components
+const loadedComponents = new Map<number, any>();
+
+const activeComponent = computed(() => {
+  const tab = tabs.value.find((t) => t.id === activeTab.value);
+  if (!tab) return null;
+
+  // Return cached component if exists
+  if (loadedComponents.has(tab.id)) {
+    return loadedComponents.get(tab.id);
+  }
+
+  // Create and cache new async component
+  const asyncComponent = defineAsyncComponent({
+    loader: tab.component,
+    errorComponent: {
+      template:
+        '<div class="p-4 text-center text-red-500">Error loading component</div>',
+    },
+    delay: 200,
+    timeout: 3000,
+  });
+
+  loadedComponents.set(tab.id, asyncComponent);
+  return asyncComponent;
+});
+
+// Cleanup
+onUnmounted(() => {
+  loadedComponents.clear();
+});
 </script>
 
 <template>
-
   <div class="min-h-screen text-gray-100 font-sans flex">
     <!-- Sidebar -->
     <div
-      class="!bg-slate-900 w-60 p-4 transition-all duration-300 ease-in-out rounded-md"
-      :class="{ '-ml-64': !isSidebarOpen }"
+      class="!bg-slate-900 p-4 transition-all duration-300 ease-in-out rounded-md flex flex-col"
+      :class="isSidebarOpen ? 'w-60' : 'w-20'"
     >
       <!-- Sidebar Header -->
-      <div class="flex items-center justify-between mb-6">
-        <!-- <h2 class="text-xl font-semibold">{{ $t("menu") }}</h2> -->
+      <div
+        class="flex items-center mb-6"
+        :class="isSidebarOpen ? 'justify-between' : 'flex-col'"
+      >
         <img
-            src="/src/assets/Qi Card PNG.png"
-            alt="logo"
-            class="w-13 h-13"
-            fetchPriority="high"
-          />
-        <!-- Toggle Button Inside Sidebar -->
+          src="/src/assets/Qi Card PNG.png"
+          alt="logo"
+          :class="isSidebarOpen ? 'w-13 h-13' : 'w-10 h-10'"
+          fetchPriority="high"
+        />
+
+        <!-- Toggle Button -->
         <button
-          v-if="isSidebarOpen"
           @click="layoutStore.toggleSidebar"
           class="text-gray-400 hover:text-white focus:outline-none"
+          :class="isSidebarOpen ? '' : 'mb-2'"
           :aria-label="isSidebarOpen ? $t('closeSidebar') : $t('openSidebar')"
         >
           <Icon
             iconClass="h-6 w-6"
             strokeWidth="2"
-            d="M4 6h16M4 12h16m-7 6h7"
+            :d="
+              isSidebarOpen
+                ? 'M4 6h16M4 12h16m-7 6h7'
+                : 'M4 6h16M4 12h16M4 18h16'
+            "
           />
         </button>
       </div>
 
       <!-- Sidebar Navigation -->
-      <nav>
+      <nav class="flex-1">
         <button
           v-for="tab in tabs"
           :key="tab.id"
-          class="w-full flex items-center p-2 text-lg font-medium rounded-lg hover:bg-gray-700 transition-colors duration-200 mt-2"
+          class="w-full flex items-center p-2 text-lg font-medium rounded-lg hover:bg-gray-700 transition-colors duration-200 mt-2 group"
           :class="{ 'bg-gray-700': activeTab === tab.id }"
           @click="activeTab = tab.id"
         >
           <Icon
-            :iconClass="'h-5 w-5 mr-3'"
+            :iconClass="'h-5 w-5'"
+            :class="isSidebarOpen ? 'mr-3' : 'mx-auto'"
             strokeWidth="2"
             :d="tab.icon"
           />
-          {{ $t(tab.label) }}
+          <span v-if="isSidebarOpen">{{ $t(tab.label) }}</span>
+          <div
+            v-else
+            class="absolute left-20 ml-2 px-2 py-1 bg-gray-800 text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity"
+          >
+            {{ $t(tab.label) }}
+          </div>
         </button>
       </nav>
     </div>
@@ -75,31 +119,20 @@ const { isSidebarOpen, tabs } = storeToRefs(layoutStore);
         <div class="flex gap-2 items-center">
           <p class="text-2xl font-bold">{{ $t("title") }}</p>
         </div>
+
         <LangougeToggle class="flex justify-end items-center" />
       </div>
 
       <!-- Tab Content -->
       <div>
-        <div v-if="activeTab === 1">
-          <!-- Dashboard  -->
-          <Dashboard />
-        </div>
-        <div v-if="activeTab === 2">
-          <!-- Dynamic Tree  -->
-          <DynamicTree />
-        </div>
+        <Suspense>
+          <component :is="activeComponent" :key="activeTab" />
+          <template #fallback>
+            <Loading />
+          </template>
+        </Suspense>
       </div>
     </div>
-
-    <!-- Toggle Button -->
-    <button
-      v-if="!isSidebarOpen"
-      @click="layoutStore.toggleSidebar"
-      class="fixed left-2 top-2 text-gray-400 hover:text-white focus:outline-none z-50"
-      :aria-label="isSidebarOpen ? $t('closeSidebar') : $t('openSidebar')"
-    >
-      <Icon iconClass="h-6 w-6" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
-    </button>
   </div>
 </template>
 

@@ -31,5 +31,6 @@
   "departments": "الأقسام",
   "menu": "القائمة",
   "empty_data": "لم يتم العثور على ايَّ بيانات.",
-  "noDepartmentsAvailable": "لا يوجد أقسام متاحة حالياً."
+  "noDepartmentsAvailable": "لا يوجد أقسام متاحة حالياً.",
+  "connection_error": "يرجى التحقق من اتصال الإنترنت والمحاولة مرة أخرى"
 }

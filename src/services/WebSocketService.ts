@@ -10,45 +10,86 @@ import { useDashboardStore } from "@/stores/dashboard";
  * socket.connect();
  * socket.send('ping');
  */
+// Updated MockWebSocket class with connection state tracking
 class MockWebSocket {
-  // @ts-ignore
   private url: string;
   private listeners: Array<(message: any) => void>;
+  private connectionState:
+    | "disconnected"
+    | "connecting"
+    | "connected"
+    | "error";
+  private reconnectAttempts: number;
+  private maxReconnectAttempts: number;
+  private reconnectInterval: number;
 
-  /**
-   * Creates a new MockWebSocket instance
-   * @param {string} url - The URL to simulate connecting to
-   */
   constructor(url: string) {
     this.url = url;
     this.listeners = [];
+    this.connectionState = "disconnected";
+    this.reconnectAttempts = 0;
+    this.maxReconnectAttempts = 5;
+    this.reconnectInterval = 3000; // 3 seconds
   }
 
-  /**
-   * Simulates establishing a WebSocket connection.
-   * After a 500ms delay, triggers a connection confirmation message.
-   */
+  get state() {
+    return this.connectionState;
+  }
+
   connect(): void {
+    if (
+      this.connectionState === "connected" ||
+      this.connectionState === "connecting"
+    ) {
+      return;
+    }
+
+    this.connectionState = "connecting";
+    this.reconnectAttempts++;
+
+    // Simulate connection attempt with possible failure
+    const shouldFail = Math.random() < 0.2; // 20% chance of failure for testing
+
     setTimeout(() => {
-      this.listeners.forEach((callback) =>
-        callback("WebSocket connection established.")
-      );
+      if (shouldFail && this.reconnectAttempts < this.maxReconnectAttempts) {
+        this.connectionState = "error";
+        console.error(
+          "Mock WebSocket connection failed. Attempting reconnect..."
+        );
+        this.scheduleReconnect();
+      } else {
+        this.connectionState = "connected";
+        this.reconnectAttempts = 0;
+        this.listeners.forEach((callback) =>
+          callback({
+            type: "connection",
+            message: "WebSocket connection established",
+          })
+        );
+      }
     }, 500);
   }
 
-  /**
-   * Simulates sending data through the WebSocket.
-   * Generates mock response data after a 500ms delay containing:
-   * - Random line chart data point
-   * - Generated heatmap data from dashboard store
-   * - Generated merchant data from dashboard store
-   *
-   * @param {string} message - The message being sent
-   */
+  private scheduleReconnect(): void {
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.error("Max reconnection attempts reached");
+      this.connectionState = "disconnected";
+      return;
+    }
+
+    setTimeout(() => this.connect(), this.reconnectInterval);
+  }
+
   send(message: string): void {
+    if (this.connectionState !== "connected") {
+      console.warn("Cannot send message - WebSocket not connected");
+      return;
+    }
+
     console.log(`Mock WebSocket sending: ${message}`);
     setTimeout(() => {
       const newData = {
+        type: "data",
         lineData: {
           x: new Date().getTime(),
           y: Math.floor(Math.random() * 1500),
@@ -60,18 +101,12 @@ class MockWebSocket {
     }, 500);
   }
 
-  /**
-   * Registers a callback function to handle incoming messages
-   * @param {(message: any) => void} callback - Function to call when messages are received
-   */
   onmessage(callback: (message: any) => void): void {
     this.listeners.push(callback);
   }
 
-  /**
-   * Simulates closing the WebSocket connection
-   */
   close(): void {
+    this.connectionState = "disconnected";
     console.log("Mock WebSocket connection closed.");
   }
 }

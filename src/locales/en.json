@@ -31,5 +31,6 @@
   "departments": "Departments",
   "menu": "Menu",
   "empty_data": "No data was found.",
-  "noDepartmentsAvailable": "No current departments available."
+  "noDepartmentsAvailable": "No current departments available.",
+  "connection_error": "Please check your internet connection and try again."
 }

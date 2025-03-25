@@ -147,6 +147,7 @@ export class APIService {
         snackbarStore.showSnackbar(`Error: ${String(error)}`, "error");
       }
 
+      // Do not show snack bar with empty child nodes 
       if (
         String(error) === 'Error: "Not found"' &&
         setError !== null &&

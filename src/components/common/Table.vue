@@ -16,6 +16,10 @@ const props = defineProps({
     type: Array<any>,
     required: true,
   },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // States for sorting
@@ -124,11 +128,43 @@ const handleSort = (column: string) => {
         />
       </div>
     </div>
+    <!-- Skeleton Loading -->
+    <div v-if="loading" class="space-y-2">
+      <!-- Skeleton header with equal width columns -->
+      <div class="flex space-x-2 animate-pulse">
+        <div
+          v-for="(header, index) in headers"
+          :key="`header-${index}`"
+          class="h-10 bg-gray-700 rounded"
+          :style="{
+            width: `${100 / headers.length}%`,
+            minWidth: '100px',
+          }"
+        ></div>
+      </div>
+
+      <!-- Skeleton rows -->
+      <div
+        v-for="i in 5"
+        :key="`row-${i}`"
+        class="flex space-x-2 animate-pulse"
+      >
+        <div
+          v-for="(header, index) in headers"
+          :key="`cell-${index}-${i}`"
+          class="h-12 bg-gray-800 rounded"
+          :style="{
+            width: `${100 / headers.length}%`,
+            minWidth: '100px',
+          }"
+        ></div>
+      </div>
+    </div>
 
     <!-- Table -->
     <table
       class="min-w-full bg-slate-900 text-white"
-      v-if="sortedAndFilteredRows.length > 0"
+      v-if="sortedAndFilteredRows.length > 0 && !loading"
     >
       <thead>
         <tr>
@@ -172,7 +208,7 @@ const handleSort = (column: string) => {
       </tbody>
     </table>
 
-    <div v-else>
+    <div v-if="sortedAndFilteredRows.length === 0 && !loading">
       <p class="text-xl text-center font-semibold">{{ $t("empty_data") }}</p>
     </div>
   </div>

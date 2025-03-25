@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, computed } from "vue";
+import { onMounted, computed, ref } from "vue";
 import MockWebSocket from "../services/WebSocketService";
 import LineChart from "@components/dashboard/LineChart.vue";
 import HeatMap from "@components/dashboard/HeatMap.vue";
@@ -7,53 +7,73 @@ import { useDashboardStore } from "@stores/dashboard";
 import { useLayoutStore } from "@stores/layout";
 import Table from "@components/common/Table.vue";
 
-// Access the store
+// Store and states
 const store = useDashboardStore();
 const { isSidebarOpen } = useLayoutStore();
+const connectionStatus = ref<
+  "disconnected" | "connecting" | "connected" | "error"
+>("disconnected");
+const ws = ref<MockWebSocket | null>(null);
+const isOnline = ref(navigator.onLine);
 
 // Initialize WebSocket and update chart data
-onMounted(() => {
-  const ws = new MockWebSocket(import.meta.env.VITE_MOCK_WEB_SOCKET_URL);
-  ws.connect();
+const initWebSocket = () => {
+  if (!isOnline.value) {
+    return;
+  }
+  ws.value = new MockWebSocket(import.meta.env.VITE_MOCK_WEB_SOCKET_URL);
 
-  // Simulate real-time data updates
-  ws.onmessage((message) => {
-    console.log("WebSocket message received:", message);
+  ws.value.onmessage((message) => {
+    if (message.type === "connection") {
+      connectionStatus.value = "connected";
+      return;
+    }
 
-    // Simulate new data for the line chart
-    const newLineData = {
-      x: new Date().getTime(), // Use current timestamp
-      y: Math.floor(Math.random() * 1000), // Random value between 0 and 1000
-    };
+    // Handle data updates
+    console.log("WebSocket data received:", message);
 
-    // Append new data to the existing line series
-    if (store.lineSeries[0]?.data) {
-      store.lineSeries[0].data.push(newLineData);
-
+    // Update line chart data
+    if (message.lineData && store.lineSeries[0]?.data) {
+      store.lineSeries[0].data.push(message.lineData);
       if (store.lineSeries[0].data.length > 20) {
         store.lineSeries[0].data.shift();
       }
     }
-    // Simulate new data for the heatmap
-    const newHeatmapData = store.heatmapSeries.map((day) => ({
-      ...day,
-      data: store.generateHeatmapRowData(), // Regenerate data for each day
-    }));
 
-    // Update the heatmap series
-    store.heatmapSeries = newHeatmapData;
+    // Update heatmap data
+    if (message.heatmapData) {
+      const newHeatmapData = store.heatmapSeries.map((day) => ({
+        ...day,
+        data: message.heatmapData,
+      }));
+      store.heatmapSeries = newHeatmapData;
+    }
 
-    // Update merchant table
-    store.merchants = message.merchantData;
-
-    // Update tableRows to reflect the new merchants data
-    store.updateTableRows();
+    // Update merchant data
+    if (message.merchantData) {
+      store.merchants = message.merchantData;
+      store.updateTableRows();
+    }
   });
 
+  ws.value.connect();
+};
+
+onMounted(() => {
+  initWebSocket();
+
   // Simulate periodic WebSocket messages
-  setInterval(() => {
-    ws.send("Update charts");
-  }, 5000); // Send a message every 5 seconds
+  const intervalId = setInterval(() => {
+    if (ws.value?.state === "connected") {
+      ws.value.send("Update charts");
+    }
+  }, 5000);
+
+  // Cleanup on unmount
+  return () => {
+    clearInterval(intervalId);
+    ws.value?.close();
+  };
 });
 
 // Compute height based on side bar visibility
@@ -62,15 +82,68 @@ const heightValue = computed(() => (isSidebarOpen ? "h-40" : "h-50"));
 
 <template>
   <div class="bg-slate-900 gap-6 p-6 rounded-t-lg">
-    <p class="font-bold text-2xl">{{ $t("charts_title") }}</p>
+    <div class="flex items-center justify-between">
+      <p class="font-bold text-2xl">{{ $t("charts_title") }}</p>
+      <!-- Connection status indicator with circle -->
+      <div class="flex items-center gap-2">
+        <span class="relative flex h-3 w-3">
+          <!-- Animated ping effect for non-connected states -->
+          <span
+            v-if="connectionStatus !== 'connected'"
+            class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+            :class="{
+              'bg-yellow-400': connectionStatus === 'connecting',
+              'bg-orange-500': connectionStatus === 'error',
+              'bg-red-500': connectionStatus === 'disconnected',
+            }"
+          ></span>
+          <!-- Static circle -->
+          <span
+            class="relative inline-flex rounded-full h-3 w-3"
+            :class="{
+              'bg-yellow-400': connectionStatus === 'connecting',
+              'bg-orange-500': connectionStatus === 'error',
+              'bg-green-500': connectionStatus === 'connected',
+              'bg-red-500': connectionStatus === 'disconnected',
+            }"
+          ></span>
+        </span>
+        <span
+          class="text-sm"
+          :class="{
+            'text-yellow-400': connectionStatus === 'connecting',
+            'text-orange-500': connectionStatus === 'error',
+            'text-green-500': connectionStatus === 'connected',
+            'text-red-500': connectionStatus === 'disconnected',
+          }"
+        >
+          {{
+            connectionStatus === "connecting"
+              ? "Connecting..."
+              : connectionStatus === "error"
+              ? "Connection error"
+              : connectionStatus === "disconnected"
+              ? "Disconnected"
+              : "Connected"
+          }}
+        </span>
+      </div>
+    </div>
   </div>
 
   <div
     class="flex items-center justify-center bg-slate-900 gap-6 p-2 !rounded-b-lg"
     :style="{ height: heightValue }"
   >
+    <div class="flex items-center justify-center py-10" v-if="!isOnline">
+      <p class="text-2xl text-center">
+        {{ $t("connection_error") }}
+      </p>
+    </div>
+
     <!-- Line Chart -->
     <LineChart
+      v-if="isOnline"
       :chart-options="store.lineChartOptions"
       :colors="store.colors"
       :series="store.lineSeries"
@@ -78,6 +151,7 @@ const heightValue = computed(() => (isSidebarOpen ? "h-40" : "h-50"));
 
     <!-- Heatmap -->
     <HeatMap
+      v-if="isOnline"
       :chart-options="store.heatmapOptions"
       :colors="store.colors"
       :series="store.heatmapSeries"
@@ -89,6 +163,7 @@ const heightValue = computed(() => (isSidebarOpen ? "h-40" : "h-50"));
     :title="$t('table_title')"
     :rows="store.tableRows"
     :headers="store.tableHeaders"
+    :loading="connectionStatus === 'connecting' || !isOnline"
     class="mt-5 rounded-lg"
   >
     <!-- Custom rendering for the "Status" column -->
@@ -113,4 +188,8 @@ const heightValue = computed(() => (isSidebarOpen ? "h-40" : "h-50"));
   </Table>
 </template>
 
-<style></style>
+<style>
+.w-3.h-3 {
+  transition: background-color 0.3s ease;
+}
+</style>

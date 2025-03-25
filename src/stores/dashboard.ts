@@ -145,12 +145,12 @@ export const useDashboardStore = defineStore("dashboard", () => {
     "status",
   ];
   const tableRows = ref<(string | number)[][]>(
-    merchants.value.map((merchant) => Object.values(merchant))
+    merchants.value?.map((merchant) => Object.values(merchant))
   );
 
   // Function to update tableRows when merchants changes
   const updateTableRows = () => {
-    tableRows.value = merchants.value.map((merchant) =>
+    tableRows.value = merchants.value?.map((merchant) =>
       Object.values(merchant)
     );
   };

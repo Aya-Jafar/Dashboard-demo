@@ -61,7 +61,7 @@ const validateForm = () => {
   errorMessages.value = errors;
 
   // Return true if there are no errors
-  return Object.keys(errors).length === 0;
+  return Object.keys(errors)?.length === 0;
 };
 
 /**

@@ -2,15 +2,17 @@
 import { ref, onMounted, watch, computed } from "vue";
 import Button from "@components/common/Button.vue";
 import TreeNode from "@components/dynamic-tree/TreeNode.vue";
-import CreateNodeModal from "@components/dynamic-tree/CreateNodeModal.vue"; // Modal for creating new nodes
+import CreateNodeModal from "@components/dynamic-tree/CreateNodeModal.vue";
 import { useDynamicTreeStore } from "@stores/dyanmicTree";
 import NodeDetailsModal from "@components/dynamic-tree/NodeDetailsModal.vue";
 import { useI18n } from "vue-i18n";
+import Loading from "@/components/common/Loading.vue";
 import type { Node } from "@stores/dyanmicTree";
 
-// Use the store
+// Store and states
 const store = useDynamicTreeStore();
 const { locale } = useI18n();
+const isOnline = ref(navigator.onLine);
 
 // Modal visibility states
 const isCreateNodeModalVisible = ref(false);
@@ -32,50 +34,61 @@ const handleCreateNode = (parentId: string | null) => {
 watch(
   () => store.searchLabel,
   (newLabel) => {
-    store.currentPage = 1; // Reset to first page on new search
-    store.fetchMainData(store.currentPage, newLabel).then(() => {
-      // Only toggle nodes after data is loaded
-      store.toggleNodesBySearch(newLabel);
-    });
+    if (isOnline.value) {
+      store.currentPage = 1; // Reset to first page on new search
+      store.fetchMainData(store.currentPage, newLabel).then(() => {
+        // Only toggle nodes after data is loaded
+        store.toggleNodesBySearch(newLabel);
+      });
+    }
   },
   { immediate: true } // Run this watcher immediately on component mount
 );
 
 // Fetch data when component is mounted
 onMounted(() => {
-  store.fetchMainData(store.currentPage, store.searchLabel);
+  if (isOnline.value) {
+    store.fetchMainData(store.currentPage, store.searchLabel);
+  }
 });
 
 // Handle next page click
 const goToNextPage = () => {
-  if (store.currentPage < store.totalPages) {
-    store.currentPage++;
-    store.fetchMainData(store.currentPage, store.searchLabel);
+  if (isOnline.value) {
+    if (store.currentPage < store.totalPages) {
+      store.currentPage++;
+      store.fetchMainData(store.currentPage, store.searchLabel);
+    }
   }
 };
 
+
 // Handle previous page click
 const goToPreviousPage = () => {
-  if (store.currentPage > 1) {
-    store.currentPage--;
-    store.fetchMainData(store.currentPage, store.searchLabel);
+  if (isOnline.value) {
+    if (store.currentPage > 1) {
+      store.currentPage--;
+      store.fetchMainData(store.currentPage, store.searchLabel);
+    }
   }
 };
 
 const showNodeDetails = (node: any) => {
-  selectedNode.value = node; // Set the selected node data
-  isDetailsModalVisible.value = true; // Show the modal
+  selectedNode.value = node;
+  isDetailsModalVisible.value = true;
 };
 
 const handleNodeCreate = (newNode: Node) => {
-  // Add the new node to the tree (assuming you have a store method for this)
-  store.add({
-    label: newNode.label,
-    parentId: newNode.parentId,
-    createdAt: new Date().getTime(),
-    numberOfEmployees: newNode.numberOfEmployees,
-    description: newNode.description,
-  });
+  // Add the new node to the tree
+  if (isOnline.value) {
+    store.add({
+      label: newNode.label,
+      parentId: newNode.parentId,
+      createdAt: new Date().getTime(),
+      numberOfEmployees: newNode.numberOfEmployees,
+      description: newNode.description,
+    });
+  }
   // Close the modal
   isCreateNodeModalVisible.value = false;
 };
@@ -105,15 +118,19 @@ const isRTL = computed(() => locale.value === "ar");
       </Button>
     </div>
 
+    <div class="flex items-center justify-center py-10" v-if="!isOnline">
+      <p class="text-2xl text-center">
+        {{ $t("connection_error") }}
+      </p>
+    </div>
+
     <!-- Loading State -->
-    <div v-if="store.isLoading" class="flex justify-center items-center py-8">
-      <div
-        class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#F2CE00]"
-      ></div>
+    <div v-if="store.isLoading">
+      <Loading />
     </div>
 
     <div
-      v-else-if="!store.isLoading && store.nodes.length === 0"
+      v-else-if="!store.isLoading && store.nodes?.length === 0 && isOnline"
       class="flex justify-center items-center py-8"
     >
       {{ $t("noDepartmentsAvailable") }}
