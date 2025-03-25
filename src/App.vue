@@ -5,6 +5,7 @@ import { storeToRefs } from "pinia";
 import Icon from "@components/common/Icon.vue";
 import LangougeToggle from "@components/common/LangougeToggle.vue";
 import Loading from "@components/common/Loading.vue";
+import ICONS from "./utils/icons";
 
 // Track the active tab
 const activeTab = ref(1);
@@ -72,15 +73,7 @@ onUnmounted(() => {
           :class="isSidebarOpen ? '' : 'mb-2'"
           :aria-label="isSidebarOpen ? $t('closeSidebar') : $t('openSidebar')"
         >
-          <Icon
-            iconClass="h-6 w-6"
-            strokeWidth="2"
-            :d="
-              isSidebarOpen
-                ? 'M4 6h16M4 12h16m-7 6h7'
-                : 'M4 6h16M4 12h16M4 18h16'
-            "
-          />
+          <Icon iconClass="h-6 w-6" strokeWidth="2" :d="ICONS.TOGGLE" />
         </button>
       </div>
 

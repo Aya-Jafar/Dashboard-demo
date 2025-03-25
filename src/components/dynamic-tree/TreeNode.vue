@@ -7,6 +7,7 @@ import { useDynamicTreeStore } from "@stores/dyanmicTree";
 import { filterByExactParentID } from "@/utils/helpers.ts";
 import OpenIcon from "@/components/dynamic-tree/OpenIcon.vue";
 import Icon from "@/components/common/Icon.vue";
+import ICONS from "@/utils/icons";
 
 const props = defineProps({
   node: {
@@ -160,7 +161,7 @@ watch(
           <Icon
             iconClass="h-6 w-6 text-blue-500 text-white"
             strokeWidth="1.5"
-            :d="'M15 12a3 3 0 11-6 0 3 3 0 016 0z M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z'"
+            :d="ICONS.EYE"
           />
         </button>
 
@@ -171,7 +172,7 @@ watch(
           :aria-label="`Create new node under ${node.label}`"
         >
           <Icon
-            :d="'M12 4v16m8-8H4'"
+            :d="ICONS.PLUS"
             iconClass="h-6 w-6 text-white"
             strokeWidth="1.5"
           />
