@@ -12,6 +12,7 @@ import { useDashboardStore } from "@/stores/dashboard";
  */
 // Updated MockWebSocket class with connection state tracking
 class MockWebSocket {
+  // @ts-ignore
   private url: string;
   private listeners: Array<(message: any) => void>;
   private connectionState:

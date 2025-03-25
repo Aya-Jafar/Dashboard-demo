@@ -133,7 +133,7 @@ const handleSort = (column: string) => {
       <!-- Skeleton header with equal width columns -->
       <div class="flex space-x-2 animate-pulse">
         <div
-          v-for="(header, index) in headers"
+          v-for="(index) in headers"
           :key="`header-${index}`"
           class="h-10 bg-gray-700 rounded"
           :style="{
@@ -150,7 +150,7 @@ const handleSort = (column: string) => {
         class="flex space-x-2 animate-pulse"
       >
         <div
-          v-for="(header, index) in headers"
+          v-for="(index) in headers"
           :key="`cell-${index}-${i}`"
           class="h-12 bg-gray-800 rounded"
           :style="{
