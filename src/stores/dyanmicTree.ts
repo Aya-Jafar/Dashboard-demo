@@ -178,7 +178,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     targetNodeId: string;
   }) => {
     // Helper function to find node, its parent, and siblings array
-    const findNodeContext = (
+    const findNode = (
       nodes: Node[],
       id: string
     ): { node: Node | null; parent: Node | null; siblings: Node[] } => {
@@ -188,7 +188,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
           const childMatch = node.children.find((child) => child.id === id);
           if (childMatch)
             return { node: childMatch, parent: node, siblings: node.children };
-          const found = findNodeContext(node.children, id);
+          const found = findNode(node.children, id);
           if (found.node) return found;
         }
       }
@@ -196,11 +196,12 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     };
 
     // Find contexts for both nodes
-    const source = findNodeContext(nodes.value, nodeId);
-    const target = findNodeContext(nodes.value, targetNodeId);
+    const source = findNode(nodes.value, nodeId);
+    const target = findNode(nodes.value, targetNodeId);
 
     if (!source.node || !target.node) {
-      console.error("Nodes not found");
+      // console.error("Nodes not found");
+      snackbarStore.showSnackbar(`Nodes not found`, "error");
       return;
     }
 
@@ -211,7 +212,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     const newNodes = JSON.parse(JSON.stringify(nodes.value));
 
     // 1. Remove from original position
-    const updatedSource = findNodeContext(newNodes, nodeId);
+    const updatedSource = findNode(newNodes, nodeId);
     if (!updatedSource.node) return;
 
     updatedSource.siblings.splice(
@@ -227,7 +228,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     if (newParentId === null) {
       newSiblings = newNodes;
     } else {
-      const newParent = findNodeContext(newNodes, newParentId).node;
+      const newParent = findNode(newNodes, newParentId).node;
       if (!newParent) return;
       newParent.children = newParent.children || [];
       newSiblings = newParent.children;
