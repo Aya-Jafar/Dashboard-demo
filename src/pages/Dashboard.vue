@@ -59,6 +59,9 @@ const initWebSocket = () => {
 };
 
 onMounted(() => {
+  if (!isOnline) {
+    return;
+  }
   initWebSocket();
 
   // Simulate periodic WebSocket messages

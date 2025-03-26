@@ -120,6 +120,12 @@ watch(
   },
   { immediate: true }
 );
+const isSearchMatch = computed(() => {
+  return (
+    store.searchLabel &&
+    props.node.label.toLowerCase().includes(store.searchLabel.toLowerCase())
+  );
+});
 </script>
 
 <template>
@@ -147,7 +153,13 @@ watch(
           <OpenIcon :isOpen="node.isOpen" />
         </span>
 
-        <span class="font-medium text-gray-100">{{ node.label }}</span>
+        <span
+          class="font-medium text-gray-100"
+          :class="{
+            'bg-yellow-500/20 border-l-4 border-yellow-500 px-2': isSearchMatch,
+          }"
+          >{{ node.label }}</span
+        >
       </div>
 
       <!-- Buttons for Details and Create New Node -->
