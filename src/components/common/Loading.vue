@@ -1,3 +1,5 @@
+<!-- Loading component -->
+ 
 <template>
   <div class="flex justify-center items-center py-8 text-center">
     <div

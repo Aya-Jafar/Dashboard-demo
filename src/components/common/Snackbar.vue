@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { useSnackbarStore } from '@/stores/snackbar';
+/**
+ * Global notification snackbar component
+ * Uses snackbar store to show alerts with different types
+ *
+ * @example Shows automatically when store.visible is true (toggled automatically with API requests with the `APIService`)
+ */
+
+import { useSnackbarStore } from "@/stores/snackbar";
 
 const snackbarStore = useSnackbarStore();
 </script>

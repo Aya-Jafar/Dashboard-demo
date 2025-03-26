@@ -1,4 +1,12 @@
 <script setup lang="ts">
+/**
+ * Displays node details in a modal
+ * @prop {Object} nodeData - Node information ({label, description, numberOfEmployees})
+ * @emits close - When clicking outside
+ * 
+ * @example <NodeDetailsModal :nodeData="currentNode" @close="showDetails = false"/>
+ */
+
 import { ref, onMounted, onUnmounted } from "vue";
 
 defineProps({

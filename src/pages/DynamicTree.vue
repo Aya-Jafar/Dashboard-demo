@@ -1,4 +1,15 @@
 <script setup lang="ts">
+/**
+ * Tree structure component with:
+ * - Hierarchical node display
+ * - Search, pagination, and sorting
+ * - Node creation/editing
+ * - Drag-and-drop reorganization
+ * - RTL language support
+ *
+ * @example <DynamicTree />
+ */
+
 import { ref, onMounted, watch, computed } from "vue";
 import Button from "@components/common/Button.vue";
 import TreeNode from "@components/dynamic-tree/TreeNode.vue";

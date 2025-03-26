@@ -1,5 +1,12 @@
-
 <script setup lang="ts">
+/**
+ * SVG Icon Component
+ * @prop {string} [iconClass="h-5 w-5"] - Tailwind classes for sizing
+ * @prop {string|number} [strokeWidth=2] - Stroke width
+ * @prop {string} d - SVG path data (required)
+ *
+ * @example <Icon d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+ */
 defineProps({
   iconClass: {
     type: String,
@@ -11,7 +18,7 @@ defineProps({
   },
   d: {
     type: String,
-    required: true, 
+    required: true,
   },
 });
 </script>

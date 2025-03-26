@@ -1,4 +1,15 @@
 <script setup lang="ts">
+
+/**
+ * Modal for creating new tree nodes
+ * @prop {string|null} [parentId] - Parent node ID
+ * @emits close - When modal closes
+ * @emits submit - When form submits ({label, parentId, description, numberOfEmployees})
+ * 
+ * @example <CreateNodeModal @submit="handleCreate" @close="handleClose"/>
+ */
+
+
 import { ref, onMounted, onUnmounted } from "vue";
 
 const props = defineProps({

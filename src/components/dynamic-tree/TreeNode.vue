@@ -1,4 +1,16 @@
 <script setup lang="ts">
+/**
+ * Recursive Tree node component with drag-and-drop, search highlighting, and expand/collapse
+ * @prop {Object} node - Node data with children
+ * @prop {Boolean} [visible=true] - Controls visibility
+ * @emits show-details - When details button clicked
+ * @emits create-node - When create button clicked (nodeId)
+ * @emits node-move - On drag-and-drop (nodeId, targetNodeId, parentId)
+ *
+ * @example <TreeNode :node="treeData" @node-move="handleMove" />
+ */
+
+ 
 import { defineProps, defineEmits, ref, watch, computed } from "vue";
 import Snackbar from "@components/common/Snackbar.vue";
 import { useDynamicTreeStore } from "@stores/dyanmicTree";

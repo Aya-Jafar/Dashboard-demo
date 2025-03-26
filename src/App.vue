@@ -1,9 +1,17 @@
 <script setup lang="ts">
+/**
+ * Main application layout with:
+ * - Collapsible sidebar navigation
+ * - Async tab loading with caching
+ * - Language toggle
+ * 
+ */
+
 import { ref, computed, defineAsyncComponent, onUnmounted } from "vue";
 import { useLayoutStore } from "@stores/layout";
 import { storeToRefs } from "pinia";
 import Icon from "@components/common/Icon.vue";
-import LangougeToggle from "@components/common/LangougeToggle.vue";
+import LanguageToggle from "@components/common/LanguageToggle.vue";
 import Loading from "@components/common/Loading.vue";
 import ICONS from "./utils/icons";
 
@@ -113,7 +121,7 @@ onUnmounted(() => {
           <p class="text-2xl font-bold">{{ $t("title") }}</p>
         </div>
 
-        <LangougeToggle class="flex justify-end items-center" />
+        <LanguageToggle class="flex justify-end items-center" />
       </div>
 
       <!-- Tab Content -->

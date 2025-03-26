@@ -1,4 +1,15 @@
 <script setup lang="ts">
+/**
+ * Sortable, filterable data table with CSV export
+ * @prop {string} title - Table title
+ * @prop {string[]} headers - Column names
+ * @prop {any[]} rows - Row data
+ * @prop {boolean} [loading] - Shows loading skeleton
+ * @slot [header] - Custom cell content ({value, row})
+ *
+ * @example <Table :headers="['Name','Email']" :rows="users"/>
+ */
+
 import { ref, computed } from "vue";
 import { exportToCSV, getCurrentLanguage } from "@/utils/helpers";
 

@@ -1,4 +1,14 @@
 <script setup lang="ts">
+/**
+ * Reusable button with states and click handler
+ * @prop {Boolean} [disabled=false] - Disables button
+ * @prop {Boolean} [loading=false] - Shows loading state
+ * @prop {Function} action - Click handler
+ * @slot default - Button content
+ *
+ * @example <Button :action="submit" :loading="busy">Save</Button>
+ */
+
 const props = defineProps({
   disabled: {
     type: Boolean,
@@ -16,7 +26,7 @@ const props = defineProps({
 
 const handleClick = () => {
   if (!props.disabled && !props.loading) {
-    props.action(); 
+    props.action();
   }
 };
 </script>

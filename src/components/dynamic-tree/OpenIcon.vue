@@ -1,4 +1,12 @@
 <script setup lang="ts">
+/**
+ * Animated arrow icon that toggles direction
+ * @prop {boolean} isOpen - Controls arrow direction
+ *
+ * @example <OpenIcon :isOpen="isExpanded" />
+ */
+
+import ICONS from "@/utils/icons";
 const props = defineProps({
   isOpen: {
     type: Boolean,
@@ -21,7 +29,7 @@ const props = defineProps({
       stroke-linecap="round"
       stroke-linejoin="round"
       stroke-width="2"
-      d="M19 9l-7 7-7-7"
+      :d="ICONS.OPEN"
     />
   </svg>
   <svg
@@ -37,7 +45,7 @@ const props = defineProps({
       stroke-linecap="round"
       stroke-linejoin="round"
       stroke-width="2"
-      d="M5 15l7-7 7 7"
+      :d="ICONS.CLOSED"
     />
   </svg>
 </template>

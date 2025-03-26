@@ -27,23 +27,7 @@ export const getCurrentLanguage = () => {
 };
 
 /**
- * Creates a debounced function that delays execution
- * @param func - The function to debounce
- * @param wait - Number of milliseconds to delay
- * @returns A debounced version of the passed function
- */
-export const debounce = (func: Function, wait: number) => {
-  let timeout: number;
-
-  return function (this: any, ...args: any[]) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), wait);
-  };
-};
-
-/**
  * Exports data to a CSV file and triggers download
- * @description
  * Generates a CSV file from provided data and automatically downloads it
  *
  * @param {Array<any>} sortedAndFilteredRows - The data rows to export
@@ -92,4 +76,19 @@ export const exportToCSV = (
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+};
+
+/**
+ * Creates a debounced function that delays execution
+ * @param func - The function to debounce
+ * @param wait - Number of milliseconds to delay
+ * @returns A debounced version of the passed function
+ */
+export const debounce = (func: Function, wait: number) => {
+  let timeout: number;
+
+  return function (this: any, ...args: any[]) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
 };

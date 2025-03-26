@@ -1,4 +1,16 @@
 <script setup lang="ts">
+/**
+ * Simulating Real-time dashboard displaying:
+ * - Line chart (20-point rolling window)
+ * - Heatmap visualization
+ * - Merchant status table with custom badges
+ * - Visual WebSocket connection status
+ *
+ * Uses MockWebSocket in development
+ *
+ * @example <Dashboard />
+ */
+
 import { onMounted, computed, ref } from "vue";
 import MockWebSocket from "../services/WebSocketService";
 import LineChart from "@components/dashboard/LineChart.vue";
