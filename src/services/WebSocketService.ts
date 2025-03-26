@@ -26,7 +26,7 @@ class MockWebSocket {
     this.connectionState = "disconnected";
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 5;
-    this.reconnectInterval = 3000; // 3 seconds
+    this.reconnectInterval = 3000; 
   }
 
   get state() {
@@ -45,7 +45,7 @@ class MockWebSocket {
     this.reconnectAttempts++;
 
     // Simulate connection attempt with possible failure
-    const shouldFail = Math.random() < 0.2; // 20% chance of failure for testing
+    const shouldFail = Math.random() < 0.2; // 20% chance of failure for simulating
 
     setTimeout(() => {
       if (shouldFail && this.reconnectAttempts < this.maxReconnectAttempts) {

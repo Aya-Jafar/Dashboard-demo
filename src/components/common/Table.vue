@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { getCurrentLanguage } from "@/utils/helpers";
-
+import { exportToCSV, getCurrentLanguage } from "@/utils/helpers";
 
 const props = defineProps({
   title: {
@@ -97,6 +96,10 @@ const handleSort = (column: string) => {
     sortDirection.value = "asc";
   }
 };
+
+const handleExport = () => {
+  exportToCSV(sortedAndFilteredRows.value, props.title, props.headers);
+};
 </script>
 
 <template>
@@ -106,26 +109,39 @@ const handleSort = (column: string) => {
       <p class="text-2xl font-bold">
         {{ title }}
       </p>
-      <div class="mb-4 w-50 flex flex-col justify-end">
-        <label for="filter" class="block text-sm font-medium text-gray-300">
-          {{ $t("filterBy") }}
-        </label>
-        <select
-          v-model="filterColumn"
-          class="mt-1 block w-full p-2 border border-gray-600 bg-slate-900 text-white rounded-md"
+      <div class="flex items-end gap-4 mb-5">
+        <div class="w-50 flex flex-col justify-end">
+          <label for="filter" class="block text-sm font-medium text-gray-300">
+            {{ $t("filterBy") }}
+          </label>
+          <select
+            v-model="filterColumn"
+            class="mt-1 block w-full p-2 border border-gray-600 bg-slate-900 text-white rounded-md"
+          >
+            <option :value="null">{{ $t("selectColumn") }}</option>
+            <option v-for="header in headers" :key="header" :value="header">
+              {{ $t(header) }}
+            </option>
+          </select>
+          <input
+            v-if="filterColumn"
+            v-model="filterValue"
+            type="text"
+            :placeholder="$t('enterFilterValue')"
+            class="mt-2 block w-full p-2 border border-gray-600 bg-slate-900 text-white rounded-md"
+          />
+        </div>
+
+        <button
+          @click="handleExport"
+          class="px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors"
+          :disabled="sortedAndFilteredRows.length === 0"
+          :class="{
+            'opacity-50 cursor-not-allowed': sortedAndFilteredRows.length === 0,
+          }"
         >
-          <option :value="null">{{ $t("selectColumn") }}</option>
-          <option v-for="header in headers" :key="header" :value="header">
-            {{ $t(header) }}
-          </option>
-        </select>
-        <input
-          v-if="filterColumn"
-          v-model="filterValue"
-          type="text"
-          :placeholder="$t('enterFilterValue')"
-          class="mt-2 block w-full p-2 border border-gray-600 bg-slate-900 text-white rounded-md"
-        />
+          {{ $t("export") }}
+        </button>
       </div>
     </div>
     <!-- Skeleton Loading -->
@@ -133,7 +149,7 @@ const handleSort = (column: string) => {
       <!-- Skeleton header with equal width columns -->
       <div class="flex space-x-2 animate-pulse">
         <div
-          v-for="(index) in headers"
+          v-for="index in headers"
           :key="`header-${index}`"
           class="h-10 bg-gray-700 rounded"
           :style="{
@@ -150,7 +166,7 @@ const handleSort = (column: string) => {
         class="flex space-x-2 animate-pulse"
       >
         <div
-          v-for="(index) in headers"
+          v-for="index in headers"
           :key="`cell-${index}-${i}`"
           class="h-12 bg-gray-800 rounded"
           :style="{

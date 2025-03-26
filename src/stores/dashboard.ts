@@ -53,15 +53,21 @@ export const useDashboardStore = defineStore("dashboard", () => {
     for (let hour = 0; hour < hours; hour++) {
       data.push({
         x: `${hour < 10 ? `0${hour}` : hour}`,
-        y: Math.floor(Math.random() * 200),
+        y: Math.floor(Math.random() * 1200),
       });
     }
     return data;
   };
 
   const generateMerchantData = () => {
-    const merchants = ["Merchant A", "Merchant B", "Merchant C", "Merchant D"];
-    const statusOptions = ["Active", "Inactive", "Pending"] as const;
+    const merchants = [
+      "Baghdad Electronics - Online Store",
+      "Al-Bayaa Market - Groceries",
+      "FedEx Shipping",
+      "Zain Iraq - Mobile Payments",
+      "Baghdad Electronics - Online Store",
+    ];
+    const statusOptions = ["Active", "Inactive", "Pending"];
 
     return merchants.map((name) => ({
       name,
@@ -113,31 +119,38 @@ export const useDashboardStore = defineStore("dashboard", () => {
   // Initial data for the merchant table
   const merchants = ref<Merchant[]>([
     {
-      name: "Merchant A",
-      count: 50,
-      value: 5000,
-      date: "2023-10-01",
-      status: "Active",
-    },
-    {
-      name: "Merchant B",
-      count: 40,
-      value: 4000,
-      date: "2023-09-25",
-      status: "Inactive",
-    },
-    {
-      name: "Merchant C",
-      count: 30,
-      value: 3000,
+      name: "Baghdad Electronics - Online Store",
+      count: 456,
+      value: 68700,
       date: "2023-10-05",
       status: "Active",
     },
     {
-      name: "Merchant D",
-      count: 20,
-      value: 2000,
+      name: "Al-Noor Pharmacy Chain",
+      count: 215,
+      value: 32400,
+      date: "2023-09-22",
+      status: "Inactive",
+    },
+    {
+      name: "Al-Bayaa Market - Groceries",
+      count: 342,
+      value: 51300,
       date: "2023-09-30",
+      status: "Active",
+    },
+    {
+      name: "FedEx Shipping",
+      count: 156,
+      value: 23400,
+      date: "2023-09-18",
+      status: "Inactive",
+    },
+    {
+      name: "Zain Iraq - Mobile Payments",
+      count: 278,
+      value: 41700,
+      date: "2023-10-08",
       status: "Pending",
     },
   ]);
@@ -254,9 +267,10 @@ export const useDashboardStore = defineStore("dashboard", () => {
         colorScale: {
           inverse: false,
           ranges: [
-            { from: 0, to: 50, name: "Low", color: "#4936FC" },
-            { from: 51, to: 100, name: "Medium", color: "#10B981" },
-            { from: 101, to: 200, name: "High", color: "#3189F2" },
+            { from: 0, to: 50, name: "Low", color: "#e98383" },
+            { from: 76, to: 100, name: "Medium", color: "#10B981" },
+            { from: 101, to: 150, name: "High", color: "#00b7ff" },
+            { from: 151, to: 1200, name: "Very High", color: "#4936FC" },
           ],
         },
       },

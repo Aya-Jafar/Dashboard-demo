@@ -127,7 +127,7 @@ watch(
   <div v-if="visible" class="space-y-2">
     <!-- Node Header -->
     <div
-      class="flex items-center justify-between"
+      class="flex items-center justify-between cursor-grab"
       draggable="true"
       @dragstart="onDragStart"
       @dragover="onDragOver($event)"

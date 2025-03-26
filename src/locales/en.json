@@ -35,5 +35,6 @@
   "connection_error": "Please check your internet connection and try again.",
   "empty_node_label": "Node label cannot be empty.",
   "empty_description": "Description cannot be empty.",
-  "invalid_employee_count": "Number of employees must be a non-negative number."
+  "invalid_employee_count": "Number of employees must be a non-negative number.",
+  "export": "Export"
 }
