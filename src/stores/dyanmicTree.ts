@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { ref, computed, type Ref } from "vue";
 import { APIService } from "@/services/ApiService";
 import API_ENDPOINTS from "@/utils/endpoints";
 import { useSnackbarStore } from "@/stores/snackbar";
+import { filterByExactParentID } from "@/utils/helpers";
 
 // ==================== TYPE DEFINITIONS ====================
 interface Node {
@@ -13,6 +14,7 @@ interface Node {
   description: string;
   numberOfEmployees: number;
   children?: Array<any>;
+  isOpen?: boolean;
 }
 
 // ==================== STORE DEFINITION ====================
@@ -169,6 +171,35 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     }
   };
 
+  const openNode = async (
+    node: Node,
+    noChildrenText: Ref<string | null>,
+    isLoading: Ref<boolean | false>
+  ) => {
+    await APIService.request({
+      endpoint: `${API_ENDPOINTS.DEPARTMENTS}?parentId=${node.id}`,
+      method: "GET",
+      setLoading: (loading: boolean) => (isLoading.value = loading),
+      setError: (message) => {
+        node.isOpen = true;
+        noChildrenText.value = message;
+      },
+      setterFunction: (data: any) => {
+        /**
+         * The mock API's path parameter is NOT filtering with the exact ID
+         * So if ?parentId=2/ the response conatins children with any parentId
+         * that contain "2" like "dept-1-2-1-1"
+         * That's why we need the filtering here
+         *  */
+        node.children = filterByExactParentID(data, node.id || null);
+        if (node.children?.length === 0) {
+          noChildrenText.value = "noSubSectionsAvailable";
+        }
+        node.isOpen = true;
+      },
+    });
+  };
+
   const moveNode = async ({
     nodeId,
     targetNodeId,
@@ -246,32 +277,12 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     //  Update state
     nodes.value = newNodes;
 
-    // try {
-    //   isLoading.value = true;
-
-    //   // Prepare request body with updated hierarchy
-    //   const updatedNode = {
-    //     id: updatedSource.node.id,
-    //     parentId: updatedSource.node.parentId,
-    //     label: updatedSource.node.label,
-    //     description: updatedSource.node.description,
-    //     numberOfEmployees: updatedSource.node.numberOfEmployees,
-    //     createdAt: updatedSource.node.createdAt,
-    //   };
-
     //   await APIService.request({
     //     endpoint: `${API_ENDPOINTS.DEPARTMENTS}/${nodeId}`,
     //     method: "PUT",
     //     body: updatedNode,
     //     setLoading: (loading: boolean) => (isLoading.value = loading),
     //   });
-
-    //   snackbarStore.showSnackbar(`Node moved successfully`, "success");
-    // } catch (error) {
-    //   snackbarStore.showSnackbar(`API Error: ${error}`, "error");
-    // } finally {
-    //   isLoading.value = false;
-    // }
   };
   return {
     isLoading,
@@ -286,6 +297,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     toggleNodesBySearch,
     add,
     moveNode,
+    openNode,
   };
 });
 

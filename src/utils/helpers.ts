@@ -7,7 +7,10 @@ import { useI18n } from "vue-i18n";
  * @param parentId
  * @returns the filtered children that match the parentID
  */
-export const filterByExactParentID = (data: Node[], parentId: string) => {
+export const filterByExactParentID = (
+  data: Node[],
+  parentId: string | null
+) => {
   return data.filter((item: any) => item.parentId === parentId);
 };
 
@@ -40,13 +43,13 @@ export const debounce = (func: Function, wait: number) => {
 
 /**
  * Exports data to a CSV file and triggers download
- * @description 
+ * @description
  * Generates a CSV file from provided data and automatically downloads it
  *
  * @param {Array<any>} sortedAndFilteredRows - The data rows to export
  * @param {string} title - Base name for the exported file (spaces will be replaced with underscores)
  * @param {Array<any>} headers - Column headers for the CSV
- * 
+ *
  * @returns {void} Triggers file download but returns nothing
  */
 export const exportToCSV = (

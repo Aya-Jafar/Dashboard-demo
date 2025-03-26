@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { defineProps, defineEmits, ref, watch, computed } from "vue";
-import { APIService } from "@/services/ApiService.ts";
-import API_ENDPOINTS from "@/utils/endpoints.ts";
 import Snackbar from "@components/common/Snackbar.vue";
 import { useDynamicTreeStore } from "@stores/dyanmicTree";
-import { filterByExactParentID } from "@/utils/helpers.ts";
 import OpenIcon from "@/components/dynamic-tree/OpenIcon.vue";
 import Icon from "@/components/common/Icon.vue";
 import ICONS from "@/utils/icons";
@@ -33,30 +30,7 @@ const toggleNode = async (node: any) => {
 
   if (!node.isOpen) {
     try {
-      isLoading.value = true;
-
-      await APIService.request({
-        endpoint: `${API_ENDPOINTS.DEPARTMENTS}?parentId=${node.id}`,
-        method: "GET",
-        setLoading: (loading: boolean) => (isLoading.value = loading),
-        setError: (message) => {
-          node.isOpen = true;
-          noChildrenText.value = message;
-        },
-        setterFunction: (data: any) => {
-          /**
-           * The mock API's path parameter is NOT filtering with the exact ID
-           * So if ?parentId=2/ the response conatins children with any parentId
-           * that contain "2" like "dept-1-2-1-1"
-           * That's why we need the filtering here
-           *  */
-          node.children = filterByExactParentID(data, node.id);
-          if (node.children?.length === 0) {
-            noChildrenText.value = "noSubSectionsAvailable";
-          }
-          node.isOpen = true;
-        },
-      });
+      await store.openNode(node, noChildrenText, isLoading);
     } catch (error) {
       console.error("Error fetching node details:", error);
     } finally {
@@ -82,6 +56,8 @@ const onDragStart = (event: DragEvent) => {
 };
 
 const onDragOver = (event: DragEvent) => {
+  // Prevent the default drag behavior
+  // The default behavior for dragover events in HTML5 drag-and-drop is to not allow dropping
   event.preventDefault();
 };
 
