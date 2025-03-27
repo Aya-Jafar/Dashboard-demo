@@ -52,10 +52,20 @@ export const useLayoutStore = defineStore("layout", () => {
     },
   ]);
 
+  // Track window width for responsive behavior
+  const checkScreenSize = () => {
+    isMobile.value = window.innerWidth < 768; // 768px is typical breakpoint for tablets
+    if (isMobile.value) {
+      toggleSidebar();
+    }
+  };
+
+
   return {
     tabs,
     isSidebarOpen,
     isMobile,
     toggleSidebar,
+    checkScreenSize,
   };
 });

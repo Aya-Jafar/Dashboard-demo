@@ -56,21 +56,15 @@ const activeComponent = computed(() => {
 });
 
 // Track window width for responsive behavior
-const checkScreenSize = () => {
-  layoutStore.isMobile = window.innerWidth < 768; // 768px is typical breakpoint for tablets
-  if (layoutStore.isMobile) {
-    layoutStore.toggleSidebar();
-  }
-};
 onMounted(() => {
-  checkScreenSize();
-  window.addEventListener("resize", checkScreenSize);
+  layoutStore.checkScreenSize();
+  window.addEventListener("resize", layoutStore.checkScreenSize);
 });
 
 // Cleanup
 onUnmounted(() => {
   loadedComponents.clear();
-  window.removeEventListener("resize", checkScreenSize);
+  window.removeEventListener("resize", layoutStore.checkScreenSize);
 });
 </script>
 
