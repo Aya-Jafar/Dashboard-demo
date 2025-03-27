@@ -146,7 +146,7 @@ const heightValue = computed(() => (isSidebarOpen ? "h-40" : "h-50"));
   </div>
 
   <div
-    class="flex items-center justify-center bg-slate-900 gap-6 p-2 !rounded-b-lg"
+    class="flex items-center justify-center flex-wrap bg-slate-900 gap-6 p-2 !rounded-b-lg"
     :style="{ height: heightValue }"
   >
     <div class="flex items-center justify-center py-10" v-if="!isOnline">

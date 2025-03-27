@@ -108,7 +108,7 @@ const isRTL = computed(() => locale.value === "ar");
     aria-labelledby="modal-title"
   >
     <!-- Search and New Button -->
-    <div class="flex justify-between items-end mb-10 py-4">
+    <div class="flex justify-between flex-wrap items-end mb-10 py-4">
       <input
         v-model.lazy="store.searchLabel"
         type="text"

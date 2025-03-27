@@ -4,10 +4,16 @@
  * - Collapsible sidebar navigation
  * - Async tab loading with caching
  * - Language toggle
- * 
+ *
  */
 
-import { ref, computed, defineAsyncComponent, onUnmounted } from "vue";
+import {
+  ref,
+  computed,
+  defineAsyncComponent,
+  onUnmounted,
+  onMounted,
+} from "vue";
 import { useLayoutStore } from "@stores/layout";
 import { storeToRefs } from "pinia";
 import Icon from "@components/common/Icon.vue";
@@ -49,9 +55,22 @@ const activeComponent = computed(() => {
   return asyncComponent;
 });
 
+// Track window width for responsive behavior
+const checkScreenSize = () => {
+  layoutStore.isMobile = window.innerWidth < 768; // 768px is typical breakpoint for tablets
+  if (layoutStore.isMobile) {
+    layoutStore.toggleSidebar();
+  }
+};
+onMounted(() => {
+  checkScreenSize();
+  window.addEventListener("resize", checkScreenSize);
+});
+
 // Cleanup
 onUnmounted(() => {
   loadedComponents.clear();
+  window.removeEventListener("resize", checkScreenSize);
 });
 </script>
 
@@ -59,7 +78,7 @@ onUnmounted(() => {
   <div class="min-h-screen text-gray-100 font-sans flex">
     <!-- Sidebar -->
     <div
-      class="!bg-slate-900 p-4 transition-all duration-300 ease-in-out rounded-md flex flex-col"
+      class="bg-slate-900 p-4 transition-all duration-300 ease-in-out rounded-md flex flex-col"
       :class="isSidebarOpen ? 'w-60' : 'w-20'"
     >
       <!-- Sidebar Header -->

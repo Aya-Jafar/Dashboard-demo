@@ -15,6 +15,7 @@ interface Tab {
 export const useLayoutStore = defineStore("layout", () => {
   const isSidebarOpen = ref(true);
   const { locale } = useI18n();
+  const isMobile = ref(false);
 
   const toggleSidebar = () => (isSidebarOpen.value = !isSidebarOpen.value);
 
@@ -54,6 +55,7 @@ export const useLayoutStore = defineStore("layout", () => {
   return {
     tabs,
     isSidebarOpen,
+    isMobile,
     toggleSidebar,
   };
 });
