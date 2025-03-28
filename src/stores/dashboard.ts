@@ -82,21 +82,25 @@ export const useDashboardStore = defineStore("dashboard", () => {
     }));
   };
 
-  const today = new Date();
-  const last7DaysData = Array.from({ length: 8 }, (_, i) => {
-    const date = new Date(today);
-    date.setDate(today.getDate() - 7 + i); // Last 7 days (including today)
-    return {
-      x: date.getTime(),
-      y: Math.floor(Math.random() * 1500), 
-    };
-  });
+
+  const generateLineData = () => {
+    const today = new Date();
+    const last7DaysData = Array.from({ length: 8 }, (_, i) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() - 7 + i); // Last 7 days (including today)
+      return {
+        x: date.getTime(),
+        y: Math.floor(Math.random() * 1500),
+      };
+    });
+    return last7DaysData;
+  };
 
   // Initial data for the line chart
   const lineSeries = ref<LineSeries[]>([
     {
       name: "",
-      data: last7DaysData,
+      data: generateLineData(),
     },
   ]);
 
@@ -313,7 +317,7 @@ export const useDashboardStore = defineStore("dashboard", () => {
     },
     // title: {
     //   text: "Transaction Volume Over the Last Week",
-    //   align: "left", 
+    //   align: "left",
     //   // margin: 10,
     //   style: {
     //     // fontSize: "16px",

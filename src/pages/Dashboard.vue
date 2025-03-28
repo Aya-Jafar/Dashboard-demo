@@ -44,11 +44,7 @@ const initWebSocket = () => {
 
     // Update heatmap data
     if (message.heatmapData) {
-      const newHeatmapData = store.heatmapSeries.map((day) => ({
-        ...day,
-        data: message.heatmapData,
-      }));
-      store.heatmapSeries = newHeatmapData;
+      store.heatmapSeries = message.heatmapData;
     }
 
     // Update merchant data

@@ -1,4 +1,3 @@
-
 /**
  * A mock WebSocket implementation for testing and development purposes.
  * Simulates WebSocket behavior without requiring an actual server connection.
@@ -90,7 +89,7 @@ class MockWebSocket {
       const store = useDashboardStore();
 
       if (!store.lineSeries?.[0]?.data) {
-        throw new Error("Invalid line series data structure");
+        return;
       }
 
       const lineData = store.lineSeries[0].data;
@@ -114,7 +113,7 @@ class MockWebSocket {
 
         lineData.push(newEntry);
 
-        // Maintain 7-day window 
+        // Maintain 7-day window
         if (lineData.length > 7) {
           console.log("Dropping oldest data point:", lineData.shift());
           lineData.shift();
@@ -130,8 +129,11 @@ class MockWebSocket {
       const newData = {
         type: "data",
         lineData: [...lineData],
-        heatmapData: useDashboardStore().generateHeatmapRowData(),
-        merchantData: useDashboardStore().generateMerchantData(),
+        heatmapData: store.heatmapSeries.map((day) => ({
+          ...day,
+          data: store.generateHeatmapRowData(),
+        })),
+        merchantData: store.generateMerchantData(),
       };
       this.listeners.forEach((callback) => callback(newData));
     }, 500);
