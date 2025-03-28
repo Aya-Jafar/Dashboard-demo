@@ -20,6 +20,7 @@ import Icon from "@components/common/Icon.vue";
 import LanguageToggle from "@components/common/LanguageToggle.vue";
 import Loading from "@components/common/Loading.vue";
 import ICONS from "./utils/icons";
+import { getCurrentLanguage } from "./utils/helpers";
 
 // Track the active tab
 const activeTab = ref(1);
@@ -73,7 +74,10 @@ onUnmounted(() => {
     <!-- Sidebar -->
     <div
       class="bg-slate-900 p-4 transition-all duration-300 ease-in-out rounded-md flex flex-col"
-      :class="isSidebarOpen ? 'w-60' : 'w-20'"
+      :class="[
+        isSidebarOpen ? 'w-60' : 'w-20',
+        getCurrentLanguage() === 'en' ? '' : 'ml-4',
+      ]"
     >
       <!-- Sidebar Header -->
       <div

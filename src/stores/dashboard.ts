@@ -1,6 +1,7 @@
 import { generateRandomY } from "@/utils/helpers";
 import { defineStore } from "pinia";
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { useI18n } from "vue-i18n";
 
 // ==================== TYPE DEFINITIONS ====================
 interface Merchant {
@@ -37,6 +38,7 @@ export type WebSocketStatus =
 
 // ==================== STORE DEFINITION ====================
 export const useDashboardStore = defineStore("dashboard", () => {
+  const { t } = useI18n();
   // Dark theme color palette
   const colors = {
     primary: "#4936FC",
@@ -82,7 +84,6 @@ export const useDashboardStore = defineStore("dashboard", () => {
       status: statusOptions[Math.floor(Math.random() * statusOptions.length)], // Random status
     }));
   };
-
 
   const generateLineData = () => {
     const today = new Date();
