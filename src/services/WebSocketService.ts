@@ -1,4 +1,3 @@
-import { useDashboardStore, type WebSocketStatus } from "@/stores/dashboard";
 
 /**
  * A mock WebSocket implementation for testing and development purposes.
@@ -10,7 +9,9 @@ import { useDashboardStore, type WebSocketStatus } from "@/stores/dashboard";
  * socket.connect();
  * socket.send('ping');
  */
-// Updated MockWebSocket class with connection state tracking
+
+import { useDashboardStore, type WebSocketStatus } from "@/stores/dashboard";
+import { generateRandomY } from "@/utils/helpers";
 class MockWebSocket {
   // @ts-ignore
   private url: string;
@@ -26,7 +27,7 @@ class MockWebSocket {
     this.connectionState = "disconnected";
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 5;
-    this.reconnectInterval = 3000; 
+    this.reconnectInterval = 3000;
   }
 
   get state() {
@@ -82,15 +83,53 @@ class MockWebSocket {
       console.warn("Cannot send message - WebSocket not connected");
       return;
     }
-
     console.log(`Mock WebSocket sending: ${message}`);
+
     setTimeout(() => {
+      const today = new Date();
+      const store = useDashboardStore();
+
+      if (!store.lineSeries?.[0]?.data) {
+        throw new Error("Invalid line series data structure");
+      }
+
+      const lineData = store.lineSeries[0].data;
+      const lastDataPoint = lineData[lineData.length - 1];
+
+      // Create comparison dates without time components
+      const normalizeDate = (date: Date) =>
+        new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+
+      const todayNormalized = normalizeDate(today);
+      const lastDateNormalized = lastDataPoint
+        ? normalizeDate(new Date(lastDataPoint.x))
+        : 0;
+
+      if (todayNormalized > lastDateNormalized) {
+        // Add new entry if it's a new day or first data point
+        const newEntry = {
+          x: today.getTime(),
+          y: generateRandomY(),
+        };
+
+        lineData.push(newEntry);
+
+        // Maintain 7-day window 
+        if (lineData.length > 7) {
+          console.log("Dropping oldest data point:", lineData.shift());
+          lineData.shift();
+        }
+      } else {
+        // Update today's existing data point
+        lineData[lineData.length - 1] = {
+          x: today.getTime(),
+          y: generateRandomY(),
+        };
+      }
+
       const newData = {
         type: "data",
-        lineData: {
-          x: new Date().getTime(),
-          y: Math.floor(Math.random() * 1500),
-        },
+        lineData: [...lineData],
         heatmapData: useDashboardStore().generateHeatmapRowData(),
         merchantData: useDashboardStore().generateMerchantData(),
       };

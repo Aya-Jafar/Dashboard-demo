@@ -92,3 +92,16 @@ export const debounce = (func: Function, wait: number) => {
     timeout = setTimeout(() => func.apply(this, args), wait);
   };
 };
+
+/**
+ * 
+ * @returns Random data point for line chart 
+ */
+export const generateRandomY = () => {
+  const base = 500; // Center point
+  const fluctuation =
+    Math.random() > 0.5
+      ? Math.floor(Math.random() * 1500) // Big positive spike (50% chance)
+      : -Math.floor(Math.random() * 700); // Negative dip (50% chance)
+  return Math.max(300, Math.min(2000, base + fluctuation)); // Keep within bounds
+};

@@ -82,29 +82,24 @@ export const useDashboardStore = defineStore("dashboard", () => {
     }));
   };
 
+  const today = new Date();
+  const last7DaysData = Array.from({ length: 8 }, (_, i) => {
+    const date = new Date(today);
+    date.setDate(today.getDate() - 7 + i); // Last 7 days (including today)
+    return {
+      x: date.getTime(),
+      y: Math.floor(Math.random() * 1500), 
+    };
+  });
+
   // Initial data for the line chart
   const lineSeries = ref<LineSeries[]>([
     {
       name: "",
-      data: [
-        { x: new Date("2025-03-01").getTime(), y: 1200 },
-        { x: new Date("2025-03-02").getTime(), y: 800 },
-        { x: new Date("2025-03-03").getTime(), y: 900 },
-        { x: new Date("2025-03-04").getTime(), y: 1000 },
-        { x: new Date("2025-03-05").getTime(), y: 1100 },
-        { x: new Date("2025-03-06").getTime(), y: 1050 },
-        { x: new Date("2025-03-07").getTime(), y: 1300 },
-        { x: new Date("2025-03-08").getTime(), y: 950 },
-        { x: new Date("2025-03-09").getTime(), y: 1400 },
-        { x: new Date("2025-03-10").getTime(), y: 1000 },
-        { x: new Date("2025-03-11").getTime(), y: 850 },
-        { x: new Date("2025-03-12").getTime(), y: 1200 },
-        { x: new Date("2025-03-13").getTime(), y: 1100 },
-        { x: new Date("2025-03-14").getTime(), y: 1300 },
-        { x: new Date("2025-03-15").getTime(), y: 900 },
-      ],
+      data: last7DaysData,
     },
   ]);
+
   // Initial data for the heatmap
   const heatmapSeries = ref<HeatmapSeries[]>([
     { name: "Monday", data: generateHeatmapRowData() },
@@ -316,6 +311,17 @@ export const useDashboardStore = defineStore("dashboard", () => {
     stroke: {
       curve: "smooth",
     },
+    // title: {
+    //   text: "Transaction Volume Over the Last Week",
+    //   align: "left", 
+    //   // margin: 10,
+    //   style: {
+    //     // fontSize: "16px",
+    //     fontWeight: "bold",
+    //     fontFamily: "Inter, sans-serif",
+    //     color: colors.text,
+    //   },
+    // },
     fill: {
       type: "gradient",
       gradient: {
@@ -336,7 +342,7 @@ export const useDashboardStore = defineStore("dashboard", () => {
     xaxis: {
       type: "datetime",
       labels: {
-        format: "dd MMM yyyy",
+        format: "dd MMM",
         style: {
           colors: colors.text,
           fontSize: "12px",

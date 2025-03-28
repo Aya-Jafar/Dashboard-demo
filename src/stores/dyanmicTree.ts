@@ -21,10 +21,10 @@ interface Node {
 export const useDynamicTreeStore = defineStore("tree-node", () => {
   const isLoading = ref(false);
   const nodes = ref<any[]>([]);
-  const currentPage = ref(1); // Track the current page
-  const pageSize = ref(10); // Number of items per page (limit)
-  const searchLabel = ref(""); // Search input for node label
-  const totalItems = ref(20); // Total items
+  const currentPage = ref(1);
+  const pageSize = ref(10);
+  const searchLabel = ref("");
+  const totalItems = ref(20);
 
   const snackbarStore = useSnackbarStore();
 
@@ -200,6 +200,24 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     });
   };
 
+  const deepFind = (
+    nodes: Node[],
+    id: string
+  ): { node: Node | null; parent: Node | null; siblings: Node[] } => {
+    for (const node of nodes) {
+      if (node.id === id) return { node, parent: null, siblings: nodes };
+      if (node.children) {
+        const childMatch = node.children.find((child) => child.id === id);
+        if (childMatch)
+          return { node: childMatch, parent: node, siblings: node.children };
+        const found = deepFind(node.children, id);
+        if (found.node) return found;
+      }
+    }
+    return { node: null, parent: null, siblings: [] };
+  };
+  
+
   const moveNode = async ({
     nodeId,
     targetNodeId,
@@ -207,30 +225,11 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     nodeId: string;
     targetNodeId: string;
   }) => {
-    // Helper function to find node, its parent, and siblings array
-    const findNode = (
-      nodes: Node[],
-      id: string
-    ): { node: Node | null; parent: Node | null; siblings: Node[] } => {
-      for (const node of nodes) {
-        if (node.id === id) return { node, parent: null, siblings: nodes };
-        if (node.children) {
-          const childMatch = node.children.find((child) => child.id === id);
-          if (childMatch)
-            return { node: childMatch, parent: node, siblings: node.children };
-          const found = findNode(node.children, id);
-          if (found.node) return found;
-        }
-      }
-      return { node: null, parent: null, siblings: [] };
-    };
-
     // Find contexts for both nodes
-    const source = findNode(nodes.value, nodeId);
-    const target = findNode(nodes.value, targetNodeId);
+    const source = deepFind(nodes.value, nodeId);
+    const target = deepFind(nodes.value, targetNodeId);
 
     if (!source.node || !target.node) {
-      // console.error("Nodes not found");
       snackbarStore.showSnackbar(`Nodes not found`, "error");
       return;
     }
@@ -242,7 +241,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     const newNodes = JSON.parse(JSON.stringify(nodes.value));
 
     // Remove from original position
-    const updatedSource = findNode(newNodes, nodeId);
+    const updatedSource = deepFind(newNodes, nodeId);
     if (!updatedSource.node) return;
 
     updatedSource.siblings.splice(
@@ -258,7 +257,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     if (newParentId === null) {
       newSiblings = newNodes;
     } else {
-      const newParent = findNode(newNodes, newParentId).node;
+      const newParent = deepFind(newNodes, newParentId).node;
       if (!newParent) return;
       newParent.children = newParent.children || [];
       newSiblings = newParent.children;

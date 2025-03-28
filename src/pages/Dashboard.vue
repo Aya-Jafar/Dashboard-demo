@@ -39,17 +39,8 @@ const initWebSocket = () => {
       connectionStatus.value = "connected";
       return;
     }
-
     // Handle data updates
     console.log("WebSocket data received:", message);
-
-    // Update line chart data
-    if (message.lineData && store.lineSeries[0]?.data) {
-      store.lineSeries[0].data.push(message.lineData);
-      if (store.lineSeries[0].data.length > 20) {
-        store.lineSeries[0].data.shift();
-      }
-    }
 
     // Update heatmap data
     if (message.heatmapData) {

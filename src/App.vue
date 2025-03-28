@@ -125,7 +125,7 @@ onUnmounted(() => {
     </div>
 
     <!-- Main Content -->
-    <div class="flex-1 px-5">
+    <div class="flex-1 pl-5">
       <!-- Header -->
       <div
         class="flex justify-between items-center mb-5 bg-slate-900 rounded-md py-10 h-15 px-5"
