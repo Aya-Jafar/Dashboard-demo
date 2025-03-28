@@ -9,7 +9,7 @@ This is the repo's for software engineering tasks
 
 I used [Mock API](https://mockapi.io) and generate data with this structure:
 
-```
+```json
 {
     "id": "dept-root-1",
     "label": "Human Resources",
@@ -26,7 +26,7 @@ Insetead of nesting objects for parents and children (which I tried at first but
 For example, to get the initial depratments children
 The request will be like this:
 
-```
+```shell
 GET "API_BASE_URL/departments?parentId=null"
 ```
 
@@ -35,7 +35,7 @@ This same pattern applies to children and grandchildren nodes.
 
 #### Recursive component implementation 
 The dynamic tree structure is implemented using a recursive TreeNode component that renders itself for each child node
-```
+```html
 <!-- In TreeNode.vue -->
     <TreeNode
         :node="node"
@@ -64,7 +64,7 @@ The recursion naturally terminates when a node has no children (empty children a
 - Automatically receonnect if some failure happens
 
 Example usage:
-```
+```ts
 const ws = new MockWebSocket(import.meta.env.VITE_MOCK_WEB_SOCKET_URL);
 ws.connect();
 ```
@@ -81,14 +81,14 @@ ws.connect();
 
 
 1. Clone the repository 
-```
+```shell
 git clone https://github.com/Aya-Jafar/SWE-task.git
 ```
 2. Install dependencies
-```
+```shell
 npm install
 ```
 3. Run development server
-```
+```shell
 npm run dev
 ```
