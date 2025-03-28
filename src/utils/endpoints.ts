@@ -4,7 +4,7 @@
  */
 
 enum API_ENDPOINTS {
-  DEPARTMENTS="mock-api/departments"
+  DEPARTMENTS="/departments"
 }
 
 

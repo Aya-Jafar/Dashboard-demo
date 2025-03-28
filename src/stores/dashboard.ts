@@ -1,3 +1,4 @@
+import { generateRandomY } from "@/utils/helpers";
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
@@ -90,7 +91,7 @@ export const useDashboardStore = defineStore("dashboard", () => {
       date.setDate(today.getDate() - 7 + i); // Last 7 days (including today)
       return {
         x: date.getTime(),
-        y: Math.floor(Math.random() * 1500),
+        y: generateRandomY(),
       };
     });
     return last7DaysData;

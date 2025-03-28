@@ -5,7 +5,7 @@
 This is the repo's for software engineering tasks
 
 
-# First Task docs- Dynamic Tree
+# First Task docs - Dynamic Tree
 
 I used [Mock API](https://mockapi.io) and generate data with this structure:
 
@@ -19,6 +19,7 @@ I used [Mock API](https://mockapi.io) and generate data with this structure:
     "numberOfEmployees": 21
 },
 ```
+#### Lazy Loading Mechanism
 
 Insetead of nesting objects for parents and children (which I tried at first but could not find a possiable way to do the lazy loading with it),This will provide the lazy loading functionality by filtering based on the parentId only to get the children
 
@@ -29,20 +30,65 @@ The request will be like this:
 GET "API_BASE_URL/departments?parentId=null"
 ```
 
-Same for it's children and grand children
+This same pattern applies to children and grandchildren nodes.
 
-![alt-image](/src/assets/Screenshot%202025-03-24%20at%201.27.38%20PM.png)
+
+#### Recursive component implementation 
+The dynamic tree structure is implemented using a recursive TreeNode component that renders itself for each child node
+```
+<!-- In TreeNode.vue -->
+    <TreeNode
+        :node="node"
+        :visible="node.visible !== false"
+        @toggle="store.toggleNodeVisibility(node.id)"
+        @show-details="showNodeDetails"
+        @create-node="handleCreateNode"
+        @node-move="store.moveNode"
+    />
+```
+The recursion naturally terminates when a node has no children (empty children array).
+
+<!-- 
+![alt-image](/src/assets/Screen%20Recording%202025-03-28%20at%209.36.58%20PM.mp4)
+ -->
+
+
+[![Watch the video](/src/assets/Screenshot%202025-03-28%20at%209.45.05%20PM.png)](/src/assets/Screen%20Recording%202025-03-28%20at%209.36.58%20PM.mp4)
 
 
 # Second Task docs - Dashboard 📈
 
-For the second task, I implemented a mock web socket service (src/services/WebSocketService.ts) that mimicks the functionality of a web socket, it generates new data every 3 seconds and push it to the old ones and show it in real time.
+### 1. WebSocket Service:
+- Created a mock WebSocket service (src/services/WebSocketService.ts)
+- Simulates real-time data updates by generating new data every 5 seconds
+- Automatically receonnect if some failure happens
 
+Example usage:
 ```
 const ws = new MockWebSocket(import.meta.env.VITE_MOCK_WEB_SOCKET_URL);
 ws.connect();
 ```
 
-For the charts I used [apexcharts](https://apexcharts.com/)
+### 2. Charting:
 
-![alt-image](/src/assets/Screenshot%202025-03-24%20at%201.33.22%20PM.png)
+- Implemented using [apexcharts](https://apexcharts.com/)
+
+![alt-image](/src/assets/Screenshot%202025-03-28%20at%209.33.30%20PM.png)
+
+
+
+## Development Setup
+
+
+1. Clone the repository 
+```
+git clone https://github.com/Aya-Jafar/SWE-task.git
+```
+2. Install dependencies
+```
+npm install
+```
+3. Run development server
+```
+npm run dev
+```
