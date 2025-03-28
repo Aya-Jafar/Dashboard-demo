@@ -1,7 +1,6 @@
 import { generateRandomY } from "@/utils/helpers";
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
-import { useI18n } from "vue-i18n";
+import { ref } from "vue";
 
 // ==================== TYPE DEFINITIONS ====================
 interface Merchant {
@@ -38,7 +37,6 @@ export type WebSocketStatus =
 
 // ==================== STORE DEFINITION ====================
 export const useDashboardStore = defineStore("dashboard", () => {
-  const { t } = useI18n();
   // Dark theme color palette
   const colors = {
     primary: "#4936FC",
@@ -87,9 +85,9 @@ export const useDashboardStore = defineStore("dashboard", () => {
 
   const generateLineData = () => {
     const today = new Date();
-    const last7DaysData = Array.from({ length: 8 }, (_, i) => {
+    const last7DaysData = Array.from({ length: 7 }, (_, i) => {
       const date = new Date(today);
-      date.setDate(today.getDate() - 7 + i); // Last 7 days (including today)
+      date.setDate(today.getDate() - 6 + i); // Last 7 days (including today)
       return {
         x: date.getTime(),
         y: generateRandomY(),
