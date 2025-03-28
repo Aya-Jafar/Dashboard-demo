@@ -19,7 +19,7 @@ I used [Mock API](https://mockapi.io) and generate data with this structure:
     "numberOfEmployees": 21
 },
 ```
-#### Lazy Loading Mechanism
+### Lazy Loading Mechanism
 
 Insetead of nesting objects for parents and children (which I tried at first but could not find a possiable way to do the lazy loading with it),This will provide the lazy loading functionality by filtering based on the parentId only to get the children
 
@@ -33,7 +33,7 @@ GET "API_BASE_URL/departments?parentId=null"
 This same pattern applies to children and grandchildren nodes.
 
 
-#### Recursive component implementation 
+### Recursive component implementation 
 The dynamic tree structure is implemented using a recursive TreeNode component that renders itself for each child node
 ```html
 <!-- In TreeNode.vue -->
