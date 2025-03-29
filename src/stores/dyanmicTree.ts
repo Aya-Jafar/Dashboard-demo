@@ -22,9 +22,9 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
   const isLoading = ref(false);
   const nodes = ref<any[]>([]);
   const currentPage = ref(1);
-  const pageSize = ref(10);
+  const pageSize = ref(7);
   const searchLabel = ref("");
-  const totalItems = ref(20);
+  const totalItems = ref(10);
 
   const snackbarStore = useSnackbarStore();
 
@@ -49,7 +49,11 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
         }&label=${encodeURIComponent(label)}&sortBy=createdAt&order=desc`,
         setLoading: (loading: boolean) => (isLoading.value = loading),
         setterFunction: (data: any) => {
-          nodes.value = data;
+          if (page === 1) {
+            nodes.value = data; 
+          } else {
+            nodes.value = [...nodes.value, ...data]; // Append new nodes
+          }
         },
       });
     } catch (error) {
@@ -216,7 +220,6 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     }
     return { node: null, parent: null, siblings: [] };
   };
-  
 
   const moveNode = async ({
     nodeId,

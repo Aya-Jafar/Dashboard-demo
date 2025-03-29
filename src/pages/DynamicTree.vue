@@ -1,104 +1,111 @@
 <script setup lang="ts">
-/**
- * Tree structure component with:
- * - Hierarchical node display
- * - Search, pagination, and sorting
- * - Node creation/editing
- * - Drag-and-drop reorganization
- * - RTL language support
- *
- * @example <DynamicTree />
- */
-
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, watch, computed, watchEffect, nextTick } from "vue";
 import Button from "@components/common/Button.vue";
 import TreeNode from "@components/dynamic-tree/TreeNode.vue";
 import CreateNodeModal from "@components/dynamic-tree/CreateNodeModal.vue";
 import { useDynamicTreeStore } from "@stores/dyanmicTree";
 import NodeDetailsModal from "@components/dynamic-tree/NodeDetailsModal.vue";
-import { useI18n } from "vue-i18n";
 import Loading from "@/components/common/Loading.vue";
 import type { Node } from "@stores/dyanmicTree";
+import { useVirtualList, useInfiniteScroll } from "@vueuse/core";
+import { debounce } from "@/utils/helpers";
 
 // Store and states
 const store = useDynamicTreeStore();
-const { locale } = useI18n();
 const isOnline = ref(navigator.onLine);
 const selectedParentId = ref<string | null>(null);
-const selectedNode = ref(null); // Selected node data for the modal
+const selectedNode = ref<Node | null>(null);
 
 // Modal visibility states
 const isCreateNodeModalVisible = ref(false);
 const isDetailsModalVisible = ref(false);
+const listEndRef = ref<HTMLElement | null>(null);
+
+// Virtualization setup
+const {
+  list: virtualNodes,
+  containerProps,
+  wrapperProps,
+} = useVirtualList(
+  computed(() => store.nodes),
+  {
+    itemHeight: 75,
+  }
+);
 
 // Function to handle creating a new node
 const handleCreateNode = (parentId: string | null) => {
-  selectedParentId.value = parentId ?? null; // Set parent ID
-  isCreateNodeModalVisible.value = true; // Show the modal
+  selectedParentId.value = parentId;
+  isCreateNodeModalVisible.value = true;
 };
 
-// Watch for changes in the search label and trigger search
+// Debounced search handler
+const handleSearch = debounce(async (newLabel: string) => {
+  if (!isOnline.value) return;
+
+  store.currentPage = 1;
+  store.searchLabel = newLabel;
+
+  try {
+    await store.fetchMainData(store.currentPage, newLabel);
+    // Ensure nodes are toggled after data is fully loaded
+    nextTick(() => {
+      store.toggleNodesBySearch(newLabel);
+    });
+  } catch (error) {
+    console.error("Search failed:", error);
+  }
+}, 300); // 300ms delay
+
+// Watch for search changes with debounce
 watch(
   () => store.searchLabel,
   (newLabel) => {
-    if (isOnline.value) {
-      store.currentPage = 1; // Reset to first page on new search
-      store.fetchMainData(store.currentPage, newLabel).then(() => {
-        // Only toggle nodes after data is loaded
-        store.toggleNodesBySearch(newLabel);
-      });
-    }
+    handleSearch(newLabel);
   },
-  { immediate: true } // Run this on component mount
+  { immediate: true }
 );
 
-// Fetch data when component is mounted
-onMounted(() => {
-  if (isOnline.value) {
+// watch(
+//   () => store.searchLabel,
+//   (newLabel) => {
+//     if (isOnline.value) {
+//       store.currentPage = 1; // Reset to first page on new search
+//       store.fetchMainData(store.currentPage, newLabel).then(() => {
+//         // Only toggle nodes after data is loaded
+//         store.toggleNodesBySearch(newLabel);
+//       });
+//     }
+//   },
+//   { immediate: true } // Run this on component mount
+// );
+
+//  Load More Data
+const loadMore = () => {
+  if (isOnline.value && store.currentPage < store.totalPages) {
+    store.currentPage++;
     store.fetchMainData(store.currentPage, store.searchLabel);
   }
-});
-
-// Handle next page click
-const goToNextPage = () => {
-  if (isOnline.value) {
-    if (store.currentPage < store.totalPages) {
-      store.currentPage++;
-      store.fetchMainData(store.currentPage, store.searchLabel);
-    }
-  }
 };
 
-// Handle previous page click
-const goToPreviousPage = () => {
-  if (isOnline.value) {
-    if (store.currentPage > 1) {
-      store.currentPage--;
-      store.fetchMainData(store.currentPage, store.searchLabel);
-    }
-  }
-};
-// Handle showing the details modal
-const showNodeDetails = (node: any) => {
+useInfiniteScroll(listEndRef, loadMore, { distance: 10 });
+
+// Node details handler
+const showNodeDetails = (node: Node) => {
   selectedNode.value = node;
   isDetailsModalVisible.value = true;
 };
 
+// Node creation handler
 const handleNodeCreate = async (newNode: Node) => {
-  // Add the new node to the tree
   if (isOnline.value) {
     await store.add({
-      label: newNode.label,
-      parentId: newNode.parentId,
+      ...newNode,
       createdAt: new Date().getTime(),
-      numberOfEmployees: newNode.numberOfEmployees,
-      description: newNode.description,
     });
   }
-  // Close the modal
   isCreateNodeModalVisible.value = false;
 };
-const isRTL = computed(() => locale.value === "ar");
 </script>
 
 <template>
@@ -124,89 +131,63 @@ const isRTL = computed(() => locale.value === "ar");
       </Button>
     </div>
 
-    <div class="flex items-center justify-center py-10" v-if="!isOnline">
+    <!-- Offline State -->
+    <div v-if="!isOnline" class="flex items-center justify-center py-10">
       <p class="text-2xl text-center">
         {{ $t("connection_error") }}
       </p>
     </div>
 
     <!-- Loading State -->
-    <div v-if="store.isLoading">
+    <div v-else-if="store.isLoading && store.currentPage === 1">
       <Loading />
     </div>
 
+    <!-- Empty State -->
     <div
-      v-else-if="!store.isLoading && store.nodes?.length === 0 && isOnline"
+      v-else-if="!store.isLoading && store?.nodes?.length === 0"
       class="flex justify-center items-center py-8"
     >
       {{ $t("noDepartmentsAvailable") }}
     </div>
 
-    <!-- Tree Rendering -->
+    <!-- Virtualized Tree -->
     <div v-else>
-      <div
-        v-for="node in store.nodes"
-        :key="node.id"
-        class="mb-4 p-4 bg-slate-900 rounded-lg shadow-md"
-      >
-        <!-- Root Level Node -->
-        <TreeNode
-          :node="node"
-          :visible="node.visible !== false"
-          @toggle="store.toggleNodeVisibility(node.id)"
-          @show-details="showNodeDetails"
-          @create-node="handleCreateNode"
-          @node-move="store.moveNode"
-        />
+      <div v-bind="containerProps" class="h-screen">
+        <div v-bind="wrapperProps">
+          <div
+            v-for="node in virtualNodes"
+            :key="node.data.id"
+            class="mb-4 p-4 bg-slate-900 rounded-lg shadow-md tree-node"
+          >
+            <TreeNode
+              :node="node.data"
+              :visible="node.data.visible !== false"
+              @toggle="store.toggleNodeVisibility(node.data.id)"
+              @show-details="showNodeDetails"
+              @create-node="handleCreateNode"
+              @node-move="store.moveNode"
+            />
+          </div>
+        </div>
       </div>
 
-      <!-- Pagination Controls -->
-      <div :dir="isRTL ? 'rtl' : 'ltr'">
-        <div class="flex justify-center mt-8">
-          <button
-            :disabled="store.currentPage === 1"
-            @click="goToPreviousPage"
-            class="px-4 py-2 bg-slate-800 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-            :class="{
-              'rounded-l': !isRTL,
-              'rounded-r': isRTL,
-            }"
-          >
-            {{ isRTL ? "السابق" : "Previous" }}
-          </button>
-          <span class="px-4 py-2 bg-slate-800 text-white">
-            {{
-              isRTL
-                ? `صفحة ${store.currentPage} من ${store.totalPages}`
-                : `Page ${store.currentPage} of ${store.totalPages}`
-            }}
-          </span>
-          <button
-            :disabled="store.currentPage === store.totalPages"
-            @click="goToNextPage"
-            class="px-4 py-2 bg-slate-800 text-white hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
-            :class="{
-              'rounded-r': !isRTL,
-              'rounded-l': isRTL,
-            }"
-          >
-            {{ isRTL ? "التالي" : "Next" }}
-          </button>
-        </div>
+      <!-- Lazy Load Trigger -->
+      <div ref="listEndRef" class="h-10 flex justify-center items-center">
+        <Loading v-if="store.isLoading && store.currentPage > 1" />
       </div>
     </div>
   </div>
 
-  <!-- Create Node Modal -->
+  <!-- Modals -->
   <CreateNodeModal
-    v-if="isCreateNodeModalVisible && selectedParentId !== undefined"
+    v-if="isCreateNodeModalVisible"
     :parentId="selectedParentId"
     @close="isCreateNodeModalVisible = false"
     @submit="handleNodeCreate"
   />
-  <!-- Node Details Modal -->
   <NodeDetailsModal
-    v-if="isDetailsModalVisible && selectedNode != null"
+    v-if="isDetailsModalVisible && selectedNode"
     :nodeData="selectedNode"
     @close="isDetailsModalVisible = false"
   />
