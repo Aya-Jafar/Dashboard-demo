@@ -1,121 +1,128 @@
 <script setup lang="ts">
-import { ref, watch, computed, watchEffect, nextTick } from "vue";
+import { ref, watch, computed } from "vue";
 import Button from "@components/common/Button.vue";
 import TreeNode from "@components/dynamic-tree/TreeNode.vue";
 import CreateNodeModal from "@components/dynamic-tree/CreateNodeModal.vue";
 import { useDynamicTreeStore } from "@stores/dyanmicTree";
 import NodeDetailsModal from "@components/dynamic-tree/NodeDetailsModal.vue";
+import { useI18n } from "vue-i18n";
 import Loading from "@/components/common/Loading.vue";
 import type { Node } from "@stores/dyanmicTree";
-import { useVirtualList, useInfiniteScroll } from "@vueuse/core";
-import { debounce } from "@/utils/helpers";
+import { useInfiniteScroll, useVirtualList } from "@vueuse/core";
 
 // Store and states
 const store = useDynamicTreeStore();
+const { locale } = useI18n();
 const isOnline = ref(navigator.onLine);
 const selectedParentId = ref<string | null>(null);
-const selectedNode = ref<Node | null>(null);
+const selectedNode = ref(null);
 
 // Modal visibility states
 const isCreateNodeModalVisible = ref(false);
 const isDetailsModalVisible = ref(false);
+const isLoadingMore = ref(false);
 const listEndRef = ref<HTMLElement | null>(null);
 
-// Virtualization setup
+// Virtual list for tree nodes
 const {
   list: virtualNodes,
   containerProps,
   wrapperProps,
 } = useVirtualList(
-  computed(() => store.nodes),
-  {
-    itemHeight: 75,
-  }
+  computed(() => store.nodes), // Wrap in a ref to track reactivity
+  { itemHeight: 80 }
 );
 
 // Function to handle creating a new node
 const handleCreateNode = (parentId: string | null) => {
-  selectedParentId.value = parentId;
+  selectedParentId.value = parentId ?? null;
   isCreateNodeModalVisible.value = true;
 };
 
-// Debounced search handler
-const handleSearch = debounce(async (newLabel: string) => {
-  if (!isOnline.value) return;
-
-  store.currentPage = 1;
-  store.searchLabel = newLabel;
-
-  try {
-    await store.fetchMainData(store.currentPage, newLabel);
-    // Ensure nodes are toggled after data is fully loaded
-    nextTick(() => {
-      store.toggleNodesBySearch(newLabel);
-    });
-  } catch (error) {
-    console.error("Search failed:", error);
-  }
-}, 300); // 300ms delay
-
-// Watch for search changes with debounce
+// Watch for changes in the search label
 watch(
   () => store.searchLabel,
   (newLabel) => {
-    handleSearch(newLabel);
+    if (isOnline.value) {
+      store.currentPage = 1;
+      store.nodes = [];
+      isLoadingMore.value = true;
+      store.fetchMainData(store.currentPage, newLabel).finally(() => {
+        isLoadingMore.value = false;
+      });
+    }
   },
   { immediate: true }
 );
+const scrollContainer = ref<HTMLElement>();
+const hasMore = ref(true);
 
-// watch(
-//   () => store.searchLabel,
-//   (newLabel) => {
-//     if (isOnline.value) {
-//       store.currentPage = 1; // Reset to first page on new search
-//       store.fetchMainData(store.currentPage, newLabel).then(() => {
-//         // Only toggle nodes after data is loaded
-//         store.toggleNodesBySearch(newLabel);
-//       });
-//     }
-//   },
-//   { immediate: true } // Run this on component mount
-// );
+const loadMore = async () => {
+  console.log("Trying to load more..."); // Debugging log
 
-//  Load More Data
-const loadMore = () => {
-  if (isOnline.value && store.currentPage < store.totalPages) {
-    store.currentPage++;
-    store.fetchMainData(store.currentPage, store.searchLabel);
+  if (
+    !isOnline.value ||
+    isLoadingMore.value ||
+    !hasMore.value ||
+    store.isLoading
+  ) {
+    console.log("Blocked due to conditions ❌");
+    return;
+  }
+
+  console.log("Loading next page... ✅");
+  isLoadingMore.value = true;
+  try {
+    const currentLength = store.nodes.length;
+    await store.fetchMainData(store.currentPage + 1, store.searchLabel);
+
+    if (store.nodes.length > currentLength) {
+      store.currentPage++;
+    } else {
+      hasMore.value = false;
+    }
+  } finally {
+    isLoadingMore.value = false;
   }
 };
 
-useInfiniteScroll(listEndRef, loadMore, { distance: 10 });
 
-// Node details handler
-const showNodeDetails = (node: Node) => {
+useInfiniteScroll(scrollContainer, loadMore, {
+  distance: 10,
+  direction: "bottom",
+});
+
+// Handle showing the details modal
+const showNodeDetails = (node: any) => {
   selectedNode.value = node;
   isDetailsModalVisible.value = true;
 };
 
-// Node creation handler
 const handleNodeCreate = async (newNode: Node) => {
   if (isOnline.value) {
     await store.add({
-      ...newNode,
+      label: newNode.label,
+      parentId: newNode.parentId,
       createdAt: new Date().getTime(),
+      numberOfEmployees: newNode.numberOfEmployees,
+      description: newNode.description,
     });
   }
   isCreateNodeModalVisible.value = false;
 };
+
+const isRTL = computed(() => locale.value === "ar");
 </script>
 
 <template>
   <div
+   ref="scrollContainer"
     :class="{ 'blur-sm': isCreateNodeModalVisible || isDetailsModalVisible }"
     aria-modal="true"
     aria-labelledby="modal-title"
   >
     <!-- Search and New Button -->
-    <div class="flex justify-between flex-wrap items-end mb-10 py-4">
+    <div class="flex justify-between items-end mb-10 py-4">
       <input
         v-model.lazy="store.searchLabel"
         type="text"
@@ -131,34 +138,33 @@ const handleNodeCreate = async (newNode: Node) => {
       </Button>
     </div>
 
-    <!-- Offline State -->
-    <div v-if="!isOnline" class="flex items-center justify-center py-10">
+    <div class="flex items-center justify-center py-10" v-if="!isOnline">
       <p class="text-2xl text-center">
         {{ $t("connection_error") }}
       </p>
     </div>
 
-    <!-- Loading State -->
-    <div v-else-if="store.isLoading && store.currentPage === 1">
+    <!-- Initial Loading State -->
+    <div v-if="store.isLoading && store.nodes.length === 0">
       <Loading />
     </div>
 
-    <!-- Empty State -->
     <div
-      v-else-if="!store.isLoading && store?.nodes?.length === 0"
+      v-else-if="!store.isLoading && store.nodes?.length === 0 && isOnline"
       class="flex justify-center items-center py-8"
     >
       {{ $t("noDepartmentsAvailable") }}
     </div>
 
-    <!-- Virtualized Tree -->
-    <div v-else>
-      <div v-bind="containerProps" class="h-screen">
+    <!-- Virtualized Tree Rendering -->
+
+    <div v-else style="height: 70vh">
+      <div class="overflow-y-auto" v-bind="containerProps"  >
         <div v-bind="wrapperProps">
           <div
             v-for="node in virtualNodes"
             :key="node.data.id"
-            class="mb-4 p-4 bg-slate-900 rounded-lg shadow-md tree-node"
+            class="mb-4 p-4 bg-slate-900 rounded-lg shadow-md"
           >
             <TreeNode
               :node="node.data"
@@ -171,26 +177,29 @@ const handleNodeCreate = async (newNode: Node) => {
           </div>
         </div>
       </div>
+    </div>
 
-      <!-- Lazy Load Trigger -->
-      <div ref="listEndRef" class="h-10 flex justify-center items-center">
-        <Loading v-if="store.isLoading && store.currentPage > 1" />
-      </div>
+    <!-- Lazy Load Trigger -->
+    <div class="h-10 flex justify-center items-center">
+      <Loading v-if="isLoadingMore" />
+      <p v-else-if="!hasMore" class="text-gray-400">
+        {{ $t("noMoreItems") }}
+      </p>
     </div>
   </div>
 
-  <!-- Modals -->
+  <!-- Create Node Modal -->
   <CreateNodeModal
-    v-if="isCreateNodeModalVisible"
+    v-if="isCreateNodeModalVisible && selectedParentId !== undefined"
     :parentId="selectedParentId"
     @close="isCreateNodeModalVisible = false"
     @submit="handleNodeCreate"
   />
+
+  <!-- Node Details Modal -->
   <NodeDetailsModal
-    v-if="isDetailsModalVisible && selectedNode"
+    v-if="isDetailsModalVisible && selectedNode != null"
     :nodeData="selectedNode"
     @close="isDetailsModalVisible = false"
   />
 </template>
-
-<style scoped></style>

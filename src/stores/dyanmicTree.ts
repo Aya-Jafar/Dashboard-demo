@@ -15,6 +15,7 @@ interface Node {
   numberOfEmployees: number;
   children?: Array<any>;
   isOpen?: boolean;
+  visible?:boolean
 }
 
 // ==================== STORE DEFINITION ====================
@@ -50,7 +51,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
         setLoading: (loading: boolean) => (isLoading.value = loading),
         setterFunction: (data: any) => {
           if (page === 1) {
-            nodes.value = data; 
+            nodes.value = data;
           } else {
             nodes.value = [...nodes.value, ...data]; // Append new nodes
           }
