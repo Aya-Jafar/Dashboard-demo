@@ -107,13 +107,16 @@ export const generateRandomY = () => {
   return Math.max(300, Math.min(2000, base + fluctuation)); // Keep within bounds
 };
 
-export const getEndpointForPage = (page: number): string | undefined => {
-  const endpoints = [
-    API_ENDPOINTS.DEPARTMENTS,
-    API_ENDPOINTS.DEPARTMENTS2,
-    API_ENDPOINTS.DEPARTMENTS3,
-  ];
+/**
+ * Get the API endpoint for root nodes based on the current page number.
+ * This function uses round-robin selection to alternate between available endpoints.
+ *
+ * @param {number} page - The page number used for round-robin selection.
+ * @returns {string} - The selected API endpoint or undefined if none available.
+ */
+export const getEndpointForRootNodes = (page: number) => {
+  const endpoints = [API_ENDPOINTS.DEPARTMENTS2, API_ENDPOINTS.DEPARTMENTS3];
 
   // Round-robin selection
-  return endpoints[(page - 1) % endpoints.length] || endpoints[0];
+  return endpoints[(page - 1) % endpoints.length];
 };

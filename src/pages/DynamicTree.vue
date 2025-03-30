@@ -19,7 +19,7 @@ import Loading from "@/components/common/Loading.vue";
 import type { Node } from "@stores/dyanmicTree";
 import { useInfiniteScroll, useVirtualList } from "@vueuse/core";
 import API_ENDPOINTS from "@/utils/endpoints";
-import { getEndpointForPage } from "@/utils/helpers";
+import { getEndpointForRootNodes } from "@/utils/helpers";
 
 // Store and states
 const store = useDynamicTreeStore();
@@ -77,10 +77,10 @@ const loadMore = async () => {
   try {
     isLoadingMore.value = true;
     // Determine which endpoint to use based on current page
-    const endpoint = getEndpointForPage(store.currentPage + 1);
+    const endpoint = getEndpointForRootNodes(store.currentPage + 1);
 
     await store.fetchMainData(
-      store.currentPage + 1, // Request next page
+      store.currentPage + 1, 
       store.searchLabel,
       endpoint
     );
