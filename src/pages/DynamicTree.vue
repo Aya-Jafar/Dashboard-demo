@@ -18,7 +18,6 @@ import NodeDetailsModal from "@components/dynamic-tree/NodeDetailsModal.vue";
 import Loading from "@/components/common/Loading.vue";
 import type { Node } from "@stores/dyanmicTree";
 import { useInfiniteScroll, useVirtualList } from "@vueuse/core";
-import API_ENDPOINTS from "@/utils/endpoints";
 import { getEndpointForRootNodes } from "@/utils/helpers";
 
 // Store and states
