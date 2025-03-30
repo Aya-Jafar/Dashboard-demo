@@ -22,7 +22,7 @@ import ICONS from "./utils/icons";
 import { getCurrentLanguage } from "./utils/helpers";
 
 // Track the active tab
-const activeTab = ref(2);
+const activeTab = ref(1);
 
 // Use the layout store
 const layoutStore = useLayoutStore();
