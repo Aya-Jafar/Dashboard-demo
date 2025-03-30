@@ -33,6 +33,10 @@ class MockWebSocket {
     return this.connectionState;
   }
 
+  /**
+   * Initiates the WebSocket connection.
+   * Simulates a connection with a chance of failure.
+   */
   connect(): void {
     if (
       this.connectionState === "connected" ||
@@ -67,6 +71,9 @@ class MockWebSocket {
     }, 500);
   }
 
+  /**
+   * Schedules a reconnection attempt if the connection fails.
+   */
   private scheduleReconnect(): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       console.error("Max reconnection attempts reached");
@@ -77,6 +84,11 @@ class MockWebSocket {
     setTimeout(() => this.connect(), this.reconnectInterval);
   }
 
+  /**
+   * Sends a message through the WebSocket (mocked behavior).
+   * Updates the store with new mock data.
+   * @param {string} message - The message to send
+   */
   send(message: string): void {
     if (this.connectionState !== "connected") {
       console.warn("Cannot send message - WebSocket not connected");
@@ -139,10 +151,17 @@ class MockWebSocket {
     }, 500);
   }
 
+  /**
+   * Registers a listener for WebSocket messages.
+   * @param {(message: any) => void} callback - The callback function to handle received messages
+   */
   onmessage(callback: (message: any) => void): void {
     this.listeners.push(callback);
   }
 
+  /**
+   * Closes the WebSocket connection.
+   */
   close(): void {
     this.connectionState = "disconnected";
     console.log("Mock WebSocket connection closed.");

@@ -46,7 +46,10 @@ export const useDashboardStore = defineStore("dashboard", () => {
     grid: "#364051",
   };
 
-  // Function to generate heatmap row data
+  /**
+   * Generates heatmap data for a single row (24 hours).
+   * @returns {HeatmapDataPoint[]} Array of heatmap data points.
+   */
   const generateHeatmapRowData = (): HeatmapDataPoint[] => {
     const data: HeatmapDataPoint[] = [];
     const hours = 24;
@@ -60,6 +63,10 @@ export const useDashboardStore = defineStore("dashboard", () => {
     return data;
   };
 
+  /**
+   * Generates random merchant data.
+   * @returns {Merchant[]} Array of merchant transaction data.
+   */
   const generateMerchantData = () => {
     const merchants = [
       "Baghdad Electronics - Online Store",
@@ -83,6 +90,10 @@ export const useDashboardStore = defineStore("dashboard", () => {
     }));
   };
 
+  /**
+   * Generates transaction volume data for the last 7 days.
+   * @returns {LineDataPoint[]} Array of line chart data points.
+   */
   const generateLineData = () => {
     const today = new Date();
     const last7DaysData = Array.from({ length: 7 }, (_, i) => {
@@ -161,6 +172,7 @@ export const useDashboardStore = defineStore("dashboard", () => {
     "date",
     "status",
   ];
+
   const tableRows = ref<(string | number)[][]>(
     merchants.value?.map((merchant) => Object.values(merchant))
   );

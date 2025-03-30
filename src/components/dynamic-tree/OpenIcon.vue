@@ -3,7 +3,7 @@
  * Animated arrow icon that toggles direction
  * @prop {boolean} isOpen - Controls arrow direction
  *
- * @example <OpenIcon :isOpen="isExpanded" />
+ * @example <OpenIcon :isOpen="true" />
  */
 
 import ICONS from "@/utils/icons";

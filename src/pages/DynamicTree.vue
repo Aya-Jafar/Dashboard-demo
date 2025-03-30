@@ -9,7 +9,7 @@
  *
  * @example <DynamicTree />
  */
-import { ref, watch, computed, watchEffect } from "vue";
+import { ref, watch, computed } from "vue";
 import Button from "@components/common/Button.vue";
 import TreeNode from "@components/dynamic-tree/TreeNode.vue";
 import CreateNodeModal from "@components/dynamic-tree/CreateNodeModal.vue";

@@ -16,6 +16,23 @@ export const useLayoutStore = defineStore("layout", () => {
   const isSidebarOpen = ref(true);
   const { locale } = useI18n();
   const isMobile = ref(false);
+  
+  // Side bar tabs
+  const tabs = ref<Tab[]>([
+    {
+      id: 1,
+      label: "dashboard",
+      icon: ICONS.HOME,
+      component: () => import("@/pages/Dashboard.vue"),
+    },
+    {
+      id: 2,
+      label: "departments",
+      icon: ICONS.BUILDINGS,
+      component: () => import("@/pages/DynamicTree.vue"),
+    },
+  ]);
+
 
   const toggleSidebar = () => (isSidebarOpen.value = !isSidebarOpen.value);
 
@@ -36,22 +53,6 @@ export const useLayoutStore = defineStore("layout", () => {
     { immediate: true }
   );
 
-  // Define the tabs
-  const tabs = ref<Tab[]>([
-    {
-      id: 1,
-      label: "dashboard",
-      icon: ICONS.HOME,
-      component: () => import("@/pages/Dashboard.vue"),
-    },
-    {
-      id: 2,
-      label: "departments",
-      icon: ICONS.BUILDINGS,
-      component: () => import("@/pages/DynamicTree.vue"),
-    },
-  ]);
-
   // Track window width for responsive behavior
   const checkScreenSize = () => {
     isMobile.value = window.innerWidth < 768; // 768px is typical breakpoint for tablets
@@ -59,7 +60,6 @@ export const useLayoutStore = defineStore("layout", () => {
       toggleSidebar();
     }
   };
-
 
   return {
     tabs,

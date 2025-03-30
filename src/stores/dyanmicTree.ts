@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { ref, computed, type Ref } from "vue";
+import { ref, type Ref } from "vue";
 import { APIService } from "@/services/ApiService";
 import API_ENDPOINTS from "@/utils/endpoints";
 import { useSnackbarStore } from "@/stores/snackbar";
@@ -15,7 +15,7 @@ interface Node {
   numberOfEmployees: number;
   children?: Array<any>;
   isOpen?: boolean;
-  visible?:boolean
+  visible?: boolean;
 }
 
 // ==================== STORE DEFINITION ====================
@@ -23,12 +23,17 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
   const isLoading = ref(false);
   const nodes = ref<any[]>([]);
   const currentPage = ref(1);
-  const pageSize = ref(7);
+  const itemsPerPage = ref(7);
   const searchLabel = ref("");
-
   const snackbarStore = useSnackbarStore();
 
-  // Fetch Initial data (parentId = null)
+
+  /**
+   * Fetches main data (nodes with parentId = null)
+   * @param {number} page - Page number
+   * @param {string} [label=""] - Label filter
+   * @returns {Promise<void>}
+   */
   const fetchMainData = async (
     page: number,
     label: string = ""
@@ -40,15 +45,11 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
         endpoint: API_ENDPOINTS.DEPARTMENTS,
         method: "GET",
         pathParams: `?parentId=null&page=${page}&limit=${
-          pageSize.value
+          itemsPerPage.value
         }&label=${encodeURIComponent(label)}&sortBy=createdAt&order=desc`,
         setLoading: (loading: boolean) => (isLoading.value = loading),
         setterFunction: (data: any) => {
-          if (page === 1) {
-            nodes.value = data;
-          } else {
-            nodes.value = [...nodes.value, ...data]; // Append new nodes
-          }
+          nodes.value = page === 1 ? data : [...nodes.value, ...data];
         },
       });
     } catch (error) {
@@ -58,12 +59,13 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     }
   };
 
-  // Toggle the visibility of nodes
+  /**
+   * Toggles visibility of a node
+   * @param {string} nodeId - Node ID
+   */
   const toggleNodeVisibility = (nodeId: string): void => {
     const node = nodes.value.find((node: any) => node.id === nodeId);
-    if (node) {
-      node.visible = !node.visible;
-    }
+    if (node) node.visible = !node.visible;
   };
 
   // Recursive function to open or close nodes based on the search label
@@ -101,26 +103,26 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     });
   };
 
-  const refetch = async (parentId: string | null): Promise<void> => {
+  /**
+   * Fetches child nodes of a given parent
+   * @param {string | null} parentId - Parent node ID
+   * @returns {Promise<void>}
+   */
+  const fetchChildren = async (parentId: string | null): Promise<void> => {
     try {
       await APIService.request<Node[]>({
         endpoint: API_ENDPOINTS.DEPARTMENTS,
         method: "GET",
-        pathParams: `?parentId=${parentId}&page=1&limit=${pageSize.value}&sortBy=createdAt&order=desc`, // Fetch the first page
+        pathParams: `?parentId=${parentId}&page=1&limit=${itemsPerPage.value}&sortBy=createdAt&order=desc`, // Fetch the first page
         setLoading: (loading: boolean) => (isLoading.value = loading),
         setterFunction: (data: any) => {
           nodes.value = nodes.value.map((node) => {
-            if (node.id === parentId) {
-              // If the node is the parent, update its children
-              return {
-                ...node,
-                children: data.filter(
-                  (item: Node) => item.parentId === parentId
-                ),
-                // filterByExactParentID(data,parentId)
-              };
-            }
-            return node; // Otherwise, return the node as is
+            return node.id === parentId
+              ? {
+                  ...node,
+                  children: filterByExactParentID(data, parentId),
+                }
+              : node;
           });
         },
       });
@@ -162,7 +164,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
       }
 
       //   Refetch data after adding
-      refetch(newNode.parentId);
+      fetchChildren(newNode.parentId);
     } catch (error) {
       snackbarStore.showSnackbar(`API Error: ${error}`, "error");
     } finally {
@@ -170,6 +172,12 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     }
   };
 
+  /**
+   * Opens a node and fetches its children from the API.
+   * @param {Node} node - The node to open.
+   * @param {Ref<string | null>} noChildrenText - Reference to display a message if no children exist.
+   * @param {Ref<boolean>} isLoading - Reference to track the loading state.
+   */
   const openNode = async (
     node: Node,
     noChildrenText: Ref<string | null>,
@@ -199,6 +207,12 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     });
   };
 
+  /**
+   * Recursively finds a node, its parent, and its siblings within a tree structure.
+   * @param {Node[]} nodes - The array of nodes to search.
+   * @param {string} id - The ID of the node to find.
+   * @returns {object} An object containing the found node, its parent, and its siblings.
+   */
   const deepFind = (
     nodes: Node[],
     id: string
@@ -216,6 +230,12 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     return { node: null, parent: null, siblings: [] };
   };
 
+  /**
+   * Moves a node to a new location within the tree.
+   * @param {object} params - The parameters for moving the node.
+   * @param {string} params.nodeId - The ID of the node to move.
+   * @param {string} params.targetNodeId - The ID of the target node.
+   */
   const moveNode = async ({
     nodeId,
     targetNodeId,
@@ -285,7 +305,7 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     isLoading,
     nodes,
     currentPage,
-    pageSize,
+    itemsPerPage,
     searchLabel,
     fetchMainData,
     toggleNodeVisibility,
