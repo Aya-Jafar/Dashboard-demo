@@ -25,14 +25,8 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
   const currentPage = ref(1);
   const pageSize = ref(7);
   const searchLabel = ref("");
-  const totalItems = ref(10);
 
   const snackbarStore = useSnackbarStore();
-
-  // Calculate total pages based on total items and page size
-  const totalPages = computed(() =>
-    Math.ceil(totalItems.value / pageSize.value)
-  );
 
   // Fetch Initial data (parentId = null)
   const fetchMainData = async (
@@ -293,8 +287,6 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
     currentPage,
     pageSize,
     searchLabel,
-    totalItems,
-    totalPages,
     fetchMainData,
     toggleNodeVisibility,
     toggleNodesBySearch,

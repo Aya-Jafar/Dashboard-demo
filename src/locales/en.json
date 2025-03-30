@@ -43,7 +43,7 @@
   "medium": "Medium",
   "high": "High",
   "very_high": "Very High",
-
+  "noMoreItems": "No more items to load",
   "12_am": "12 AM",
   "1_am": "1 AM",
   "2_am": "2 AM",

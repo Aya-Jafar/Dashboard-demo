@@ -1,18 +1,26 @@
 <script setup lang="ts">
-import { ref, watch, computed } from "vue";
+/**
+ * Tree structure component with:
+ * - Hierarchical node display
+ * - Search, lazy loading, and virtualization
+ * - Node/sub-node creation
+ * - Drag-and-drop
+ * - RTL language support
+ *
+ * @example <DynamicTree />
+ */
+import { ref, watch, computed, watchEffect } from "vue";
 import Button from "@components/common/Button.vue";
 import TreeNode from "@components/dynamic-tree/TreeNode.vue";
 import CreateNodeModal from "@components/dynamic-tree/CreateNodeModal.vue";
 import { useDynamicTreeStore } from "@stores/dyanmicTree";
 import NodeDetailsModal from "@components/dynamic-tree/NodeDetailsModal.vue";
-import { useI18n } from "vue-i18n";
 import Loading from "@/components/common/Loading.vue";
 import type { Node } from "@stores/dyanmicTree";
 import { useInfiniteScroll, useVirtualList } from "@vueuse/core";
 
 // Store and states
 const store = useDynamicTreeStore();
-const { locale } = useI18n();
 const isOnline = ref(navigator.onLine);
 const selectedParentId = ref<string | null>(null);
 const selectedNode = ref(null);
@@ -20,17 +28,19 @@ const selectedNode = ref(null);
 // Modal visibility states
 const isCreateNodeModalVisible = ref(false);
 const isDetailsModalVisible = ref(false);
+
+// Virtualization setup and states
 const isLoadingMore = ref(false);
 const listEndRef = ref<HTMLElement | null>(null);
+const hasMore = ref(true);
 
-// Virtual list for tree nodes
 const {
   list: virtualNodes,
   containerProps,
   wrapperProps,
 } = useVirtualList(
-  computed(() => store.nodes), // Wrap in a ref to track reactivity
-  { itemHeight: 80 }
+  computed(() => store.nodes),
+  { itemHeight: 20 }
 );
 
 // Function to handle creating a new node
@@ -45,7 +55,7 @@ watch(
   (newLabel) => {
     if (isOnline.value) {
       store.currentPage = 1;
-      store.nodes = [];
+      store.nodes = []; 
       isLoadingMore.value = true;
       store.fetchMainData(store.currentPage, newLabel).finally(() => {
         isLoadingMore.value = false;
@@ -54,43 +64,28 @@ watch(
   },
   { immediate: true }
 );
-const scrollContainer = ref<HTMLElement>();
-const hasMore = ref(true);
 
 const loadMore = async () => {
-  console.log("Trying to load more..."); // Debugging log
-
-  if (
-    !isOnline.value ||
-    isLoadingMore.value ||
-    !hasMore.value ||
-    store.isLoading
-  ) {
-    console.log("Blocked due to conditions ❌");
+  if (!isOnline.value || !hasMore.value || isLoadingMore.value) {
     return;
   }
+  store.currentPage++;
+  const previousLength = store.nodes.length;
 
-  console.log("Loading next page... ✅");
-  isLoadingMore.value = true;
   try {
-    const currentLength = store.nodes.length;
-    await store.fetchMainData(store.currentPage + 1, store.searchLabel);
-
-    if (store.nodes.length > currentLength) {
-      store.currentPage++;
-    } else {
-      hasMore.value = false;
-    }
-  } finally {
+    isLoadingMore.value = true;
+    await store.fetchMainData(store.currentPage, store.searchLabel);
     isLoadingMore.value = false;
+  } catch (error) {
+    return;
+  }
+  // If no new data was added, stop further requests
+  if (store.nodes.length === previousLength) {
+    hasMore.value = false;
   }
 };
-
-
-useInfiniteScroll(scrollContainer, loadMore, {
-  distance: 10,
-  direction: "bottom",
-});
+// Lazy loading
+useInfiniteScroll(listEndRef, loadMore, { distance: 10 });
 
 // Handle showing the details modal
 const showNodeDetails = (node: any) => {
@@ -110,13 +105,10 @@ const handleNodeCreate = async (newNode: Node) => {
   }
   isCreateNodeModalVisible.value = false;
 };
-
-const isRTL = computed(() => locale.value === "ar");
 </script>
 
 <template>
   <div
-   ref="scrollContainer"
     :class="{ 'blur-sm': isCreateNodeModalVisible || isDetailsModalVisible }"
     aria-modal="true"
     aria-labelledby="modal-title"
@@ -145,7 +137,7 @@ const isRTL = computed(() => locale.value === "ar");
     </div>
 
     <!-- Initial Loading State -->
-    <div v-if="store.isLoading && store.nodes.length === 0">
+    <div v-if="store.isLoading && store.currentPage === 1">
       <Loading />
     </div>
 
@@ -157,9 +149,8 @@ const isRTL = computed(() => locale.value === "ar");
     </div>
 
     <!-- Virtualized Tree Rendering -->
-
-    <div v-else style="height: 70vh">
-      <div class="overflow-y-auto" v-bind="containerProps"  >
+    <div v-else>
+      <div v-bind="containerProps" class="h-screen">
         <div v-bind="wrapperProps">
           <div
             v-for="node in virtualNodes"
@@ -180,8 +171,8 @@ const isRTL = computed(() => locale.value === "ar");
     </div>
 
     <!-- Lazy Load Trigger -->
-    <div class="h-10 flex justify-center items-center">
-      <Loading v-if="isLoadingMore" />
+    <div class="h-10 flex justify-center items-center" ref="listEndRef">
+      <Loading v-if="isLoadingMore && store.currentPage > 1" />
       <p v-else-if="!hasMore" class="text-gray-400">
         {{ $t("noMoreItems") }}
       </p>
