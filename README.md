@@ -4,10 +4,6 @@
 
 This is the repo's for software engineering tasks
 
-<p align="center">
-  <img src="/src/assets/result.jpg" width="45%" />
-  <img src="/src/assets/result-ar.jpg" width="45%" />
-</p>
 
 # Dynamic Tree
 
@@ -103,7 +99,8 @@ ws.connect();
 - Implemented using [apexcharts](https://apexcharts.com/)
 - Used similar color schema and took UI inspiration from [this design](https://i.pinimg.com/736x/a8/8d/6a/a88d6a49607e0232966d655a8e00ac00.jpg)
 
-![alt-image](/src/assets/Screenshot%202025-03-28%20at%209.33.30%20PM.png)
+![alt-image](/src/assets/result.jpg)
+![alt-image](/src/assets/result-ar.jpg)
 
 ## Development Setup
 
