@@ -99,8 +99,9 @@ ws.connect();
 - Implemented using [apexcharts](https://apexcharts.com/)
 - Used similar color schema and took UI inspiration from [this design](https://i.pinimg.com/736x/a8/8d/6a/a88d6a49607e0232966d655a8e00ac00.jpg)
 
-![alt-image](/src/assets/result.jpg)
-![alt-image](/src/assets/result-ar.jpg)
+![alt](/src/assets/result.jpg)
+
+![alt](/src/assets/result-ar.jpg)
 
 ## Development Setup
 
