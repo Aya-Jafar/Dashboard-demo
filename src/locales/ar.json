@@ -38,6 +38,10 @@
   "invalid_employee_count": "يجب أن يكون عدد الموظفين رقمًا غير سالب.",
   "export": "تصدير",
   "lineChartTitle": "حجم المعاملات (دينار عراقي)",
+  "connection_connecting": "جاري الاتصال...",
+  "connection_error_ws": "خطأ في الاتصال",
+  "connection_disconnected": "غير متصل",
+  "connection_connected": "متصل",
 
   "low": "منخفض",
   "medium": "متوسط",

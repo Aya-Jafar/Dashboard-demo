@@ -118,15 +118,15 @@ const heightValue = computed(() => (isSidebarOpen ? "h-40" : "h-50"));
             'text-red-500': connectionStatus === 'disconnected',
           }"
         >
-          {{
-            connectionStatus === "connecting"
-              ? "Connecting..."
-              : connectionStatus === "error"
-              ? "Connection error"
-              : connectionStatus === "disconnected"
-              ? "Disconnected"
-              : "Connected"
-          }}
+         {{
+        connectionStatus === "connecting"
+          ? $t("connection_connecting")
+          : connectionStatus === "error"
+          ? $t("connection_error")
+          : connectionStatus === "disconnected"
+          ? $t("connection_disconnected")
+          : $t("connection_connected")
+      }}
         </span>
       </div>
     </div>
