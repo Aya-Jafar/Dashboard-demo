@@ -27,7 +27,6 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
   const searchLabel = ref("");
   const snackbarStore = useSnackbarStore();
 
-
   /**
    * Fetches main data (nodes with parentId = null)
    * @param {number} page - Page number
@@ -36,13 +35,14 @@ export const useDynamicTreeStore = defineStore("tree-node", () => {
    */
   const fetchMainData = async (
     page: number,
-    label: string = ""
+    label: string = "",
+    endpoint: string = API_ENDPOINTS.DEPARTMENTS
   ): Promise<void> => {
     try {
       isLoading.value = true;
 
       await APIService.request<Node[]>({
-        endpoint: API_ENDPOINTS.DEPARTMENTS,
+        endpoint: endpoint || API_ENDPOINTS.DEPARTMENTS,
         method: "GET",
         pathParams: `?parentId=null&page=${page}&limit=${
           itemsPerPage.value

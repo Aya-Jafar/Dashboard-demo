@@ -18,6 +18,8 @@ import NodeDetailsModal from "@components/dynamic-tree/NodeDetailsModal.vue";
 import Loading from "@/components/common/Loading.vue";
 import type { Node } from "@stores/dyanmicTree";
 import { useInfiniteScroll, useVirtualList } from "@vueuse/core";
+import API_ENDPOINTS from "@/utils/endpoints";
+import { getEndpointForPage } from "@/utils/helpers";
 
 // Store and states
 const store = useDynamicTreeStore();
@@ -40,7 +42,7 @@ const {
   wrapperProps,
 } = useVirtualList(
   computed(() => store.nodes),
-  { itemHeight: 20 }
+  { itemHeight: 80, overscan: 10 }
 );
 
 // Function to handle creating a new node
@@ -55,7 +57,7 @@ watch(
   (newLabel) => {
     if (isOnline.value) {
       store.currentPage = 1;
-      store.nodes = []; 
+      store.nodes = [];
       isLoadingMore.value = true;
       store.fetchMainData(store.currentPage, newLabel).finally(() => {
         isLoadingMore.value = false;
@@ -74,7 +76,15 @@ const loadMore = async () => {
 
   try {
     isLoadingMore.value = true;
-    await store.fetchMainData(store.currentPage, store.searchLabel);
+    // Determine which endpoint to use based on current page
+    const endpoint = getEndpointForPage(store.currentPage + 1);
+
+    await store.fetchMainData(
+      store.currentPage + 1, // Request next page
+      store.searchLabel,
+      endpoint
+    );
+
     isLoadingMore.value = false;
   } catch (error) {
     return;
@@ -85,7 +95,10 @@ const loadMore = async () => {
   }
 };
 // Lazy loading
-useInfiniteScroll(listEndRef, loadMore, { distance: 10 });
+useInfiniteScroll(listEndRef, loadMore, {
+  distance: 20,
+  direction: "bottom",
+});
 
 // Handle showing the details modal
 const showNodeDetails = (node: any) => {
@@ -111,6 +124,7 @@ const handleNodeCreate = async (newNode: Node) => {
   <div
     :class="{ 'blur-sm': isCreateNodeModalVisible || isDetailsModalVisible }"
     aria-modal="true"
+    v-bind="containerProps"
     aria-labelledby="modal-title"
   >
     <!-- Search and New Button -->
@@ -149,9 +163,9 @@ const handleNodeCreate = async (newNode: Node) => {
     </div>
 
     <!-- Virtualized Tree Rendering -->
-    <div v-else>
-      <div v-bind="containerProps" class="h-screen">
-        <div v-bind="wrapperProps">
+    <div v-else v-bind="wrapperProps">
+      <div class="h-[10vh]">
+        <div>
           <div
             v-for="node in virtualNodes"
             :key="node.data.id"
@@ -166,16 +180,19 @@ const handleNodeCreate = async (newNode: Node) => {
               @node-move="store.moveNode"
             />
           </div>
+          <!-- Lazy Load Trigger -->
+          <div
+            class="h-10 flex justify-center items-center"
+            ref="listEndRef"
+            v-if="hasMore || isLoadingMore"
+          >
+            <Loading v-if="isLoadingMore && store.currentPage > 1" />
+            <p v-else-if="!hasMore" class="text-gray-400">
+              {{ $t("noMoreItems") }}
+            </p>
+          </div>
         </div>
       </div>
-    </div>
-
-    <!-- Lazy Load Trigger -->
-    <div class="h-10 flex justify-center items-center" ref="listEndRef">
-      <Loading v-if="isLoadingMore && store.currentPage > 1" />
-      <p v-else-if="!hasMore" class="text-gray-400">
-        {{ $t("noMoreItems") }}
-      </p>
     </div>
   </div>
 

@@ -1,5 +1,6 @@
 import type { Node } from "../stores/dyanmicTree";
 import { useI18n } from "vue-i18n";
+import API_ENDPOINTS from "./endpoints";
 
 /**
  * Filters by the exact parent ID to get the correct children
@@ -94,8 +95,8 @@ export const debounce = (func: Function, wait: number) => {
 };
 
 /**
- * 
- * @returns Random data point for line chart 
+ *
+ * @returns Random data point for line chart
  */
 export const generateRandomY = () => {
   const base = 500; // Center point
@@ -104,4 +105,15 @@ export const generateRandomY = () => {
       ? Math.floor(Math.random() * 1500) // Big positive spike (50% chance)
       : -Math.floor(Math.random() * 700); // Negative dip (50% chance)
   return Math.max(300, Math.min(2000, base + fluctuation)); // Keep within bounds
+};
+
+export const getEndpointForPage = (page: number): string | undefined => {
+  const endpoints = [
+    API_ENDPOINTS.DEPARTMENTS,
+    API_ENDPOINTS.DEPARTMENTS2,
+    API_ENDPOINTS.DEPARTMENTS3,
+  ];
+
+  // Round-robin selection
+  return endpoints[(page - 1) % endpoints.length] || endpoints[0];
 };

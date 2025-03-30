@@ -4,7 +4,9 @@
  */
 
 enum API_ENDPOINTS {
-  DEPARTMENTS="/departments"
+  DEPARTMENTS = "/departments",
+  DEPARTMENTS2 = "/departments-2", // for fetching more data and get rid of the first resourse limit
+  DEPARTMENTS3 = "/departments-3", 
 }
 
 
