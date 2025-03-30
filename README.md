@@ -101,7 +101,6 @@ ws.connect();
 
 ![alt](/src/assets/result.jpg)
 
-![alt](/src/assets/result-ar.jpg)
 
 ## Development Setup
 
