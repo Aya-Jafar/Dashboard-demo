@@ -4,25 +4,30 @@
 
 This is the repo's for software engineering tasks
 
+<p align="center">
+  <img src="/src/assets/result.jpg" width="45%" />
+  <img src="/src/assets/result-ar.jpg" width="45%" />
+</p>
+
 # Dynamic Tree
 
 I used [Mock API](https://mockapi.io) and generate data with this structure:
 
 ```json
 {
-    "id": "dept-root-1",
-    "label": "Human Resources",
-    "parentId": null,
-    "createdAt": 1637003251499,
-    "description": "Handles recruitment, employee relations, and benefits.",
-    "numberOfEmployees": 21
+  "id": "dept-root-1",
+  "label": "Human Resources",
+  "parentId": null,
+  "createdAt": 1637003251499,
+  "description": "Handles recruitment, employee relations, and benefits.",
+  "numberOfEmployees": 21
 }
 ```
+
 The data was splied into 3 resourses due to the limit of the Mock API (with the paid version as well) and with using the same fetch approch and switching between differnt resources.
 All used resourses are stored in `/src/utils/endpoints.ts`.
 I also thought this could be a **simulation for real scenarios where big data is stored in multiple servers or resources**.
 ![img](/src/assets/image.png)
-
 
 ### Lazy Loading Mechanism
 
@@ -75,8 +80,8 @@ const {
 ```
 
 ### Metric
-![alt](/src/assets/image%20copy.png)
 
+![alt](/src/assets/image%20copy.png)
 
 # Dashboard 📈
 
