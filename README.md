@@ -25,7 +25,7 @@ All used resourses are stored in `/src/utils/endpoints.ts`.
 I also thought this could be a **simulation for real scenarios where big data is stored in multiple servers or resources**.
 ![img](/src/assets/image.png)
 
-### Lazy Loading Mechanism
+### Lazy Loading Mechanism with node toggle
 
 Insetead of nesting objects for parents and children (which I tried at first but could not find a possiable way to do the lazy loading with it),This will provide the lazy loading functionality by filtering based on the parentId only to get the children
 
