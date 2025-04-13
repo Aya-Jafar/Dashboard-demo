@@ -41,7 +41,7 @@ const {
   wrapperProps,
 } = useVirtualList(
   computed(() => store.nodes),
-  { itemHeight: 80, overscan: 10 }
+  { itemHeight: 95, overscan: 10 }
 );
 
 // Function to handle creating a new node
@@ -133,7 +133,7 @@ const handleNodeCreate = async (newNode: Node) => {
         type="text"
         aria-label="Node search input"
         :placeholder="$t('search')"
-        class="p-2 rounded-md w-80 bg-slate-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+        class="p-2 rounded-md w-80 bg-slate-800 text-white placeholder-gray-400 focus:outline-none"
       />
       <Button
         :action="() => handleCreateNode(null)"
@@ -163,7 +163,7 @@ const handleNodeCreate = async (newNode: Node) => {
 
     <!-- Virtualized Tree Rendering -->
     <div v-else v-bind="wrapperProps">
-      <div class="h-[10vh]">
+      <div>
         <div>
           <div
             v-for="node in virtualNodes"
@@ -181,7 +181,7 @@ const handleNodeCreate = async (newNode: Node) => {
           </div>
           <!-- Lazy Load Trigger -->
           <div
-            class="h-10 flex justify-center items-center"
+            class="flex justify-center items-center"
             ref="listEndRef"
             v-if="hasMore || isLoadingMore"
           >
