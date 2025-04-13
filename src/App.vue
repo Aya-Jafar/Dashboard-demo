@@ -83,13 +83,6 @@ onUnmounted(() => {
         class="flex items-center mb-6"
         :class="isSidebarOpen ? 'justify-between' : 'flex-col'"
       >
-        <img
-          src="/src/assets/Qi Card PNG.png"
-          alt="logo"
-          :class="isSidebarOpen ? 'w-13 h-13' : 'w-10 h-10'"
-          fetchPriority="high"
-        />
-
         <!-- Toggle Button -->
         <button
           @click="layoutStore.toggleSidebar"
