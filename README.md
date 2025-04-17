@@ -1,6 +1,8 @@
 # Dashboard Demo
 
-## Vue 3 + TypeScript + Vite
+[![Vue 3](https://img.shields.io/badge/Vue%203-4FC08D?logo=vue.js&logoColor=white&style=for-the-badge)](https://vuejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white&style=for-the-badge)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white&style=for-the-badge)](https://vitejs.dev/)
 
 This is the repo's for software engineering tasks
 
