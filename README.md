@@ -9,7 +9,7 @@ This is the repo's for a software engineering task
 
 # Dynamic Tree
 
-I used [Mock API](https://mockapi.io) and generate data with this structure:
+I used [Mock API](https://mockapi.io) and generated data with this structure:
 
 ```json
 {
