@@ -1,4 +1,4 @@
-# Tasks Demo
+# Dashboard Demo
 
 ## Vue 3 + TypeScript + Vite
 
