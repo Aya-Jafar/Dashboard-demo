@@ -4,7 +4,6 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white&style=for-the-badge)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white&style=for-the-badge)](https://vitejs.dev/)
 
-This is the repo's for a software engineering task
 
 ![result](https://github.com/Aya-Jafar/Dashboard-demo/blob/main/Tech%20Gaming%20Retail%20Website%20Design%20(14).png)
 
