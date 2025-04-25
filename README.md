@@ -6,6 +6,7 @@
 
 This is the repo's for a software engineering task
 
+![result](https://github.com/Aya-Jafar/Dashboard-demo/blob/main/Tech%20Gaming%20Retail%20Website%20Design%20(14).png)
 
 # Dynamic Tree
 
